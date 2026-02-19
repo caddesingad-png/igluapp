@@ -128,7 +128,7 @@ const Sets = () => {
               className="rounded-2xl border border-border bg-card overflow-hidden cursor-pointer group"
               onClick={() => navigate(`/sets/${set.id}`)}
             >
-              {/* Collage preview */}
+              {/* Collage preview with name overlay */}
               <div className="relative flex gap-1 p-2 bg-muted/30">
                 {/* Cover photo - square */}
                 <div className="w-[52%] shrink-0">
@@ -166,61 +166,49 @@ const Sets = () => {
                 </div>
               </div>
 
-              {/* Info + actions */}
-              <div className="px-3 py-2.5">
-                <div className="flex items-start justify-between gap-1">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate leading-tight">{set.name}</p>
-                    {set.occasion && (
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">{set.occasion}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {set.product_count} produto{set.product_count !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => handleShare(set)}
-                    >
-                      <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+              {/* Info row */}
+              <div className="px-3 pt-2 pb-1">
+                <p className="text-sm font-semibold text-foreground leading-tight line-clamp-1">{set.name}</p>
+                {set.occasion && (
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">{set.occasion}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {set.product_count} produto{set.product_count !== 1 ? "s" : ""}
+                </p>
+              </div>
+
+              {/* Actions row */}
+              <div className="flex items-center justify-end px-1 pb-1" onClick={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleShare(set)}>
+                  <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate(`/sets/${set.id}/edit`)}>
+                  <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigate(`/sets/${set.id}/edit`)}
-                    >
-                      <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Deletar set?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Isso removerá permanentemente <strong>{set.name}</strong>.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(set.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Deletar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Deletar set?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Isso removerá permanentemente <strong>{set.name}</strong>.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(set.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Deletar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           ))}
