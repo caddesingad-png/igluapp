@@ -22,12 +22,12 @@ interface Product {
   category: string;
   purchase_price: number;
   photo_url: string | null;
-  color_codes: string[];
   pao_months: number;
   purchase_date: string;
   usage_frequency: string;
   is_favorite: boolean;
   created_at: string;
+  current_color?: string | null;
 }
 
 const CATEGORIES = [
@@ -67,10 +67,31 @@ const Library = () => {
   useEffect(() => {
     if (!user) return;
     const fetchProducts = async () => {
-      const { data, error } = await (supabase.from("products" as any) as any)
-        .select("id, name, brand, category, purchase_price, photo_url, color_codes, pao_months, purchase_date, usage_frequency, is_favorite, created_at")
-        .eq("user_id", user.id);
-      if (!error && data) setProducts(data);
+      const [productsRes, colorsRes] = await Promise.all([
+        (supabase.from("products" as any) as any)
+          .select("id, name, brand, category, purchase_price, photo_url, pao_months, purchase_date, usage_frequency, is_favorite, created_at")
+          .eq("user_id", user.id),
+        (supabase.from("product_color_codes" as any) as any)
+          .select("product_id, code")
+          .eq("user_id", user.id)
+          .eq("is_current", true),
+      ]);
+
+      if (!productsRes.error && productsRes.data) {
+        // Attach current_color to each product
+        const currentByProduct: Record<string, string> = {};
+        if (!colorsRes.error && colorsRes.data) {
+          for (const row of colorsRes.data) {
+            currentByProduct[row.product_id] = row.code;
+          }
+        }
+        setProducts(
+          productsRes.data.map((p: Product) => ({
+            ...p,
+            current_color: currentByProduct[p.id] ?? null,
+          }))
+        );
+      }
       setLoading(false);
     };
     fetchProducts();

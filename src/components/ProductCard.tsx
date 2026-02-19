@@ -1,8 +1,7 @@
 import {
-  Sparkles, FlaskConical, Palette, Eye, Wind, Wand2,
-  Layers, Sun, Droplets, Star, Heart
+  Sparkles, FlaskConical, Eye, Wind, Wand2,
+  Layers, Sun, Droplets, Star, Heart, Palette
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -12,6 +11,7 @@ interface Product {
   purchase_price: number;
   photo_url: string | null;
   is_favorite?: boolean;
+  current_color?: string | null; // hex or named color for current shade
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -28,6 +28,13 @@ const categoryIcons: Record<string, React.ElementType> = {
   Other: Star,
 };
 
+const isValidColor = (c: string) => {
+  if (!c) return false;
+  const s = new Option().style;
+  s.color = c;
+  return s.color !== "";
+};
+
 interface ProductCardProps {
   product: Product;
   viewMode?: "grid" | "list";
@@ -36,6 +43,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) => {
   const Icon = categoryIcons[product.category] ?? Star;
+  const hasValidSwatch = product.current_color && isValidColor(product.current_color);
 
   if (viewMode === "list") {
     return (
@@ -56,14 +64,30 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
             <Icon className="w-6 h-6 text-muted-foreground/50" />
           )}
         </div>
+
         {/* Info */}
         <div className="flex-1 min-w-0">
           <p className="text-xs text-muted-foreground truncate">{product.brand}</p>
           <p className="text-sm font-semibold text-foreground truncate">{product.name}</p>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-            {product.category}
-          </span>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+              {product.category}
+            </span>
+            {hasValidSwatch && (
+              <div
+                className="w-3.5 h-3.5 rounded-full border border-border shadow-sm shrink-0"
+                style={{ backgroundColor: product.current_color! }}
+                title={`Current shade: ${product.current_color}`}
+              />
+            )}
+            {product.current_color && !hasValidSwatch && (
+              <span className="text-[10px] font-mono text-muted-foreground truncate max-w-[60px]">
+                {product.current_color}
+              </span>
+            )}
+          </div>
         </div>
+
         {/* Price + Fav */}
         <div className="flex flex-col items-end gap-1 shrink-0">
           <span className="text-sm font-semibold text-foreground">
@@ -77,6 +101,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
     );
   }
 
+  // Grid
   return (
     <div
       onClick={onClick}
@@ -100,6 +125,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
           </div>
         )}
       </div>
+
       {/* Info */}
       <div className="p-3">
         <p className="text-xs text-muted-foreground truncate">{product.brand}</p>
@@ -112,6 +138,21 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
             ${product.purchase_price.toFixed(2)}
           </span>
         </div>
+
+        {/* Current color swatch row */}
+        {product.current_color && (
+          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border">
+            {hasValidSwatch ? (
+              <div
+                className="w-4 h-4 rounded-full border border-border shadow-sm shrink-0"
+                style={{ backgroundColor: product.current_color }}
+              />
+            ) : null}
+            <span className="text-[10px] font-mono text-muted-foreground truncate">
+              {product.current_color}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
