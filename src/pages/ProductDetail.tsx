@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Pencil, Trash2, Calendar, DollarSign,
-  Clock, Repeat, Weight, StickyNote, Plus, Check, X, Star
+  Clock, Repeat, Weight, StickyNote, Plus, Check, X, Star,
+  ShoppingBag, Store, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,16 @@ interface ColorCode {
   is_current: boolean;
 }
 
+interface PurchaseRecord {
+  id: string;
+  price: number;
+  color_code: string | null;
+  purchase_date: string;
+  store: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
 const categoryIcons: Record<string, React.ElementType> = {
   Foundation: Layers,
   Lipstick: HeartIcon,
@@ -54,13 +65,15 @@ const categoryIcons: Record<string, React.ElementType> = {
   Other: Star,
 };
 
-/** Detect if a hex-ish string is a valid CSS color */
 const isValidColor = (c: string) => {
   if (!c) return false;
   const s = new Option().style;
   s.color = c;
   return s.color !== "";
 };
+
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,18 +95,36 @@ const ProductDetail = () => {
   const [editingNoteValue, setEditingNoteValue] = useState("");
   const newCodeRef = useRef<HTMLInputElement>(null);
 
+  // Purchase history state
+  const [purchases, setPurchases] = useState<PurchaseRecord[]>([]);
+  const [addingPurchase, setAddingPurchase] = useState(false);
+  const [savingPurchase, setSavingPurchase] = useState(false);
+  const [purchaseForm, setPurchaseForm] = useState({
+    price: "",
+    color_code: "",
+    purchase_date: new Date().toISOString().slice(0, 10),
+    store: "",
+    notes: "",
+  });
+  const [showAllPurchases, setShowAllPurchases] = useState(false);
+
   useEffect(() => {
     if (!id) return;
     const fetchAll = async () => {
-      const [productRes, colorsRes] = await Promise.all([
+      const [productRes, colorsRes, purchasesRes] = await Promise.all([
         (supabase.from("products" as any) as any).select("*").eq("id", id).single(),
         (supabase.from("product_color_codes" as any) as any)
           .select("id, code, note, is_current")
           .eq("product_id", id)
           .order("created_at", { ascending: true }),
+        (supabase.from("purchase_history" as any) as any)
+          .select("id, price, color_code, purchase_date, store, notes, created_at")
+          .eq("product_id", id)
+          .order("purchase_date", { ascending: false }),
       ]);
       if (!productRes.error && productRes.data) setProduct(productRes.data);
       if (!colorsRes.error && colorsRes.data) setColorCodes(colorsRes.data);
+      if (!purchasesRes.error && purchasesRes.data) setPurchases(purchasesRes.data);
       setLoading(false);
     };
     fetchAll();
@@ -125,7 +156,7 @@ const ProductDetail = () => {
     }
   };
 
-  // ── Color code actions ──────────────────────────────────────────────────────
+  // ── Color code actions ──
 
   const handleAddColor = async () => {
     if (!newCode.trim() || !user || !id) return;
@@ -136,7 +167,7 @@ const ProductDetail = () => {
         user_id: user.id,
         code: newCode.trim(),
         note: newNote.trim() || null,
-        is_current: colorCodes.length === 0, // first one auto-becomes current
+        is_current: colorCodes.length === 0,
       })
       .select("id, code, note, is_current")
       .single();
@@ -153,16 +184,11 @@ const ProductDetail = () => {
 
   const handleSetCurrent = async (ccId: string) => {
     if (!id) return;
-    // Unset all for product, then set this one
     await (supabase.from("product_color_codes" as any) as any)
-      .update({ is_current: false })
-      .eq("product_id", id);
+      .update({ is_current: false }).eq("product_id", id);
     await (supabase.from("product_color_codes" as any) as any)
-      .update({ is_current: true })
-      .eq("id", ccId);
-    setColorCodes((prev) =>
-      prev.map((c) => ({ ...c, is_current: c.id === ccId }))
-    );
+      .update({ is_current: true }).eq("id", ccId);
+    setColorCodes((prev) => prev.map((c) => ({ ...c, is_current: c.id === ccId })));
   };
 
   const handleDeleteColor = async (ccId: string) => {
@@ -170,7 +196,6 @@ const ProductDetail = () => {
       .delete().eq("id", ccId);
     if (!error) {
       const remaining = colorCodes.filter((c) => c.id !== ccId);
-      // If we deleted the current one, auto-promote the first remaining
       const wasCurrent = colorCodes.find((c) => c.id === ccId)?.is_current;
       if (wasCurrent && remaining.length > 0) {
         await (supabase.from("product_color_codes" as any) as any)
@@ -183,15 +208,76 @@ const ProductDetail = () => {
 
   const handleSaveNote = async (ccId: string) => {
     await (supabase.from("product_color_codes" as any) as any)
-      .update({ note: editingNoteValue.trim() || null })
-      .eq("id", ccId);
+      .update({ note: editingNoteValue.trim() || null }).eq("id", ccId);
     setColorCodes((prev) =>
       prev.map((c) => c.id === ccId ? { ...c, note: editingNoteValue.trim() || null } : c)
     );
     setEditingNoteId(null);
   };
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ── Purchase history actions ──
+
+  const handleAddPurchase = async () => {
+    if (!purchaseForm.price || !user || !id) return;
+    const priceNum = parseFloat(purchaseForm.price);
+    if (isNaN(priceNum) || priceNum < 0) {
+      toast({ title: "Invalid price", variant: "destructive" });
+      return;
+    }
+    setSavingPurchase(true);
+    const { data, error } = await (supabase.from("purchase_history" as any) as any)
+      .insert({
+        product_id: id,
+        user_id: user.id,
+        price: priceNum,
+        color_code: purchaseForm.color_code.trim() || null,
+        purchase_date: purchaseForm.purchase_date,
+        store: purchaseForm.store.trim() || null,
+        notes: purchaseForm.notes.trim() || null,
+      })
+      .select("id, price, color_code, purchase_date, store, notes, created_at")
+      .single();
+    if (!error && data) {
+      setPurchases((prev) => [data, ...prev]);
+      setPurchaseForm({
+        price: "",
+        color_code: "",
+        purchase_date: new Date().toISOString().slice(0, 10),
+        store: "",
+        notes: "",
+      });
+      setAddingPurchase(false);
+      toast({ title: "Purchase recorded!" });
+    } else {
+      toast({ title: "Error", description: "Could not save purchase.", variant: "destructive" });
+    }
+    setSavingPurchase(false);
+  };
+
+  const handleDeletePurchase = async (pId: string) => {
+    const { error } = await (supabase.from("purchase_history" as any) as any)
+      .delete().eq("id", pId);
+    if (!error) setPurchases((prev) => prev.filter((p) => p.id !== pId));
+  };
+
+  // Price trend helper
+  const getPriceTrend = (idx: number): React.ReactNode => {
+    if (idx >= purchases.length - 1) return null; // oldest purchase, no comparison
+    const current = purchases[idx].price;
+    const previous = purchases[idx + 1].price;
+    const diff = current - previous;
+    if (Math.abs(diff) < 0.01) return null;
+    const sign = diff > 0 ? "↑" : "↓";
+    const color = diff > 0 ? "text-destructive" : "text-green-600 dark:text-green-400";
+    const label = diff > 0 ? "more expensive" : "cheaper";
+    return (
+      <span className={`text-xs font-medium ${color}`}>
+        {sign} {formatCurrency(Math.abs(diff))} {label} than last time
+      </span>
+    );
+  };
+
+  // ──────────────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -230,6 +316,8 @@ const ProductDetail = () => {
       </div>
     </div>
   );
+
+  const visiblePurchases = showAllPurchases ? purchases : purchases.slice(0, 3);
 
   return (
     <div className="min-h-screen pb-10 bg-background">
@@ -312,7 +400,6 @@ const ProductDetail = () => {
             </Button>
           </div>
 
-          {/* Color code list */}
           {colorCodes.length === 0 && !addingColor && (
             <p className="text-sm text-muted-foreground px-4 py-4">
               No color codes yet. Tap Add to track your shades.
@@ -325,25 +412,19 @@ const ProductDetail = () => {
               return (
                 <div key={cc.id} className="px-4 py-3">
                   <div className="flex items-center gap-2.5">
-                    {/* Swatch */}
                     <div
                       className="w-7 h-7 rounded-full border border-border shrink-0 shadow-sm"
                       style={swatch ? { backgroundColor: cc.code } : { background: "var(--muted)" }}
                     />
-
-                    {/* Code + current badge */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-sm font-mono font-medium text-foreground">
-                          {cc.code}
-                        </span>
+                        <span className="text-sm font-mono font-medium text-foreground">{cc.code}</span>
                         {cc.is_current && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
                             Current
                           </span>
                         )}
                       </div>
-                      {/* Note */}
                       {editingNoteId === cc.id ? (
                         <div className="flex items-center gap-1.5 mt-1">
                           <Input
@@ -366,33 +447,20 @@ const ProductDetail = () => {
                         </div>
                       ) : (
                         <button
-                          onClick={() => {
-                            setEditingNoteId(cc.id);
-                            setEditingNoteValue(cc.note ?? "");
-                          }}
+                          onClick={() => { setEditingNoteId(cc.id); setEditingNoteValue(cc.note ?? ""); }}
                           className="mt-0.5 text-left"
                         >
                           {cc.note ? (
                             <span className="text-xs text-muted-foreground italic">{cc.note}</span>
                           ) : (
-                            <span className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors">
-                              + add note
-                            </span>
+                            <span className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors">+ add note</span>
                           )}
                         </button>
                       )}
                     </div>
-
-                    {/* Actions */}
                     <div className="flex items-center gap-0.5 shrink-0">
                       {!cc.is_current && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          title="Set as current"
-                          onClick={() => handleSetCurrent(cc.id)}
-                        >
+                        <Button variant="ghost" size="icon" className="h-7 w-7" title="Set as current" onClick={() => handleSetCurrent(cc.id)}>
                           <Check className="w-3.5 h-3.5 text-muted-foreground" />
                         </Button>
                       )}
@@ -405,18 +473,11 @@ const ProductDetail = () => {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete color code?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Remove <strong>{cc.code}</strong> from this product.
-                            </AlertDialogDescription>
+                            <AlertDialogDescription>Remove <strong>{cc.code}</strong> from this product.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteColor(cc.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDeleteColor(cc.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -427,7 +488,6 @@ const ProductDetail = () => {
             })}
           </div>
 
-          {/* Add new color inline form */}
           {addingColor && (
             <div className="px-4 py-3 border-t border-border bg-muted/30">
               <p className="text-xs font-medium text-foreground mb-2">New color code</p>
@@ -441,10 +501,7 @@ const ProductDetail = () => {
                   className="h-9 text-sm font-mono"
                 />
                 {isValidColor(newCode) && (
-                  <div
-                    className="w-9 h-9 rounded-md border border-border shrink-0"
-                    style={{ backgroundColor: newCode }}
-                  />
+                  <div className="w-9 h-9 rounded-md border border-border shrink-0" style={{ backgroundColor: newCode }} />
                 )}
               </div>
               <Input
@@ -455,22 +512,208 @@ const ProductDetail = () => {
                 className="h-9 text-sm mb-2"
               />
               <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleAddColor}
-                  disabled={!newCode.trim() || savingColor}
-                  className="rounded-full flex-1"
-                >
+                <Button size="sm" onClick={handleAddColor} disabled={!newCode.trim() || savingColor} className="rounded-full flex-1">
                   {savingColor ? "Saving…" : "Save"}
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => { setAddingColor(false); setNewCode(""); setNewNote(""); }}
-                  className="rounded-full"
-                >
+                <Button size="sm" variant="outline" onClick={() => { setAddingColor(false); setNewCode(""); setNewNote(""); }} className="rounded-full">
                   Cancel
                 </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── Purchase History Section ── */}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Purchase History</h2>
+              {purchases.length > 0 && (
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                  {purchases.length}
+                </span>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAddingPurchase(true)}
+              className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Register
+            </Button>
+          </div>
+
+          {purchases.length === 0 && !addingPurchase && (
+            <p className="text-sm text-muted-foreground px-4 py-4">
+              No purchases recorded yet.
+            </p>
+          )}
+
+          {/* Purchase list */}
+          <div className="divide-y divide-border">
+            {visiblePurchases.map((p, idx) => (
+              <div key={p.id} className="px-4 py-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-foreground">
+                        {formatCurrency(p.price)}
+                      </span>
+                      {idx === 0 && purchases.length > 1 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
+                          Latest
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(p.purchase_date + "T00:00:00").toLocaleDateString("en-US", {
+                          year: "numeric", month: "short", day: "numeric",
+                        })}
+                      </span>
+                      {p.store && (
+                        <>
+                          <span className="text-muted-foreground/40 text-xs">·</span>
+                          <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                            <Store className="w-3 h-3" />
+                            {p.store}
+                          </span>
+                        </>
+                      )}
+                      {p.color_code && (
+                        <>
+                          <span className="text-muted-foreground/40 text-xs">·</span>
+                          <span className="text-xs font-mono text-muted-foreground">{p.color_code}</span>
+                        </>
+                      )}
+                    </div>
+                    {/* Price trend */}
+                    <div className="mt-1">{getPriceTrend(idx)}</div>
+                    {p.notes && (
+                      <p className="text-xs text-muted-foreground italic mt-1">{p.notes}</p>
+                    )}
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 mt-0.5">
+                        <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete purchase?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Remove this purchase record from the history.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDeletePurchase(p.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {purchases.length > 3 && (
+            <button
+              onClick={() => setShowAllPurchases(!showAllPurchases)}
+              className="w-full flex items-center justify-center gap-1 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors border-t border-border"
+            >
+              {showAllPurchases ? (
+                <><ChevronUp className="w-3.5 h-3.5" /> Show less</>
+              ) : (
+                <><ChevronDown className="w-3.5 h-3.5" /> Show {purchases.length - 3} more</>
+              )}
+            </button>
+          )}
+
+          {/* Add purchase form */}
+          {addingPurchase && (
+            <div className="px-4 py-3 border-t border-border bg-muted/30">
+              <p className="text-xs font-medium text-foreground mb-3">New purchase</p>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Price *</label>
+                    <Input
+                      autoFocus
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={purchaseForm.price}
+                      onChange={(e) => setPurchaseForm((f) => ({ ...f, price: e.target.value }))}
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Date *</label>
+                    <Input
+                      type="date"
+                      value={purchaseForm.purchase_date}
+                      onChange={(e) => setPurchaseForm((f) => ({ ...f, purchase_date: e.target.value }))}
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Color code</label>
+                    <Input
+                      placeholder="e.g. N30"
+                      value={purchaseForm.color_code}
+                      onChange={(e) => setPurchaseForm((f) => ({ ...f, color_code: e.target.value }))}
+                      className="h-9 text-sm font-mono"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">Store</label>
+                    <Input
+                      placeholder="e.g. Sephora"
+                      value={purchaseForm.store}
+                      onChange={(e) => setPurchaseForm((f) => ({ ...f, store: e.target.value }))}
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Notes</label>
+                  <Input
+                    placeholder="Optional note…"
+                    value={purchaseForm.notes}
+                    onChange={(e) => setPurchaseForm((f) => ({ ...f, notes: e.target.value }))}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    onClick={handleAddPurchase}
+                    disabled={!purchaseForm.price || savingPurchase}
+                    className="rounded-full flex-1"
+                  >
+                    {savingPurchase ? "Saving…" : "Save purchase"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setAddingPurchase(false)}
+                    className="rounded-full"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
             </div>
           )}
