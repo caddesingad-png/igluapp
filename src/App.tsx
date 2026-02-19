@@ -13,6 +13,9 @@ import Profile from "./pages/Profile";
 import AddProduct from "./pages/AddProduct";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
+import SetForm from "./pages/SetForm";
+import SetDetail from "./pages/SetDetail";
+import PublicSetView from "./pages/PublicSetView";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +33,7 @@ const AppRoutes = () => {
   if (!user) {
     return (
       <Routes>
+        <Route path="/sets/:id/public" element={<PublicSetView />} />
         <Route path="*" element={<Auth />} />
       </Routes>
     );
@@ -41,6 +45,10 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/library" replace />} />
         <Route path="/library" element={<Library />} />
         <Route path="/sets" element={<Sets />} />
+        <Route path="/sets/new" element={<SetForm />} />
+        <Route path="/sets/:id/public" element={<PublicSetView />} />
+        <Route path="/sets/:id/edit" element={<SetForm />} />
+        <Route path="/sets/:id" element={<SetDetail />} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/add-product" element={<AddProduct />} />
