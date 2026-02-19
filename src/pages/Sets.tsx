@@ -22,6 +22,7 @@ interface SetItem {
   is_public: boolean;
   created_at: string;
   product_count?: number;
+  product_photos?: (string | null)[];
 }
 
 const Sets = () => {
@@ -40,18 +41,28 @@ const Sets = () => {
         .order("created_at", { ascending: false });
 
       if (!error && data) {
-        // Count products per set
         const ids = (data as SetItem[]).map((s) => s.id);
         if (!ids.length) { setSets([]); setLoading(false); return; }
-        const { data: counts } = await (supabase.from("set_products" as any) as any)
-          .select("set_id")
+
+        // Fetch set_products with product photos
+        const { data: setProducts } = await (supabase.from("set_products" as any) as any)
+          .select("set_id, products(photo_url)")
           .in("set_id", ids);
 
         const countMap: Record<string, number> = {};
-        for (const r of counts ?? []) {
+        const photosMap: Record<string, (string | null)[]> = {};
+        for (const r of setProducts ?? []) {
           countMap[r.set_id] = (countMap[r.set_id] ?? 0) + 1;
+          if (!photosMap[r.set_id]) photosMap[r.set_id] = [];
+          if (photosMap[r.set_id].length < 6) {
+            photosMap[r.set_id].push(r.products?.photo_url ?? null);
+          }
         }
-        setSets((data as SetItem[]).map((s) => ({ ...s, product_count: countMap[s.id] ?? 0 })));
+        setSets((data as SetItem[]).map((s) => ({
+          ...s,
+          product_count: countMap[s.id] ?? 0,
+          product_photos: photosMap[s.id] ?? [],
+        })));
       }
       setLoading(false);
     };
@@ -110,91 +121,105 @@ const Sets = () => {
           </Button>
         </div>
       ) : (
-        <div className="max-w-lg mx-auto px-4 pt-4 space-y-3">
+        <div className="max-w-lg mx-auto px-4 pt-4 grid grid-cols-2 gap-3">
           {sets.map((set) => (
             <div
               key={set.id}
-              className="rounded-xl border border-border bg-card overflow-hidden"
+              className="rounded-2xl border border-border bg-card overflow-hidden cursor-pointer group"
+              onClick={() => navigate(`/sets/${set.id}`)}
             >
-              {/* Photo banner */}
-              {set.photo_url && (
-                <div
-                  className="w-full h-36 bg-cover bg-center cursor-pointer"
-                  style={{ backgroundImage: `url(${set.photo_url})` }}
-                  onClick={() => navigate(`/sets/${set.id}`)}
-                />
-              )}
-
-              <div className="px-4 py-3 flex items-start gap-3">
-                {/* Icon placeholder when no photo */}
-                {!set.photo_url && (
-                  <div
-                    className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 cursor-pointer"
-                    onClick={() => navigate(`/sets/${set.id}`)}
-                  >
-                    <Layers className="w-6 h-6 text-primary" />
-                  </div>
-                )}
-
-                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => navigate(`/sets/${set.id}`)}>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-semibold text-foreground truncate">{set.name}</p>
-                    {set.is_public ? (
-                      <Globe className="w-3 h-3 text-primary shrink-0" />
-                    ) : (
-                      <Lock className="w-3 h-3 text-muted-foreground shrink-0" />
-                    )}
-                  </div>
-                  {set.occasion && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{set.occasion}</p>
+              {/* Collage preview */}
+              <div className="relative flex gap-1 p-2 bg-muted/30">
+                {/* Cover photo - square */}
+                <div className="w-[52%] shrink-0">
+                  {set.photo_url ? (
+                    <img
+                      src={set.photo_url}
+                      alt={set.name}
+                      className="w-full aspect-square object-cover rounded-xl"
+                    />
+                  ) : (
+                    <div className="w-full aspect-square rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Layers className="w-8 h-8 text-primary/40" />
+                    </div>
                   )}
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {set.product_count} product{set.product_count !== 1 ? "s" : ""}
-                  </p>
                 </div>
 
-                <div className="flex items-center gap-0.5 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    title="Share"
-                    onClick={() => handleShare(set)}
-                  >
-                    <Share2 className="w-4 h-4 text-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => navigate(`/sets/${set.id}/edit`)}
-                  >
-                    <Pencil className="w-4 h-4 text-muted-foreground" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete set?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently remove <strong>{set.name}</strong>.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(set.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                {/* Product grid - 2x3 */}
+                <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-1">
+                  {Array.from({ length: 6 }).map((_, i) => {
+                    const photo = set.product_photos?.[i];
+                    return photo ? (
+                      <img
+                        key={i}
+                        src={photo}
+                        alt=""
+                        className="w-full aspect-square object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div
+                        key={i}
+                        className="w-full aspect-square rounded-lg bg-muted"
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Info + actions */}
+              <div className="px-3 py-2.5">
+                <div className="flex items-start justify-between gap-1">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate leading-tight">{set.name}</p>
+                    {set.occasion && (
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{set.occasion}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {set.product_count} produto{set.product_count !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleShare(set)}
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => navigate(`/sets/${set.id}/edit`)}
+                    >
+                      <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Deletar set?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Isso removerá permanentemente <strong>{set.name}</strong>.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(set.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Deletar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </div>
             </div>
