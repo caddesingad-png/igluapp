@@ -152,26 +152,28 @@ const SetForm = () => {
 
       <div className="max-w-lg mx-auto px-4 pt-5 space-y-5">
         {/* Photo */}
-        <div
-          className="w-full h-44 rounded-2xl bg-muted flex items-center justify-center cursor-pointer overflow-hidden relative"
-          onClick={() => photoRef.current?.click()}
-        >
-          {photoUrl ? (
-            <img src={photoUrl} alt="Set cover" className="w-full h-full object-cover" />
-          ) : (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <Camera className="w-8 h-8" />
-              <span className="text-xs">{uploadingPhoto ? "Uploading…" : "Add cover photo"}</span>
-            </div>
-          )}
-          {photoUrl && (
-            <button
-              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/80 flex items-center justify-center"
-              onClick={(e) => { e.stopPropagation(); setPhotoUrl(null); }}
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
+        <div className="flex justify-center">
+          <div
+            className="w-40 h-40 rounded-2xl bg-muted flex items-center justify-center cursor-pointer overflow-hidden relative"
+            onClick={() => photoRef.current?.click()}
+          >
+            {photoUrl ? (
+              <img src={photoUrl} alt="Set cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Camera className="w-8 h-8" />
+                <span className="text-xs text-center">{uploadingPhoto ? "Enviando…" : "Adicionar foto"}</span>
+              </div>
+            )}
+            {photoUrl && (
+              <button
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/80 flex items-center justify-center"
+                onClick={(e) => { e.stopPropagation(); setPhotoUrl(null); }}
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
         <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
 
