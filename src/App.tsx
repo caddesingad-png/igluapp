@@ -12,6 +12,7 @@ import History from "./pages/History";
 import Profile from "./pages/Profile";
 import AddProduct from "./pages/AddProduct";
 import NotFound from "./pages/NotFound";
+import ProductDetail from "./pages/ProductDetail";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const AppRoutes = () => {
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
