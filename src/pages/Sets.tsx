@@ -42,9 +42,10 @@ const Sets = () => {
       if (!error && data) {
         // Count products per set
         const ids = (data as SetItem[]).map((s) => s.id);
+        if (!ids.length) { setSets([]); setLoading(false); return; }
         const { data: counts } = await (supabase.from("set_products" as any) as any)
           .select("set_id")
-          .in("set_id", ids.length ? ids : ["none"]);
+          .in("set_id", ids);
 
         const countMap: Record<string, number> = {};
         for (const r of counts ?? []) {
