@@ -136,6 +136,42 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_history: {
+        Row: {
+          color_code: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          price: number
+          product_id: string
+          purchase_date: string
+          store: string | null
+          user_id: string
+        }
+        Insert: {
+          color_code?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price: number
+          product_id: string
+          purchase_date?: string
+          store?: string | null
+          user_id: string
+        }
+        Update: {
+          color_code?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price?: number
+          product_id?: string
+          purchase_date?: string
+          store?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
