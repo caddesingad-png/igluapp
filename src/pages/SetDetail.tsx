@@ -100,9 +100,15 @@ const SetDetail = () => {
       </header>
 
       <div className="max-w-lg mx-auto">
-        {/* Cover photo */}
+        {/* Cover photo — square crop */}
         {set.photo_url && (
-          <img src={set.photo_url} alt={set.name} className="w-full h-56 object-cover" />
+          <div className="flex justify-center px-4 pt-4">
+            <img
+              src={set.photo_url}
+              alt={set.name}
+              className="w-48 h-48 object-cover rounded-2xl shadow-sm"
+            />
+          </div>
         )}
 
         <div className="px-4 pt-5 pb-4">
