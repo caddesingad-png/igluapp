@@ -21,6 +21,7 @@ export type Database = {
           color_codes: string[] | null
           created_at: string
           id: string
+          is_favorite: boolean
           name: string
           notes: string | null
           pao_months: number
@@ -38,6 +39,7 @@ export type Database = {
           color_codes?: string[] | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           name: string
           notes?: string | null
           pao_months?: number
@@ -55,6 +57,7 @@ export type Database = {
           color_codes?: string[] | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           name?: string
           notes?: string | null
           pao_months?: number
