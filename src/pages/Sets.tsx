@@ -13,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { shareSet } from "@/lib/shareSet";
+import DiscoverFeed from "@/components/DiscoverFeed";
 
 interface SetItem {
   id: string;
@@ -25,12 +26,15 @@ interface SetItem {
   product_photos?: (string | null)[];
 }
 
+type Tab = "my" | "discover";
+
 const Sets = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [sets, setSets] = useState<SetItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<Tab>("my");
 
   useEffect(() => {
     if (!user) return;
@@ -44,7 +48,6 @@ const Sets = () => {
         const ids = (data as SetItem[]).map((s) => s.id);
         if (!ids.length) { setSets([]); setLoading(false); return; }
 
-        // Fetch set_products with product photos
         const { data: setProducts } = await (supabase.from("set_products" as any) as any)
           .select("set_id, products(photo_url)")
           .in("set_id", ids);
@@ -77,7 +80,6 @@ const Sets = () => {
 
   const handleShare = async (set: SetItem) => {
     if (!set.is_public) {
-      // Make it public first
       await (supabase.from("sets" as any) as any)
         .update({ is_public: true })
         .eq("id", set.id);
@@ -92,18 +94,46 @@ const Sets = () => {
       <header className="sticky top-0 z-40 glass border-b border-border px-5 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">SETs</h1>
-          <Button
-            size="sm"
-            className="rounded-full gap-1.5 text-xs h-8"
-            onClick={() => navigate("/sets/new")}
+          {tab === "my" && (
+            <Button
+              size="sm"
+              className="rounded-full gap-1.5 text-xs h-8"
+              onClick={() => navigate("/sets/new")}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Novo set
+            </Button>
+          )}
+        </div>
+
+        {/* Sub-tabs */}
+        <div className="max-w-lg mx-auto mt-3 flex gap-1 bg-muted/50 rounded-xl p-1">
+          <button
+            onClick={() => setTab("my")}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              tab === "my"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }`}
           >
-            <Plus className="w-3.5 h-3.5" />
-            New set
-          </Button>
+            Meus SETs
+          </button>
+          <button
+            onClick={() => setTab("discover")}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              tab === "discover"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }`}
+          >
+            ✨ Descobrir
+          </button>
         </div>
       </header>
 
-      {loading ? (
+      {tab === "discover" ? (
+        <DiscoverFeed />
+      ) : loading ? (
         <div className="flex items-center justify-center pt-32">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
@@ -112,12 +142,12 @@ const Sets = () => {
           <div className="w-20 h-20 rounded-3xl bg-accent/30 flex items-center justify-center mb-6">
             <Layers className="w-10 h-10 text-accent-foreground" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground mb-2">No sets yet</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-2">Nenhum set ainda</h2>
           <p className="text-muted-foreground text-center text-sm max-w-[260px] mb-6">
-            Create sets to organize your products into looks and routines
+            Crie sets para organizar seus produtos em looks e rotinas
           </p>
           <Button className="rounded-full gap-2" onClick={() => navigate("/sets/new")}>
-            <Plus className="w-4 h-4" /> Create your first set
+            <Plus className="w-4 h-4" /> Criar primeiro set
           </Button>
         </div>
       ) : (
@@ -128,9 +158,8 @@ const Sets = () => {
               className="rounded-2xl border border-border bg-card overflow-hidden cursor-pointer group"
               onClick={() => navigate(`/sets/${set.id}`)}
             >
-              {/* Collage preview with name overlay */}
+              {/* Collage preview */}
               <div className="relative flex gap-1 p-2 bg-muted/30">
-                {/* Cover photo - square */}
                 <div className="w-[52%] shrink-0">
                   {set.photo_url ? (
                     <img
@@ -144,29 +173,19 @@ const Sets = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Product grid - 2x3 */}
                 <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-1">
                   {Array.from({ length: 6 }).map((_, i) => {
                     const photo = set.product_photos?.[i];
                     return photo ? (
-                      <img
-                        key={i}
-                        src={photo}
-                        alt=""
-                        className="w-full aspect-square object-cover rounded-lg"
-                      />
+                      <img key={i} src={photo} alt="" className="w-full aspect-square object-cover rounded-lg" />
                     ) : (
-                      <div
-                        key={i}
-                        className="w-full aspect-square rounded-lg bg-muted"
-                      />
+                      <div key={i} className="w-full aspect-square rounded-lg bg-muted" />
                     );
                   })}
                 </div>
               </div>
 
-              {/* Info row */}
+              {/* Info */}
               <div className="px-3 pt-2 pb-1">
                 <p className="text-sm font-semibold text-foreground leading-tight line-clamp-1">{set.name}</p>
                 {set.occasion && (
@@ -177,7 +196,7 @@ const Sets = () => {
                 </p>
               </div>
 
-              {/* Actions row */}
+              {/* Actions */}
               <div className="flex items-center justify-end px-1 pb-1" onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleShare(set)}>
                   <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
