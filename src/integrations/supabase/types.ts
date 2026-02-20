@@ -192,6 +192,47 @@ export type Database = {
           },
         ]
       }
+      set_layers: {
+        Row: {
+          created_at: string
+          id: string
+          layer_icon: string
+          layer_name: string
+          layer_order: number
+          note: string | null
+          product_ids: string[]
+          set_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          layer_icon: string
+          layer_name: string
+          layer_order: number
+          note?: string | null
+          product_ids?: string[]
+          set_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          layer_icon?: string
+          layer_name?: string
+          layer_order?: number
+          note?: string | null
+          product_ids?: string[]
+          set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "set_layers_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       set_likes: {
         Row: {
           created_at: string
