@@ -16,6 +16,7 @@ interface DiscoverSet {
   likes_count: number;
   user_id: string;
   product_photos: (string | null)[];
+  total_products: number;
   creator_name: string | null;
   creator_avatar: string | null;
 }
@@ -64,17 +65,22 @@ const DiscoverFeed = () => {
         return;
       }
 
-      const mapped: DiscoverSet[] = (data as any[]).map((s) => ({
-        id: s.id,
-        name: s.name,
-        occasion: s.occasion,
-        photo_url: s.photo_url,
-        likes_count: s.likes_count ?? 0,
-        user_id: s.user_id,
-        product_photos: (s.set_products || []).slice(0, 6).map((sp: any) => sp?.products?.photo_url ?? null),
-        creator_name: null,
-        creator_avatar: null,
-      }));
+      const mapped: DiscoverSet[] = (data as any[]).map((s) => {
+        const allProducts = s.set_products || [];
+        const total = allProducts.length;
+        return {
+          id: s.id,
+          name: s.name,
+          occasion: s.occasion,
+          photo_url: s.photo_url,
+          likes_count: s.likes_count ?? 0,
+          user_id: s.user_id,
+          total_products: total,
+          product_photos: allProducts.slice(0, 5).map((sp: any) => sp?.products?.photo_url ?? null),
+          creator_name: null,
+          creator_avatar: null,
+        };
+      });
 
       if (mapped.length < PAGE_SIZE) setHasMore(false);
       else setHasMore(true);
@@ -281,25 +287,43 @@ const DiscoverFeed = () => {
                     </button>
                   </div>
 
-                  {/* 6 product thumbnails — full row */}
-                  <div className="flex gap-1 mt-2">
-                    {Array.from({ length: 6 }).map((_, i) => {
-                      const photo = set.product_photos[i];
-                      return photo ? (
-                        <img
-                          key={i}
-                          src={photo}
-                          alt=""
-                          className="flex-1 aspect-square object-cover rounded-[4px]"
-                        />
-                      ) : (
+                  {/* Style capsule — 4 products + "+X more" slot */}
+                  {set.total_products > 0 && (
+                    <div className="flex gap-1 mt-2">
+                      {/* Show up to 4 product photos */}
+                      {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
+                        const photo = set.product_photos[i];
+                        return photo ? (
+                          <img
+                            key={i}
+                            src={photo}
+                            alt=""
+                            className="flex-1 aspect-square object-cover rounded-[4px]"
+                          />
+                        ) : (
+                          <div
+                            key={i}
+                            className="flex-1 aspect-square rounded-[4px] bg-muted"
+                          />
+                        );
+                      })}
+
+                      {/* "+X" overflow slot */}
+                      {set.total_products > 4 && (
                         <div
-                          key={i}
-                          className="flex-1 aspect-square rounded-[4px] bg-muted"
-                        />
-                      );
-                    })}
-                  </div>
+                          className="flex-1 aspect-square rounded-[4px] flex items-center justify-center"
+                          style={{ backgroundColor: "hsl(var(--foreground))" }}
+                        >
+                          <span
+                            className="font-body font-medium leading-none"
+                            style={{ fontSize: "9px", color: "hsl(var(--btn-primary-fg))" }}
+                          >
+                            +{set.total_products - 4}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Set name */}
                   <p className="font-body font-medium text-[12px] text-foreground leading-snug line-clamp-2 mt-2">
