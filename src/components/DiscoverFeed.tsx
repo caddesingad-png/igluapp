@@ -294,7 +294,7 @@ const DiscoverFeed = () => {
                         Produtos usados
                       </p>
                       <div className="flex gap-1">
-                        {/* Show up to 4 product photos */}
+                        {/* Show up to 4 product photos — fixed small size */}
                         {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
                           const photo = set.product_photos[i];
                           return photo ? (
@@ -302,12 +302,12 @@ const DiscoverFeed = () => {
                               key={i}
                               src={photo}
                               alt=""
-                              className="flex-1 aspect-square object-cover rounded-[4px]"
+                              className="w-9 h-9 object-cover rounded-[4px] shrink-0"
                             />
                           ) : (
                             <div
                               key={i}
-                              className="flex-1 aspect-square rounded-[4px] bg-muted"
+                              className="w-9 h-9 rounded-[4px] bg-muted shrink-0"
                             />
                           );
                         })}
@@ -315,7 +315,7 @@ const DiscoverFeed = () => {
                         {/* "+X" overflow slot */}
                         {set.total_products > 4 && (
                           <div
-                            className="flex-1 aspect-square rounded-[4px] flex items-center justify-center"
+                            className="w-9 h-9 rounded-[4px] shrink-0 flex items-center justify-center"
                             style={{ backgroundColor: "hsl(var(--foreground))" }}
                           >
                             <span
