@@ -192,17 +192,24 @@ const SetDetail = () => {
           {/* Creator row */}
           {!isOwner && creator && (
             <div className="flex items-center justify-between mt-4 p-4 rounded-xl border border-border bg-card" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                  <span className="font-body font-medium text-[13px] text-muted-foreground">
-                    {(creator.display_name || "?")[0].toUpperCase()}
-                  </span>
+              <button
+                className="flex items-center gap-2.5"
+                onClick={() => set && navigate(`/user/${set.user_id}`)}
+              >
+                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                  {creator.avatar_url ? (
+                    <img src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-body font-medium text-[13px] text-muted-foreground">
+                      {(creator.display_name || "?")[0].toUpperCase()}
+                    </span>
+                  )}
                 </div>
-                <div>
+                <div className="text-left">
                   <p className="font-body font-medium text-[13px] text-foreground">{creator.display_name || "Usuária"}</p>
                   <p className="label-overline">Criadora</p>
                 </div>
-              </div>
+              </button>
               {user && (
                 <button
                   onClick={toggleFollow}
