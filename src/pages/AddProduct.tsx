@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { compressImage } from "@/lib/compressImage";
 import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +56,8 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+  const isEdit = Boolean(id);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,9 +74,38 @@ const AddProduct = () => {
   const [notes, setNotes] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(isEdit);
+
+  useEffect(() => {
+    if (!isEdit || !id) return;
+    (supabase.from("products" as any) as any)
+      .select("*")
+      .eq("id", id)
+      .single()
+      .then(({ data }: any) => {
+        if (data) {
+          setName(data.name ?? "");
+          setBrand(data.brand ?? "");
+          setCategory(data.category ?? "");
+          setColorCodes(data.color_codes ?? []);
+          setPurchasePrice(data.purchase_price != null ? String(data.purchase_price) : "");
+          setWeightGrams(data.weight_grams != null ? String(data.weight_grams) : "");
+          if (data.purchase_date) setPurchaseDate(parseISO(data.purchase_date));
+          setPaoMonths(data.pao_months ? String(data.pao_months) : "12");
+          setUsageFrequency(data.usage_frequency ?? "Ocasional");
+          setNotes(data.notes ?? "");
+          if (data.photo_url) {
+            setExistingPhotoUrl(data.photo_url);
+            setPhotoPreview(data.photo_url);
+          }
+        }
+        setLoadingProduct(false);
+      });
+  }, [isEdit, id]);
 
   const addColorCode = () => {
     const trimmed = colorInput.trim();
@@ -102,6 +133,7 @@ const AddProduct = () => {
   const removePhoto = () => {
     setPhoto(null);
     setPhotoPreview(null);
+    setExistingPhotoUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -139,7 +171,7 @@ const AddProduct = () => {
 
     setSaving(true);
     try {
-      let photoUrl: string | null = null;
+      let photoUrl: string | null = existingPhotoUrl;
 
       if (photo) {
         const filePath = `${user.id}/${crypto.randomUUID()}.jpg`;
@@ -149,8 +181,7 @@ const AddProduct = () => {
         photoUrl = urlData.publicUrl;
       }
 
-      const { data: productData, error } = await (supabase.from("products" as any) as any).insert({
-        user_id: user.id,
+      const productPayload = {
         name: name.trim(),
         brand: brand.trim(),
         category,
@@ -162,25 +193,36 @@ const AddProduct = () => {
         usage_frequency: usageFrequency,
         notes: notes.trim() || null,
         photo_url: photoUrl,
-      }).select("id").single();
+      };
 
-      if (error) throw error;
+      if (isEdit && id) {
+        const { error } = await (supabase.from("products" as any) as any)
+          .update(productPayload)
+          .eq("id", id);
+        if (error) throw error;
+        toast.success("Produto atualizado! 💄");
+        navigate(`/product/${id}`);
+      } else {
+        const { data: productData, error } = await (supabase.from("products" as any) as any)
+          .insert({ user_id: user.id, ...productPayload })
+          .select("id")
+          .single();
+        if (error) throw error;
 
-      // Registrar o preço de compra como primeiro registro de compra
-      if (productData?.id) {
-        await supabase.from("purchase_history").insert({
-          user_id: user.id,
-          product_id: productData.id,
-          price: parseFloat(purchasePrice),
-          purchase_date: format(purchaseDate, "yyyy-MM-dd"),
-          color_code: colorCodes[0] || null,
-          notes: null,
-          store: null,
-        });
+        if (productData?.id) {
+          await supabase.from("purchase_history").insert({
+            user_id: user.id,
+            product_id: productData.id,
+            price: parseFloat(purchasePrice),
+            purchase_date: format(purchaseDate, "yyyy-MM-dd"),
+            color_code: colorCodes[0] || null,
+            notes: null,
+            store: null,
+          });
+        }
+        toast.success("Produto adicionado! 💄");
+        navigate("/library");
       }
-
-      toast.success("Produto adicionado! 💄");
-      navigate("/library");
     } catch (error: any) {
       toast.error(error.message || "Erro ao salvar produto");
     } finally {
@@ -189,6 +231,14 @@ const AddProduct = () => {
   };
 
   const isValid = name.trim() && brand.trim() && category && purchasePrice;
+
+  if (loadingProduct) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -202,7 +252,9 @@ const AddProduct = () => {
             <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
               <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
             </button>
-            <h1 className="font-display text-[18px] font-normal text-foreground">Adicionar Produto</h1>
+            <h1 className="font-display text-[18px] font-normal text-foreground">
+              {isEdit ? "Editar Produto" : "Adicionar Produto"}
+            </h1>
           </div>
         </header>
 
@@ -427,7 +479,7 @@ const AddProduct = () => {
             </div>
 
             <Button type="submit" className="w-full mt-2" disabled={!isValid || saving}>
-              {saving ? "Salvando..." : "Salvar Produto"}
+              {saving ? "Salvando..." : isEdit ? "Salvar Alterações" : "Salvar Produto"}
             </Button>
           </div>
         </form>
