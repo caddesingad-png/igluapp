@@ -87,7 +87,8 @@ const UserProfile = () => {
     if (!userId) return;
     const load = async () => {
       const [profileRes, setsRes, followersRes, followingRes, productsRes] = await Promise.all([
-        supabase.from("profiles").select("user_id, display_name, avatar_url, bio").eq("user_id", userId).single(),
+        // Usa profiles_public (view sem monthly_budget) para dados de outros usuários
+        (supabase.from("profiles_public" as any) as any).select("user_id, display_name, avatar_url, bio").eq("user_id", userId).single(),
         (supabase.from("sets" as any) as any)
           .select("id, name, occasion, photo_url, likes_count")
           .eq("user_id", userId)
