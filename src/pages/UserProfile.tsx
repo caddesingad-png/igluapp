@@ -23,12 +23,30 @@ interface PublicSet {
   likes_count: number;
 }
 
+interface ProductPhoto {
+  id: string;
+  photo_url: string | null;
+  name: string;
+}
+
 interface FollowList {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
   user_id: string;
 }
+
+// Orbital positions for product photos around the avatar
+// Returns {x, y} as percentage offsets from center
+const getOrbitalPositions = (count: number, radius: number) => {
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+    };
+  });
+};
 
 const UserProfile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -37,6 +55,8 @@ const UserProfile = () => {
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [sets, setSets] = useState<PublicSet[]>([]);
+  const [productPhotos, setProductPhotos] = useState<ProductPhoto[]>([]);
+  const [productsCount, setProductsCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -61,7 +81,7 @@ const UserProfile = () => {
   useEffect(() => {
     if (!userId) return;
     const load = async () => {
-      const [profileRes, setsRes, followersRes, followingRes] = await Promise.all([
+      const [profileRes, setsRes, followersRes, followingRes, productsRes] = await Promise.all([
         supabase.from("profiles").select("user_id, display_name, avatar_url, bio").eq("user_id", userId).single(),
         (supabase.from("sets" as any) as any)
           .select("id, name, occasion, photo_url, likes_count")
@@ -74,6 +94,12 @@ const UserProfile = () => {
         (supabase.from("user_follows" as any) as any)
           .select("id", { count: "exact" })
           .eq("follower_id", userId),
+        supabase.from("products")
+          .select("id, name, photo_url")
+          .eq("user_id", userId)
+          .not("photo_url", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(12),
       ]);
 
       if (profileRes.error || !profileRes.data) {
@@ -86,6 +112,14 @@ const UserProfile = () => {
       setSets(setsRes.data ?? []);
       setFollowersCount(followersRes.count ?? 0);
       setFollowingCount(followingRes.count ?? 0);
+      setProductPhotos((productsRes.data ?? []) as ProductPhoto[]);
+
+      // Get total products count (including those without photos)
+      const { count: totalProducts } = await supabase
+        .from("products")
+        .select("id", { count: "exact" })
+        .eq("user_id", userId);
+      setProductsCount(totalProducts ?? 0);
 
       if (user && !isOwnProfile) {
         const { data: followData } = await (supabase.from("user_follows" as any) as any)
@@ -175,12 +209,15 @@ const UserProfile = () => {
     );
   }
 
+  // Prepare orbital photos — up to 8 shown
+  const orbitPhotos = productPhotos.slice(0, 8);
+  const orbitPositions = getOrbitalPositions(orbitPhotos.length, 115);
+
   return (
     <>
       <div className="min-h-screen pb-24 bg-background">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
-            {/* Back arrow — só quando navegado de outra tela (não próprio perfil via tab) */}
             {!isOwnProfile ? (
               <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
                 <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
@@ -193,7 +230,6 @@ const UserProfile = () => {
               {isOwnProfile ? "Meu Perfil" : (profile?.display_name || "Perfil")}
             </span>
 
-            {/* Settings gear — só no próprio perfil */}
             {isOwnProfile ? (
               <button
                 onClick={() => setShowSettings(true)}
@@ -207,20 +243,65 @@ const UserProfile = () => {
           </div>
         </header>
 
-        <div className="max-w-lg mx-auto px-6 pt-6">
-          {/* Avatar + name + bio */}
-          <div className="flex flex-col items-center gap-3 text-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="font-body font-medium text-[24px] text-muted-foreground">{initials}</span>
-              )}
+        <div className="max-w-lg mx-auto px-6">
+          {/* ── Orbital hero ─────────────────────────────────── */}
+          <div className="flex flex-col items-center pt-8 pb-2">
+            {/* Orbital container */}
+            <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
+              {/* Orbit rings */}
+              <div
+                className="absolute rounded-full border border-border/40"
+                style={{ width: 230, height: 230 }}
+              />
+              <div
+                className="absolute rounded-full border border-border/20"
+                style={{ width: 280, height: 280 }}
+              />
+
+              {/* Orbital product photos */}
+              {orbitPhotos.map((photo, i) => {
+                const pos = orbitPositions[i];
+                return (
+                  <div
+                    key={photo.id}
+                    className="absolute rounded-full overflow-hidden border-2 border-background"
+                    style={{
+                      width: 52,
+                      height: 52,
+                      left: "50%",
+                      top: "50%",
+                      transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`,
+                      boxShadow: "0 2px 8px rgba(26,23,20,0.12)",
+                    }}
+                  >
+                    {photo.photo_url ? (
+                      <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Center avatar */}
+              <div className="relative z-10 w-[96px] h-[96px] rounded-full overflow-hidden border-[3px] border-background"
+                style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
+              >
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <span className="font-body font-medium text-[28px] text-muted-foreground">{initials}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Name — editável no próprio perfil */}
+            {/* Name */}
             {isOwnProfile && editingName ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-1">
                 <input
                   autoFocus
                   value={nameInput}
@@ -233,7 +314,7 @@ const UserProfile = () => {
                 <button onClick={() => setEditingName(false)} className="w-7 h-7 flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" strokeWidth={2} /></button>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 mt-1">
                 <h1 className="font-body font-medium text-[17px] text-foreground">
                   {profile?.display_name || "Adicionar nome"}
                 </h1>
@@ -245,9 +326,9 @@ const UserProfile = () => {
               </div>
             )}
 
-            {/* Bio — editável no próprio perfil */}
+            {/* Bio */}
             {isOwnProfile && editingBio ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-1">
                 <input
                   autoFocus
                   value={bioInput}
@@ -262,7 +343,7 @@ const UserProfile = () => {
               </div>
             ) : (
               <button
-                className="flex items-center gap-1.5"
+                className="flex items-center gap-1.5 mt-0.5"
                 onClick={() => isOwnProfile && (setBioInput(profile?.bio || ""), setEditingBio(true))}
               >
                 <span className="font-body font-light text-[13px] text-muted-foreground">
@@ -274,14 +355,14 @@ const UserProfile = () => {
               </button>
             )}
 
-            {/* Follow button — outros perfis */}
+            {/* Follow button */}
             {!isOwnProfile && user && (
               <button
                 onClick={toggleFollow}
-                className="flex items-center gap-1.5 h-9 px-5 rounded-lg font-body text-[13px] font-medium transition-colors mt-1"
+                className="flex items-center gap-1.5 h-9 px-5 rounded-lg font-body text-[13px] font-medium transition-colors mt-3"
                 style={{
                   backgroundColor: isFollowing ? "hsl(var(--muted))" : "hsl(var(--foreground))",
-                  color: isFollowing ? "hsl(var(--muted-foreground))" : "hsl(var(--btn-primary-fg))",
+                  color: isFollowing ? "hsl(var(--muted-foreground))" : "hsl(var(--background))",
                 }}
               >
                 {isFollowing ? <><UserCheck className="w-3.5 h-3.5" /> Seguindo</> : <><UserPlus className="w-3.5 h-3.5" /> Seguir</>}
@@ -289,23 +370,30 @@ const UserProfile = () => {
             )}
           </div>
 
-          {/* Counters */}
-          <div className="flex gap-6 mb-6">
+          {/* ── Stats bar ─────────────────────────────────────── */}
+          <div className="flex justify-around py-5 border-t border-b border-border mt-4 mb-6">
             <div className="text-center">
-              <p className="font-body font-medium text-[18px] text-foreground">{sets.length}</p>
-              <p className="label-overline">SETs</p>
+              <p className="font-body font-semibold text-[20px] text-foreground leading-tight">{productsCount}</p>
+              <p className="label-overline mt-0.5">Produtos</p>
             </div>
+            <div className="w-px bg-border" />
+            <div className="text-center">
+              <p className="font-body font-semibold text-[20px] text-foreground leading-tight">{sets.length}</p>
+              <p className="label-overline mt-0.5">SETs</p>
+            </div>
+            <div className="w-px bg-border" />
             <button className="text-center" onClick={() => { setShowFollowers(true); loadFollowers(); }}>
-              <p className="font-body font-medium text-[18px] text-foreground">{followersCount}</p>
-              <p className="label-overline">Seguidores</p>
+              <p className="font-body font-semibold text-[20px] text-foreground leading-tight">{followersCount}</p>
+              <p className="label-overline mt-0.5">Seguidores</p>
             </button>
+            <div className="w-px bg-border" />
             <button className="text-center" onClick={() => { setShowFollowing(true); loadFollowing(); }}>
-              <p className="font-body font-medium text-[18px] text-foreground">{followingCount}</p>
-              <p className="label-overline">Seguindo</p>
+              <p className="font-body font-semibold text-[20px] text-foreground leading-tight">{followingCount}</p>
+              <p className="label-overline mt-0.5">Seguindo</p>
             </button>
           </div>
 
-          {/* Public SETs grid */}
+          {/* ── Public SETs grid ──────────────────────────────── */}
           <p className="label-overline mb-3">SETs públicos</p>
           {sets.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -372,7 +460,7 @@ const UserProfile = () => {
         />
       )}
 
-      {/* Settings bottom sheet — próprio perfil */}
+      {/* Settings bottom sheet */}
       {showSettings && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center"
@@ -389,15 +477,12 @@ const UserProfile = () => {
             </div>
             <div className="px-6 pt-3 pb-4">
               <p className="font-display text-[18px] font-normal text-foreground mb-4">Configurações</p>
-
-              {/* Account info */}
               <div className="rounded-xl border border-border bg-background p-4 mb-4">
                 <p className="label-overline mb-1">Conta</p>
                 <p className="font-body font-light text-[13px] text-muted-foreground truncate">
                   {user?.email}
                 </p>
               </div>
-
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border font-body text-[14px] text-destructive border-destructive/30 hover:bg-destructive/5 transition-colors"
