@@ -30,21 +30,18 @@ const SetForm = () => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Products
   const [myProducts, setMyProducts] = useState<Product[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [productSearch, setProductSearch] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    // Load user's products
     (supabase.from("products" as any) as any)
       .select("id, name, brand, category, photo_url")
       .eq("user_id", user.id)
       .order("name")
       .then(({ data }: any) => setMyProducts(data ?? []));
 
-    // If editing, load existing set data
     if (isEdit && id) {
       (supabase.from("sets" as any) as any)
         .select("name, occasion, photo_url, is_public")
@@ -102,8 +99,6 @@ const SetForm = () => {
       await (supabase.from("sets" as any) as any)
         .update({ name: name.trim(), occasion: occasion.trim() || null, photo_url: photoUrl, is_public: isPublic })
         .eq("id", id);
-
-      // Sync products: delete all then re-insert
       await (supabase.from("set_products" as any) as any).delete().eq("set_id", id);
     } else {
       const { data } = await (supabase.from("sets" as any) as any)
@@ -131,17 +126,17 @@ const SetForm = () => {
 
   return (
     <div className="min-h-screen pb-10 bg-background">
-      <header className="sticky top-0 z-40 glass border-b border-border px-4 py-3">
-        <div className="flex items-center justify-between max-w-lg mx-auto">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/sets")}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-base font-semibold text-foreground">
+      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+        <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
+          <button onClick={() => navigate("/sets")} className="w-8 h-8 flex items-center justify-center text-foreground">
+            <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
+          </button>
+          <h1 className="font-display text-[18px] font-normal text-foreground">
             {isEdit ? "Edit set" : "New set"}
           </h1>
           <Button
             size="sm"
-            className="rounded-full text-xs h-8"
+            className="h-8 px-4 text-[12px]"
             onClick={handleSave}
             disabled={!name.trim() || saving}
           >
@@ -150,27 +145,27 @@ const SetForm = () => {
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 pt-5 space-y-5">
+      <div className="max-w-lg mx-auto px-6 pt-6 space-y-5">
         {/* Photo */}
         <div className="flex justify-center">
           <div
-            className="w-40 h-40 rounded-2xl bg-muted flex items-center justify-center cursor-pointer overflow-hidden relative"
+            className="w-36 h-36 rounded-xl bg-muted flex items-center justify-center cursor-pointer overflow-hidden relative border border-border"
             onClick={() => photoRef.current?.click()}
           >
             {photoUrl ? (
               <img src={photoUrl} alt="Set cover" className="w-full h-full object-cover" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <Camera className="w-8 h-8" />
-                <span className="text-xs text-center">{uploadingPhoto ? "Enviando…" : "Adicionar foto"}</span>
+                <Camera className="w-7 h-7" strokeWidth={1.5} />
+                <span className="font-body text-[11px] text-center">{uploadingPhoto ? "Enviando…" : "Adicionar foto"}</span>
               </div>
             )}
             {photoUrl && (
               <button
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/80 flex items-center justify-center"
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-background/90 flex items-center justify-center"
                 onClick={(e) => { e.stopPropagation(); setPhotoUrl(null); }}
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3 text-foreground" />
               </button>
             )}
           </div>
@@ -179,59 +174,68 @@ const SetForm = () => {
 
         {/* Name */}
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1 block">Set name *</label>
+          <label className="label-overline block mb-2">Set name *</label>
           <Input
             placeholder="e.g. Summer date night look"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="h-10"
           />
         </div>
 
         {/* Occasion */}
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1 block">Occasion</label>
+          <label className="label-overline block mb-2">Occasion</label>
           <Input
             placeholder="e.g. Date night, Work, Festival…"
             value={occasion}
             onChange={(e) => setOccasion(e.target.value)}
-            className="h-10"
           />
         </div>
 
         {/* Visibility toggle */}
         <div
           className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 cursor-pointer select-none"
+          style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
           onClick={() => setIsPublic((v) => !v)}
         >
           <div className="flex items-center gap-3">
-            {isPublic ? <Globe className="w-4 h-4 text-primary" /> : <Lock className="w-4 h-4 text-muted-foreground" />}
+            {isPublic ? (
+              <Globe className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+            ) : (
+              <Lock className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+            )}
             <div>
-              <p className="text-sm font-medium text-foreground">{isPublic ? "Public" : "Private"}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="font-body font-medium text-[13px] text-foreground">{isPublic ? "Public" : "Private"}</p>
+              <p className="font-body font-light text-[11px] text-muted-foreground">
                 {isPublic ? "Anyone with the link can view" : "Only you can see this set"}
               </p>
             </div>
           </div>
-          <div className={`w-10 h-6 rounded-full transition-colors ${isPublic ? "bg-primary" : "bg-muted"} relative`}>
-            <div className={`absolute top-1 w-4 h-4 rounded-full bg-background transition-transform ${isPublic ? "translate-x-5" : "translate-x-1"}`} />
+          <div
+            className="w-10 h-6 rounded-full relative transition-colors"
+            style={{ backgroundColor: isPublic ? "hsl(var(--foreground))" : "hsl(var(--muted))" }}
+          >
+            <div
+              className="absolute top-1 w-4 h-4 rounded-full bg-card transition-transform"
+              style={{ transform: isPublic ? "translateX(20px)" : "translateX(4px)" }}
+            />
           </div>
         </div>
 
         {/* Product picker */}
         <div>
-          <p className="text-sm font-semibold text-foreground mb-2">
-            Products ({selectedIds.size} selected)
+          <p className="font-display text-[16px] font-normal text-foreground mb-3">
+            Products <span className="font-body font-light text-[13px] text-muted-foreground">({selectedIds.size} selected)</span>
           </p>
-          <Input
+          <input
             placeholder="Search products…"
             value={productSearch}
             onChange={(e) => setProductSearch(e.target.value)}
-            className="h-9 mb-2 text-sm"
+            className="w-full h-[44px] px-3 rounded-md border border-border bg-card font-body text-[14px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors mb-2"
           />
-          <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
+          <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
             {filtered.length === 0 && (
-              <p className="text-sm text-muted-foreground px-4 py-4">No products found.</p>
+              <p className="font-body font-light text-[13px] text-muted-foreground px-4 py-4">No products found.</p>
             )}
             {filtered.map((p) => {
               const selected = selectedIds.has(p.id);
@@ -241,17 +245,23 @@ const SetForm = () => {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors"
                   onClick={() => toggleProduct(p.id)}
                 >
-                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${selected ? "bg-primary border-primary" : "border-border"}`}>
-                    {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                  <div
+                    className="w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-colors"
+                    style={{
+                      backgroundColor: selected ? "hsl(var(--foreground))" : "transparent",
+                      borderColor: selected ? "hsl(var(--foreground))" : "hsl(var(--border))",
+                    }}
+                  >
+                    {selected && <Check className="w-3 h-3 text-btn-dark-fg" />}
                   </div>
                   {p.photo_url ? (
-                    <img src={p.photo_url} alt={p.name} className="w-9 h-9 rounded-lg object-cover shrink-0" />
+                    <img src={p.photo_url} alt={p.name} className="w-9 h-9 rounded-[8px] object-cover shrink-0" />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg bg-muted shrink-0" />
+                    <div className="w-9 h-9 rounded-[8px] bg-muted shrink-0" />
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{p.brand}</p>
+                    <p className="font-body font-medium text-[13px] text-foreground truncate">{p.name}</p>
+                    <p className="font-body font-light text-[11px] text-muted-foreground uppercase tracking-[0.06em] truncate">{p.brand}</p>
                   </div>
                 </button>
               );

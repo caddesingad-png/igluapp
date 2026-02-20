@@ -79,7 +79,6 @@ const DiscoverFeed = () => {
       if (mapped.length < PAGE_SIZE) setHasMore(false);
       else setHasMore(true);
 
-      // Batch-fetch profiles, likes, follows
       const userIds = [...new Set(mapped.map((s) => s.user_id))];
       const setIds = mapped.map((s) => s.id);
 
@@ -120,7 +119,6 @@ const DiscoverFeed = () => {
     [user]
   );
 
-  // Initial load + filter change
   useEffect(() => {
     setPage(0);
     setHasMore(true);
@@ -128,7 +126,6 @@ const DiscoverFeed = () => {
     fetchPage(0, filter, true);
   }, [filter, fetchPage]);
 
-  // Infinite scroll
   useEffect(() => {
     if (!sentinelRef.current) return;
     const obs = new IntersectionObserver(
@@ -150,7 +147,6 @@ const DiscoverFeed = () => {
     if (!user) return;
     const liked = likedSetIds.has(set.id);
 
-    // Optimistic update
     setLikedSetIds((prev) => {
       const next = new Set(prev);
       liked ? next.delete(set.id) : next.add(set.id);
@@ -163,13 +159,9 @@ const DiscoverFeed = () => {
     );
 
     if (liked) {
-      await (supabase.from("set_likes" as any) as any)
-        .delete()
-        .eq("user_id", user.id)
-        .eq("set_id", set.id);
+      await (supabase.from("set_likes" as any) as any).delete().eq("user_id", user.id).eq("set_id", set.id);
     } else {
-      await (supabase.from("set_likes" as any) as any)
-        .insert({ user_id: user.id, set_id: set.id });
+      await (supabase.from("set_likes" as any) as any).insert({ user_id: user.id, set_id: set.id });
     }
   };
 
@@ -185,23 +177,23 @@ const DiscoverFeed = () => {
     });
 
     if (followed) {
-      await (supabase.from("user_follows" as any) as any)
-        .delete()
-        .eq("follower_id", user.id)
-        .eq("following_id", userId);
+      await (supabase.from("user_follows" as any) as any).delete().eq("follower_id", user.id).eq("following_id", userId);
     } else {
-      await (supabase.from("user_follows" as any) as any)
-        .insert({ follower_id: user.id, following_id: userId });
+      await (supabase.from("user_follows" as any) as any).insert({ follower_id: user.id, following_id: userId });
     }
   };
 
   return (
-    <div className="px-4 pt-3 pb-4">
+    <div className="px-6 pt-4 pb-4">
       {/* Occasion filters */}
       <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
         <button
           onClick={() => setFilter(null)}
-          className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${!filter ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+          className="shrink-0 h-8 px-3.5 rounded-sm font-body text-[12px] uppercase tracking-[0.08em] transition-colors"
+          style={{
+            backgroundColor: !filter ? "hsl(var(--foreground))" : "hsl(var(--muted))",
+            color: !filter ? "hsl(var(--btn-primary-fg))" : "hsl(var(--muted-foreground))",
+          }}
         >
           Todos
         </button>
@@ -209,7 +201,11 @@ const DiscoverFeed = () => {
           <button
             key={occ}
             onClick={() => setFilter(occ === filter ? null : occ)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${filter === occ ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+            className="shrink-0 h-8 px-3.5 rounded-sm font-body text-[12px] uppercase tracking-[0.08em] transition-colors"
+            style={{
+              backgroundColor: filter === occ ? "hsl(var(--foreground))" : "hsl(var(--muted))",
+              color: filter === occ ? "hsl(var(--btn-primary-fg))" : "hsl(var(--muted-foreground))",
+            }}
           >
             {occ}
           </button>
@@ -219,12 +215,12 @@ const DiscoverFeed = () => {
       {/* Masonry grid */}
       {initialLoad ? (
         <div className="flex justify-center pt-16">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
         </div>
       ) : sets.length === 0 ? (
         <div className="flex flex-col items-center justify-center pt-20 text-center">
-          <Layers className="w-10 h-10 text-muted-foreground/40 mb-3" />
-          <p className="text-muted-foreground text-sm">Nenhum set público encontrado</p>
+          <Layers className="w-9 h-9 text-muted-foreground/30 mb-3" strokeWidth={1.5} />
+          <p className="font-body font-light text-[13px] text-muted-foreground">Nenhum set público encontrado</p>
         </div>
       ) : (
         <div className="columns-2 gap-3">
@@ -236,16 +232,13 @@ const DiscoverFeed = () => {
             return (
               <div
                 key={set.id}
-                className="break-inside-avoid mb-3 rounded-2xl border border-border bg-card overflow-hidden cursor-pointer"
+                className="break-inside-avoid mb-3 rounded-xl border border-border bg-card overflow-hidden cursor-pointer"
+                style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
                 onClick={() => navigate(`/sets/${set.id}`)}
               >
                 {/* Cover photo */}
                 {set.photo_url ? (
-                  <img
-                    src={set.photo_url}
-                    alt={set.name}
-                    className="w-full aspect-square object-cover"
-                  />
+                  <img src={set.photo_url} alt={set.name} className="w-full aspect-[4/5] object-cover" />
                 ) : (
                   <div className="w-full aspect-square bg-muted/50 grid grid-cols-2 gap-0.5 p-0.5">
                     {Array.from({ length: 4 }).map((_, i) => {
@@ -259,9 +252,21 @@ const DiscoverFeed = () => {
                   </div>
                 )}
 
+                {/* Occasion badge on top */}
+                {set.occasion && (
+                  <div className="px-2.5 pt-2">
+                    <span
+                      className="font-body text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-sm"
+                      style={{ backgroundColor: "rgba(253,250,247,0.9)", color: "hsl(var(--foreground))" }}
+                    >
+                      {set.occasion}
+                    </span>
+                  </div>
+                )}
+
                 {/* Product strip (if has cover photo) */}
                 {set.photo_url && set.product_photos.some(Boolean) && (
-                  <div className="flex gap-0.5 p-0.5 bg-muted/30">
+                  <div className="flex gap-0.5 px-2 pb-0.5 pt-1">
                     {Array.from({ length: 3 }).map((_, i) => {
                       const photo = set.product_photos[i];
                       return photo ? (
@@ -276,48 +281,39 @@ const DiscoverFeed = () => {
                 {/* Info */}
                 <div className="p-2.5">
                   <div className="flex items-start justify-between gap-1 mb-1.5">
-                    <p className="text-xs font-semibold text-foreground line-clamp-2 leading-snug flex-1">{set.name}</p>
-                    <button
-                      onClick={(e) => toggleLike(set, e)}
-                      className="shrink-0 flex items-center gap-0.5 mt-0.5"
-                    >
+                    <p className="font-body font-medium text-[12px] text-foreground line-clamp-2 leading-snug flex-1">{set.name}</p>
+                    <button onClick={(e) => toggleLike(set, e)} className="shrink-0 flex items-center gap-0.5 mt-0.5">
                       <Heart
-                        className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-rose-500 text-rose-500" : "text-muted-foreground"}`}
+                        className="w-3.5 h-3.5 transition-colors"
+                        style={{ fill: liked ? "hsl(var(--primary))" : "none", color: liked ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
+                        strokeWidth={1.5}
                       />
-                      <span className="text-[10px] text-muted-foreground">{set.likes_count}</span>
+                      <span className="font-body text-[10px] text-muted-foreground">{set.likes_count}</span>
                     </button>
                   </div>
-
-                  {set.occasion && (
-                    <p className="text-[10px] text-muted-foreground mb-2">{set.occasion}</p>
-                  )}
 
                   {/* Creator row */}
                   <div className="flex items-center gap-1.5 justify-between" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1 min-w-0">
-                      <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                        <span className="text-[8px] font-bold text-primary">
+                      <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
+                        <span className="font-body text-[8px] text-muted-foreground font-medium">
                           {(set.creator_name || "?")[0].toUpperCase()}
                         </span>
                       </div>
-                      <span className="text-[10px] text-muted-foreground truncate">
+                      <span className="font-body text-[10px] text-muted-foreground truncate">
                         {set.creator_name || "Usuária"}
                       </span>
                     </div>
                     {!isOwn && (
                       <button
                         onClick={(e) => toggleFollow(set.user_id, e)}
-                        className={`shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium transition-colors ${
-                          followed
-                            ? "bg-primary/10 text-primary"
-                            : "bg-muted text-muted-foreground"
-                        }`}
+                        className="shrink-0 flex items-center gap-0.5 h-5 px-1.5 rounded-sm font-body text-[9px] font-medium transition-colors"
+                        style={{
+                          backgroundColor: followed ? "hsl(var(--muted))" : "hsl(var(--foreground))",
+                          color: followed ? "hsl(var(--muted-foreground))" : "hsl(var(--btn-primary-fg))",
+                        }}
                       >
-                        {followed ? (
-                          <UserCheck className="w-2.5 h-2.5" />
-                        ) : (
-                          <UserPlus className="w-2.5 h-2.5" />
-                        )}
+                        {followed ? <UserCheck className="w-2.5 h-2.5" /> : <UserPlus className="w-2.5 h-2.5" />}
                         {followed ? "Seguindo" : "Seguir"}
                       </button>
                     )}
@@ -329,11 +325,10 @@ const DiscoverFeed = () => {
         </div>
       )}
 
-      {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-8" />
       {loading && !initialLoad && (
         <div className="flex justify-center py-4">
-          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
         </div>
       )}
     </div>
