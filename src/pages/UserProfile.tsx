@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
@@ -176,11 +177,11 @@ const UserProfile = () => {
     if (!file || !userId) return;
     setUploadingAvatar(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `avatars/${userId}.${ext}`;
+      const compressed = await compressImage(file, 600, 0.88);
+      const path = `avatars/${userId}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from("product-photos")
-        .upload(path, file, { upsert: true });
+        .upload(path, compressed, { upsert: true });
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
       const avatarUrl = urlData.publicUrl;
