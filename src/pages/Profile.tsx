@@ -40,10 +40,12 @@ const Profile = () => {
 
       const [profileRes, purchaseRes, productRes] = await Promise.all([
         supabase.from("profiles").select("display_name, monthly_budget").eq("user_id", user.id).single(),
-        (supabase.from("purchase_history" as any) as any)
+        supabase
+          .from("purchase_history")
           .select("price, purchase_date, products(name, category, pao_months)")
           .eq("user_id", user.id),
-        (supabase.from("products" as any) as any)
+        supabase
+          .from("products")
           .select("id, name, purchase_price, pao_months, category")
           .eq("user_id", user.id),
       ]);
