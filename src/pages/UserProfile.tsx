@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users } from "lucide-react";
+import {
+  ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
+  Settings, Pencil, Check, X, LogOut,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface ProfileData {
   user_id: string;
@@ -39,7 +43,14 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // Modal states
+  // Own-profile edit states
+  const [showSettings, setShowSettings] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioInput, setBioInput] = useState("");
+
+  // Follow modals
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [followersList, setFollowersList] = useState<FollowList[]>([]);
@@ -95,23 +106,38 @@ const UserProfile = () => {
     const wasFollowing = isFollowing;
     setIsFollowing(!wasFollowing);
     setFollowersCount((c) => c + (wasFollowing ? -1 : 1));
-
     if (wasFollowing) {
-      await (supabase.from("user_follows" as any) as any)
-        .delete()
-        .eq("follower_id", user.id)
-        .eq("following_id", userId);
+      await (supabase.from("user_follows" as any) as any).delete().eq("follower_id", user.id).eq("following_id", userId);
     } else {
-      await (supabase.from("user_follows" as any) as any)
-        .insert({ follower_id: user.id, following_id: userId });
+      await (supabase.from("user_follows" as any) as any).insert({ follower_id: user.id, following_id: userId });
     }
+  };
+
+  const saveName = async () => {
+    const trimmed = nameInput.trim();
+    if (!trimmed || !userId) return;
+    await supabase.from("profiles").update({ display_name: trimmed } as any).eq("user_id", userId);
+    setProfile((p) => p ? { ...p, display_name: trimmed } : p);
+    setEditingName(false);
+    toast.success("Nome atualizado");
+  };
+
+  const saveBio = async () => {
+    if (!userId) return;
+    await supabase.from("profiles").update({ bio: bioInput } as any).eq("user_id", userId);
+    setProfile((p) => p ? { ...p, bio: bioInput } : p);
+    setEditingBio(false);
+    toast.success("Bio atualizada");
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Sessão encerrada");
   };
 
   const loadFollowers = async () => {
     if (!userId) return;
-    const { data } = await (supabase.from("user_follows" as any) as any)
-      .select("follower_id")
-      .eq("following_id", userId);
+    const { data } = await (supabase.from("user_follows" as any) as any).select("follower_id").eq("following_id", userId);
     if (!data?.length) { setFollowersList([]); return; }
     const ids = data.map((r: any) => r.follower_id);
     const { data: profiles } = await supabase.from("profiles").select("user_id, display_name, avatar_url").in("user_id", ids);
@@ -120,9 +146,7 @@ const UserProfile = () => {
 
   const loadFollowing = async () => {
     if (!userId) return;
-    const { data } = await (supabase.from("user_follows" as any) as any)
-      .select("following_id")
-      .eq("follower_id", userId);
+    const { data } = await (supabase.from("user_follows" as any) as any).select("following_id").eq("follower_id", userId);
     if (!data?.length) { setFollowingList([]); return; }
     const ids = data.map((r: any) => r.following_id);
     const { data: profiles } = await supabase.from("profiles").select("user_id, display_name, avatar_url").in("user_id", ids);
@@ -156,63 +180,111 @@ const UserProfile = () => {
       <div className="min-h-screen pb-24 bg-background">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
-            <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
-              <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
-            </button>
+            {/* Back arrow — só quando navegado de outra tela (não próprio perfil via tab) */}
+            {!isOwnProfile ? (
+              <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
+                <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
+              </button>
+            ) : (
+              <div className="w-8" />
+            )}
+
             <span className="font-display text-[16px] font-normal text-foreground">
-              {profile?.display_name || "Perfil"}
+              {isOwnProfile ? "Meu Perfil" : (profile?.display_name || "Perfil")}
             </span>
-            <div className="w-8" />
+
+            {/* Settings gear — só no próprio perfil */}
+            {isOwnProfile ? (
+              <button
+                onClick={() => setShowSettings(true)}
+                className="w-8 h-8 flex items-center justify-center text-foreground"
+              >
+                <Settings className="w-[18px] h-[18px]" strokeWidth={1.5} />
+              </button>
+            ) : (
+              <div className="w-8" />
+            )}
           </div>
         </header>
 
         <div className="max-w-lg mx-auto px-6 pt-6">
           {/* Avatar + name + bio */}
-          <div className="flex items-start justify-between gap-4 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="font-body font-medium text-[20px] text-muted-foreground">{initials}</span>
-                )}
-              </div>
-              <div>
-                <h1 className="font-body font-medium text-[17px] text-foreground">
-                  {profile?.display_name || "Usuária"}
-                </h1>
-                {profile?.bio && (
-                  <p className="font-body font-light text-[13px] text-muted-foreground mt-0.5 leading-relaxed max-w-[220px]">
-                    {profile.bio}
-                  </p>
-                )}
-              </div>
+          <div className="flex flex-col items-center gap-3 text-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-body font-medium text-[24px] text-muted-foreground">{initials}</span>
+              )}
             </div>
 
-            {/* Follow button — só aparece para outros perfis */}
+            {/* Name — editável no próprio perfil */}
+            {isOwnProfile && editingName ? (
+              <div className="flex items-center gap-2">
+                <input
+                  autoFocus
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  maxLength={40}
+                  className="h-9 text-[15px] bg-muted rounded-lg px-3 border border-border font-body text-foreground outline-none text-center"
+                  onKeyDown={(e) => e.key === "Enter" && saveName()}
+                />
+                <button onClick={saveName} className="w-7 h-7 flex items-center justify-center text-foreground"><Check className="w-4 h-4" strokeWidth={2} /></button>
+                <button onClick={() => setEditingName(false)} className="w-7 h-7 flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" strokeWidth={2} /></button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-body font-medium text-[17px] text-foreground">
+                  {profile?.display_name || "Adicionar nome"}
+                </h1>
+                {isOwnProfile && (
+                  <button onClick={() => { setNameInput(profile?.display_name || ""); setEditingName(true); }}>
+                    <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" strokeWidth={1.5} />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Bio — editável no próprio perfil */}
+            {isOwnProfile && editingBio ? (
+              <div className="flex items-center gap-2">
+                <input
+                  autoFocus
+                  value={bioInput}
+                  onChange={(e) => setBioInput(e.target.value)}
+                  maxLength={80}
+                  placeholder="Bio curta..."
+                  className="h-9 text-[13px] bg-muted rounded-lg px-3 border border-border font-body text-foreground outline-none text-center w-[220px]"
+                  onKeyDown={(e) => e.key === "Enter" && saveBio()}
+                />
+                <button onClick={saveBio} className="w-7 h-7 flex items-center justify-center text-foreground"><Check className="w-4 h-4" strokeWidth={2} /></button>
+                <button onClick={() => setEditingBio(false)} className="w-7 h-7 flex items-center justify-center text-muted-foreground"><X className="w-4 h-4" strokeWidth={2} /></button>
+              </div>
+            ) : (
+              <button
+                className="flex items-center gap-1.5"
+                onClick={() => isOwnProfile && (setBioInput(profile?.bio || ""), setEditingBio(true))}
+              >
+                <span className="font-body font-light text-[13px] text-muted-foreground">
+                  {profile?.bio || (isOwnProfile ? "Adicionar bio..." : "")}
+                </span>
+                {isOwnProfile && (
+                  <Pencil className="w-3 h-3 text-muted-foreground/40" strokeWidth={1.5} />
+                )}
+              </button>
+            )}
+
+            {/* Follow button — outros perfis */}
             {!isOwnProfile && user && (
               <button
                 onClick={toggleFollow}
-                className="shrink-0 flex items-center gap-1.5 h-9 px-4 rounded-lg font-body text-[13px] font-medium transition-colors"
+                className="flex items-center gap-1.5 h-9 px-5 rounded-lg font-body text-[13px] font-medium transition-colors mt-1"
                 style={{
                   backgroundColor: isFollowing ? "hsl(var(--muted))" : "hsl(var(--foreground))",
                   color: isFollowing ? "hsl(var(--muted-foreground))" : "hsl(var(--btn-primary-fg))",
                 }}
               >
-                {isFollowing ? (
-                  <><UserCheck className="w-3.5 h-3.5" /> Seguindo</>
-                ) : (
-                  <><UserPlus className="w-3.5 h-3.5" /> Seguir</>
-                )}
-              </button>
-            )}
-
-            {isOwnProfile && (
-              <button
-                onClick={() => navigate("/profile")}
-                className="shrink-0 h-9 px-4 rounded-lg border border-border font-body text-[13px] text-muted-foreground transition-colors hover:bg-muted"
-              >
-                Editar perfil
+                {isFollowing ? <><UserCheck className="w-3.5 h-3.5" /> Seguindo</> : <><UserPlus className="w-3.5 h-3.5" /> Seguir</>}
               </button>
             )}
           </div>
@@ -223,17 +295,11 @@ const UserProfile = () => {
               <p className="font-body font-medium text-[18px] text-foreground">{sets.length}</p>
               <p className="label-overline">SETs</p>
             </div>
-            <button
-              className="text-center"
-              onClick={() => { setShowFollowers(true); loadFollowers(); }}
-            >
+            <button className="text-center" onClick={() => { setShowFollowers(true); loadFollowers(); }}>
               <p className="font-body font-medium text-[18px] text-foreground">{followersCount}</p>
               <p className="label-overline">Seguidores</p>
             </button>
-            <button
-              className="text-center"
-              onClick={() => { setShowFollowing(true); loadFollowing(); }}
-            >
+            <button className="text-center" onClick={() => { setShowFollowing(true); loadFollowing(); }}>
               <p className="font-body font-medium text-[18px] text-foreground">{followingCount}</p>
               <p className="label-overline">Seguindo</p>
             </button>
@@ -255,7 +321,6 @@ const UserProfile = () => {
                   className="rounded-xl overflow-hidden border border-border bg-card text-left transition-all active:scale-[0.98]"
                   style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
                 >
-                  {/* Cover */}
                   <div className="relative">
                     {set.photo_url ? (
                       <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
@@ -273,7 +338,6 @@ const UserProfile = () => {
                       </span>
                     )}
                   </div>
-                  {/* Info */}
                   <div className="p-2.5">
                     <p className="font-body font-medium text-[12px] text-foreground line-clamp-1">{set.name}</p>
                     <div className="flex items-center gap-1 mt-1">
@@ -307,11 +371,49 @@ const UserProfile = () => {
           onNavigate={(uid) => { setShowFollowing(false); navigate(`/user/${uid}`); }}
         />
       )}
+
+      {/* Settings bottom sheet — próprio perfil */}
+      {showSettings && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          style={{ backgroundColor: "rgba(26,23,20,0.4)" }}
+          onClick={() => setShowSettings(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-card rounded-t-2xl pb-8 overflow-hidden"
+            style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-8 h-1 rounded-full bg-border" />
+            </div>
+            <div className="px-6 pt-3 pb-4">
+              <p className="font-display text-[18px] font-normal text-foreground mb-4">Configurações</p>
+
+              {/* Account info */}
+              <div className="rounded-xl border border-border bg-background p-4 mb-4">
+                <p className="label-overline mb-1">Conta</p>
+                <p className="font-body font-light text-[13px] text-muted-foreground truncate">
+                  {user?.email}
+                </p>
+              </div>
+
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border font-body text-[14px] text-destructive border-destructive/30 hover:bg-destructive/5 transition-colors"
+              >
+                <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
 
-// ── Mini modal list ──────────────────────────────────────────────
+// ── Follow modal ────────────────────────────────────────────────
 interface FollowModalProps {
   title: string;
   list: FollowList[];
@@ -330,15 +432,12 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
       style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)" }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Handle */}
       <div className="flex justify-center pt-3 pb-1">
         <div className="w-8 h-1 rounded-full bg-border" />
       </div>
-
       <div className="px-6 pt-3 pb-2">
         <p className="font-display text-[18px] font-normal text-foreground">{title}</p>
       </div>
-
       <div className="max-h-[60vh] overflow-y-auto px-6">
         {list.length === 0 ? (
           <p className="font-body font-light text-[13px] text-muted-foreground py-8 text-center">Nenhuma pessoa aqui ainda.</p>
@@ -349,11 +448,7 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
                 ? person.display_name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
                 : "?";
               return (
-                <button
-                  key={person.id}
-                  className="flex items-center gap-3 w-full text-left"
-                  onClick={() => onNavigate(person.user_id)}
-                >
+                <button key={person.id} className="flex items-center gap-3 w-full text-left" onClick={() => onNavigate(person.user_id)}>
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                     {person.avatar_url ? (
                       <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -361,9 +456,7 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
                       <span className="font-body font-medium text-[13px] text-muted-foreground">{initials}</span>
                     )}
                   </div>
-                  <p className="font-body font-medium text-[14px] text-foreground">
-                    {person.display_name || "Usuária"}
-                  </p>
+                  <p className="font-body font-medium text-[14px] text-foreground">{person.display_name || "Usuária"}</p>
                 </button>
               );
             })}
