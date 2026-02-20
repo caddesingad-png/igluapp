@@ -122,7 +122,7 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    toast.success("Signed out");
+    toast.success("Sessão encerrada");
   };
 
   const saveBudget = async () => {

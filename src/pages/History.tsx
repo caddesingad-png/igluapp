@@ -18,17 +18,17 @@ interface PurchaseEntry {
 }
 
 const formatCurrency = (val: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
 const formatDate = (dateStr: string) =>
-  new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+  new Date(dateStr + "T00:00:00").toLocaleDateString("pt-BR", {
     year: "numeric", month: "short", day: "numeric",
   });
 
 const groupByMonth = (entries: PurchaseEntry[]) => {
   const groups: Record<string, PurchaseEntry[]> = {};
   for (const entry of entries) {
-    const label = new Date(entry.purchase_date + "T00:00:00").toLocaleDateString("en-US", {
+    const label = new Date(entry.purchase_date + "T00:00:00").toLocaleDateString("pt-BR", {
       year: "numeric", month: "long",
     });
     if (!groups[label]) groups[label] = [];
@@ -81,7 +81,7 @@ const History = () => {
     <div className="min-h-screen pb-20 bg-background">
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="max-w-lg mx-auto px-6 h-full flex items-center justify-between">
-          <h1 className="font-display text-[18px] font-normal text-foreground">Purchase History</h1>
+          <h1 className="font-display text-[18px] font-normal text-foreground">Histórico de Compras</h1>
           {purchases.length > 0 && (
             <p className="font-body text-[11px] text-muted-foreground">
               {formatCurrency(totalSpend)} total
@@ -99,9 +99,9 @@ const History = () => {
           <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-6">
             <Clock className="w-7 h-7 text-muted-foreground/50" strokeWidth={1.5} />
           </div>
-          <h2 className="font-display text-[20px] font-normal text-foreground mb-3">No purchases yet</h2>
+          <h2 className="font-display text-[20px] font-normal text-foreground mb-3">Sem compras ainda</h2>
           <p className="font-body font-light text-[14px] text-muted-foreground leading-relaxed max-w-[240px]">
-            Register a purchase on any product to start tracking your spending
+            Registre uma compra em qualquer produto para começar a acompanhar seus gastos
           </p>
         </div>
       ) : (
