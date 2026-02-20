@@ -32,22 +32,25 @@ const AvatarCropModal = ({ imageSrc, onConfirm, onCancel }: AvatarCropModalProps
     setProcessing(true);
 
     const img = imgRef.current;
-    const scaleX = img.naturalWidth / img.width;
-    const scaleY = img.naturalHeight / img.height;
 
-    // Convert % crop to px
-    const pixelX = (crop.x / 100) * img.width * scaleX;
-    const pixelY = (crop.y / 100) * img.height * scaleY;
-    const pixelW = (crop.width / 100) * img.width * scaleX;
-    const pixelH = (crop.height / 100) * img.height * scaleY;
+    // crop.unit === "%" → converter para pixels naturais da imagem
+    const naturalX = (crop.x / 100) * img.naturalWidth;
+    const naturalY = (crop.y / 100) * img.naturalHeight;
+    const naturalW = (crop.width / 100) * img.naturalWidth;
+    const naturalH = (crop.height / 100) * img.naturalHeight;
 
-    const size = Math.min(pixelW, pixelH);
-    const outputSize = Math.min(size, 600); // máx 600px
+    const size = Math.min(naturalW, naturalH);
+    const outputSize = Math.min(size, 600);
 
     const canvas = document.createElement("canvas");
     canvas.width = outputSize;
     canvas.height = outputSize;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { setProcessing(false); return; }
+
+    // Fundo branco (para imagens com transparência)
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, outputSize, outputSize);
 
     // Clip circular
     ctx.beginPath();
@@ -55,7 +58,12 @@ const AvatarCropModal = ({ imageSrc, onConfirm, onCancel }: AvatarCropModalProps
     ctx.closePath();
     ctx.clip();
 
-    ctx.drawImage(img, pixelX, pixelY, size, size, 0, 0, outputSize, outputSize);
+    // Desenha a região recortada
+    ctx.drawImage(
+      img,
+      naturalX, naturalY, size, size,   // source
+      0, 0, outputSize, outputSize       // destination
+    );
 
     canvas.toBlob(
       (blob) => {
