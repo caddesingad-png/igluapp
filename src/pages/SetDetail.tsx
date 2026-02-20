@@ -6,6 +6,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { shareSet } from "@/lib/shareSet";
 import { useToast } from "@/hooks/use-toast";
 
+interface SetLayer {
+  id: string;
+  layer_order: number;
+  layer_name: string;
+  layer_icon: string;
+  product_ids: string[];
+  note: string | null;
+}
+
 interface SetData {
   id: string;
   name: string;
@@ -43,6 +52,7 @@ const SetDetail = () => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [followed, setFollowed] = useState(false);
+  const [layers, setLayers] = useState<SetLayer[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -80,6 +90,14 @@ const SetDetail = () => {
       if (prodRes.data) {
         setProducts((prodRes.data as any[]).map((r) => r.products).filter(Boolean));
       }
+
+      // Load layers
+      const { data: layerData } = await (supabase.from("set_layers" as any) as any)
+        .select("*")
+        .eq("set_id", id)
+        .order("layer_order");
+      setLayers(layerData ?? []);
+
       setLoading(false);
     };
     load();
@@ -258,6 +276,117 @@ const SetDetail = () => {
             )}
           </div>
         </div>
+
+        {/* ── CAMADAS (read-only) ── */}
+        {layers.length > 0 && (
+          <div className="px-6 mt-6">
+            <p
+              className="font-body mb-4"
+              style={{
+                fontSize: "11px",
+                fontWeight: 400,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#8C8480",
+              }}
+            >
+              Camadas
+            </p>
+
+            <div className="relative">
+              {/* Timeline vertical line */}
+              <div
+                className="absolute left-[11px] top-0 bottom-0 w-px"
+                style={{ backgroundColor: "#E8E2DC" }}
+              />
+
+              <div className="space-y-0">
+                {layers.map((layer, idx) => {
+                  const layerProducts = products.filter((p) => layer.product_ids.includes(p.id));
+                  return (
+                    <div key={layer.id} className="relative">
+                      {/* Timeline dot */}
+                      <div
+                        className="absolute left-0 top-4 w-[23px] h-[23px] rounded-full flex items-center justify-center text-[11px] bg-background"
+                        style={{ border: "1px solid #E8E2DC", zIndex: 1 }}
+                      >
+                        <span>{layer.layer_icon}</span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="pl-10 pb-5">
+                        {/* Layer header */}
+                        <div className="flex items-center gap-1.5 pt-3.5 mb-2">
+                          <span
+                            className="font-body"
+                            style={{
+                              fontSize: "11px",
+                              color: "#8C8480",
+                              fontWeight: 400,
+                              marginRight: "2px",
+                            }}
+                          >
+                            {layer.layer_order}
+                          </span>
+                          <p
+                            className="font-body"
+                            style={{
+                              fontSize: "13px",
+                              fontWeight: 500,
+                              color: "#1A1714",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {layer.layer_name}
+                          </p>
+                        </div>
+
+                        {/* Product chips */}
+                        {layerProducts.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {layerProducts.map((p) => (
+                              <button
+                                key={p.id}
+                                className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1.5 hover:bg-muted/80 transition-colors"
+                                onClick={() => isOwner && navigate(`/product/${p.id}`)}
+                              >
+                                {p.photo_url && (
+                                  <img src={p.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                                )}
+                                <span className="font-body text-[12px] text-foreground">{p.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Note */}
+                        {layer.note && (
+                          <p
+                            className="font-body"
+                            style={{
+                              fontSize: "13px",
+                              fontWeight: 300,
+                              fontStyle: "italic",
+                              color: "#8C8480",
+                            }}
+                          >
+                            {layer.note}
+                          </p>
+                        )}
+
+                        {/* Divider (not after last) */}
+                        {idx < layers.length - 1 && (
+                          <div className="mt-4" style={{ height: "1px", backgroundColor: "#E8E2DC" }} />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
