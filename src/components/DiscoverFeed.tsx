@@ -232,88 +232,114 @@ const DiscoverFeed = () => {
             return (
               <div
                 key={set.id}
-                className="break-inside-avoid mb-3 rounded-xl border border-border bg-card overflow-hidden cursor-pointer"
-                style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
+                className="break-inside-avoid mb-3 rounded-xl bg-card overflow-hidden cursor-pointer"
+                style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)", border: "1px solid hsl(var(--border))" }}
                 onClick={() => navigate(`/sets/${set.id}`)}
               >
-                {/* Cover photo — full width, hero */}
-                <div className="relative">
-                  {set.photo_url ? (
-                    <img src={set.photo_url} alt={set.name} className="w-full aspect-[4/5] object-cover" />
-                  ) : (
-                    <div className="w-full aspect-[4/5] bg-muted flex items-center justify-center">
-                      <Layers className="w-8 h-8 text-muted-foreground/30" strokeWidth={1.5} />
-                    </div>
-                  )}
-                  {/* Occasion badge overlay */}
-                  {set.occasion && (
-                    <div className="absolute top-2 left-2">
-                      <span
-                        className="font-body text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-sm"
-                        style={{ backgroundColor: "rgba(253,250,247,0.92)", color: "hsl(var(--foreground))" }}
-                      >
-                        {set.occasion}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Product thumbnails strip — same layout as Meus SETs */}
-                <div className="flex gap-0.5 px-1.5 pt-1.5 pb-0.5">
-                  {Array.from({ length: 4 }).map((_, i) => {
-                    const photo = set.product_photos[i];
-                    return photo ? (
-                      <img key={i} src={photo} alt="" className="flex-1 aspect-square object-cover rounded-sm" />
+                {/* Polaroid-style padded photo */}
+                <div className="p-2 pb-1">
+                  <div className="relative rounded-[8px] overflow-hidden">
+                    {set.photo_url ? (
+                      <img
+                        src={set.photo_url}
+                        alt={set.name}
+                        className="w-full aspect-[4/5] object-cover"
+                      />
                     ) : (
-                      <div key={i} className="flex-1 aspect-square rounded-sm bg-muted/60" />
-                    );
-                  })}
-                </div>
+                      <div className="w-full aspect-[4/5] bg-muted flex items-center justify-center">
+                        <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />
+                      </div>
+                    )}
 
-                {/* Info */}
-                <div className="px-2.5 pt-1.5 pb-2">
-                  <div className="flex items-start justify-between gap-1 mb-1.5">
-                    <p className="font-body font-medium text-[12px] text-foreground line-clamp-2 leading-snug flex-1">{set.name}</p>
-                    <button onClick={(e) => toggleLike(set, e)} className="shrink-0 flex items-center gap-0.5 mt-0.5">
+                    {/* Occasion badge — top left */}
+                    {set.occasion && (
+                      <div className="absolute top-1.5 left-1.5">
+                        <span
+                          className="font-body text-[8px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-sm"
+                          style={{ backgroundColor: "rgba(253,250,247,0.92)", color: "hsl(var(--foreground))" }}
+                        >
+                          {set.occasion}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Like — top right */}
+                    <button
+                      onClick={(e) => toggleLike(set, e)}
+                      className="absolute top-1.5 right-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-sm"
+                      style={{ backgroundColor: "rgba(253,250,247,0.88)" }}
+                    >
                       <Heart
-                        className="w-3.5 h-3.5 transition-colors"
-                        style={{ fill: liked ? "hsl(var(--primary))" : "none", color: liked ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
+                        className="w-3 h-3 transition-colors"
+                        style={{
+                          fill: liked ? "hsl(var(--primary))" : "none",
+                          color: liked ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
+                        }}
                         strokeWidth={1.5}
                       />
-                      <span className="font-body text-[10px] text-muted-foreground">{set.likes_count}</span>
+                      <span className="font-body text-[9px] text-muted-foreground">{set.likes_count}</span>
                     </button>
                   </div>
 
-                  {/* Creator row */}
-                  <div className="flex items-center gap-1.5 justify-between" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center gap-1 min-w-0">
-                      {set.creator_avatar ? (
-                        <img src={set.creator_avatar} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+                  {/* 6 product thumbnails — full row */}
+                  <div className="flex gap-1 mt-2">
+                    {Array.from({ length: 6 }).map((_, i) => {
+                      const photo = set.product_photos[i];
+                      return photo ? (
+                        <img
+                          key={i}
+                          src={photo}
+                          alt=""
+                          className="flex-1 aspect-square object-cover rounded-[4px]"
+                        />
                       ) : (
-                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
-                          <span className="font-body text-[8px] text-muted-foreground font-medium">
-                            {(set.creator_name || "?")[0].toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <span className="font-body text-[10px] text-muted-foreground truncate">
-                        {set.creator_name || "Usuária"}
-                      </span>
-                    </div>
-                    {!isOwn && (
-                      <button
-                        onClick={(e) => toggleFollow(set.user_id, e)}
-                        className="shrink-0 flex items-center gap-0.5 h-5 px-1.5 rounded-sm font-body text-[9px] font-medium transition-colors"
-                        style={{
-                          backgroundColor: followed ? "hsl(var(--muted))" : "hsl(var(--foreground))",
-                          color: followed ? "hsl(var(--muted-foreground))" : "hsl(var(--btn-primary-fg))",
-                        }}
-                      >
-                        {followed ? <UserCheck className="w-2.5 h-2.5" /> : <UserPlus className="w-2.5 h-2.5" />}
-                        {followed ? "Seguindo" : "Seguir"}
-                      </button>
-                    )}
+                        <div
+                          key={i}
+                          className="flex-1 aspect-square rounded-[4px] bg-muted"
+                        />
+                      );
+                    })}
                   </div>
+
+                  {/* Set name */}
+                  <p className="font-body font-medium text-[12px] text-foreground leading-snug line-clamp-2 mt-2">
+                    {set.name}
+                  </p>
+                </div>
+
+                {/* Creator row */}
+                <div
+                  className="flex items-center justify-between px-2 pb-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center gap-1 min-w-0">
+                    {set.creator_avatar ? (
+                      <img src={set.creator_avatar} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
+                        <span className="font-body text-[7px] text-muted-foreground font-medium">
+                          {(set.creator_name || "?")[0].toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="font-body text-[9px] text-muted-foreground truncate">
+                      {set.creator_name || "Usuária"}
+                    </span>
+                  </div>
+
+                  {!isOwn && (
+                    <button
+                      onClick={(e) => toggleFollow(set.user_id, e)}
+                      className="shrink-0 flex items-center gap-0.5 h-5 px-1.5 rounded-sm font-body text-[8px] font-medium transition-colors"
+                      style={{
+                        backgroundColor: followed ? "hsl(var(--muted))" : "hsl(var(--foreground))",
+                        color: followed ? "hsl(var(--muted-foreground))" : "hsl(var(--btn-primary-fg))",
+                      }}
+                    >
+                      {followed ? <UserCheck className="w-2.5 h-2.5" /> : <UserPlus className="w-2.5 h-2.5" />}
+                      {followed ? "Seguindo" : "Seguir"}
+                    </button>
+                  )}
                 </div>
               </div>
             );
