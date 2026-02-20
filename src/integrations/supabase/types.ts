@@ -112,6 +112,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           display_name: string | null
           id: string
@@ -121,6 +122,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -130,6 +132,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -171,6 +174,27 @@ export type Database = {
           product_id?: string
           purchase_date?: string
           store?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      set_likes: {
+        Row: {
+          created_at: string
+          id: string
+          set_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          set_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          set_id?: string
           user_id?: string
         }
         Relationships: []
@@ -219,6 +243,7 @@ export type Database = {
           created_at: string
           id: string
           is_public: boolean
+          likes_count: number
           name: string
           occasion: string | null
           photo_url: string | null
@@ -229,6 +254,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_public?: boolean
+          likes_count?: number
           name: string
           occasion?: string | null
           photo_url?: string | null
@@ -239,11 +265,33 @@ export type Database = {
           created_at?: string
           id?: string
           is_public?: boolean
+          likes_count?: number
           name?: string
           occasion?: string | null
           photo_url?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
         Relationships: []
       }
