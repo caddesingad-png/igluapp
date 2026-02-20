@@ -85,12 +85,14 @@ const SortableGridItem = ({
         position: "relative",
       }}
     >
-      {/* Drag handle overlay (top-right) */}
+      {/* Drag handle overlay (top-left) — aria-hidden so no text leaks */}
       <div
         {...attributes}
         {...listeners}
-        className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded bg-background/70 touch-none cursor-grab active:cursor-grabbing"
+        aria-hidden="true"
+        className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded bg-background/60 touch-none cursor-grab active:cursor-grabbing"
         onClick={(e) => e.stopPropagation()}
+        style={{ WebkitUserSelect: "none", userSelect: "none" }}
       >
         <GripVertical className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
       </div>
