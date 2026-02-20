@@ -66,6 +66,7 @@ export type Database = {
           photo_url: string | null
           purchase_date: string
           purchase_price: number
+          sort_order: number | null
           updated_at: string
           usage_frequency: string
           user_id: string
@@ -84,6 +85,7 @@ export type Database = {
           photo_url?: string | null
           purchase_date?: string
           purchase_price: number
+          sort_order?: number | null
           updated_at?: string
           usage_frequency?: string
           user_id: string
@@ -102,6 +104,7 @@ export type Database = {
           photo_url?: string | null
           purchase_date?: string
           purchase_price?: number
+          sort_order?: number | null
           updated_at?: string
           usage_frequency?: string
           user_id?: string

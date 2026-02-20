@@ -1,7 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
-import { Plus, LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { Plus, LayoutGrid, List, Search, SlidersHorizontal, X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +14,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sparkles } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Product {
   id: string;
@@ -28,6 +44,7 @@ interface Product {
   usage_frequency: string;
   is_favorite: boolean;
   created_at: string;
+  sort_order: number | null;
   current_color?: string | null;
 }
 
@@ -37,6 +54,7 @@ const CATEGORIES = [
 ];
 
 const SORT_OPTIONS = [
+  { value: "custom", label: "Personalizado" },
   { value: "date_desc", label: "Mais recentes" },
   { value: "date_asc", label: "Mais antigas" },
   { value: "price_desc", label: "Preço: maior → menor" },
@@ -44,6 +62,81 @@ const SORT_OPTIONS = [
   { value: "name_asc", label: "Nome A → Z" },
   { value: "favorites", label: "Favoritas primeiro" },
 ];
+
+// ─── Sortable wrappers ────────────────────────────────────────────────────────
+
+const SortableGridItem = ({
+  product,
+  onClick,
+}: {
+  product: Product;
+  onClick: () => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: product.id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        position: "relative",
+      }}
+    >
+      {/* Drag handle overlay (top-right) */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded bg-background/70 touch-none cursor-grab active:cursor-grabbing"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+      </div>
+      <ProductCard product={product} viewMode="grid" onClick={onClick} />
+    </div>
+  );
+};
+
+const SortableListItem = ({
+  product,
+  onClick,
+}: {
+  product: Product;
+  onClick: () => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: product.id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+      }}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="shrink-0 w-7 h-7 flex items-center justify-center text-muted-foreground touch-none cursor-grab active:cursor-grabbing"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="w-4 h-4" strokeWidth={1.5} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <ProductCard product={product} viewMode="list" onClick={onClick} />
+      </div>
+    </div>
+  );
+};
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 const Library = () => {
   const navigate = useNavigate();
@@ -53,16 +146,23 @@ const Library = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todas");
-  const [sortBy, setSortBy] = useState("date_desc");
+  const [sortBy, setSortBy] = useState("custom");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
 
   useEffect(() => {
     if (!user) return;
     const fetchProducts = async () => {
       const [productsRes, colorsRes] = await Promise.all([
-        (supabase.from("products" as any) as any)
-          .select("id, name, brand, category, purchase_price, photo_url, pao_months, purchase_date, usage_frequency, is_favorite, created_at")
+        supabase
+          .from("products" as any)
+          .select("id, name, brand, category, purchase_price, photo_url, pao_months, purchase_date, usage_frequency, is_favorite, created_at, sort_order")
           .eq("user_id", user.id),
-        (supabase.from("product_color_codes" as any) as any)
+        supabase
+          .from("product_color_codes" as any)
           .select("product_id, code")
           .eq("user_id", user.id)
           .eq("is_current", true),
@@ -71,16 +171,17 @@ const Library = () => {
       if (!productsRes.error && productsRes.data) {
         const currentByProduct: Record<string, string> = {};
         if (!colorsRes.error && colorsRes.data) {
-          for (const row of colorsRes.data) {
+          for (const row of colorsRes.data as any[]) {
             currentByProduct[row.product_id] = row.code;
           }
         }
-        setProducts(
-          productsRes.data.map((p: Product) => ({
-            ...p,
-            current_color: currentByProduct[p.id] ?? null,
-          }))
-        );
+        const mapped = (productsRes.data as any[]).map((p) => ({
+          ...p,
+          current_color: currentByProduct[p.id] ?? null,
+        }));
+        // Sort by sort_order initially
+        mapped.sort((a, b) => (a.sort_order ?? 9999) - (b.sort_order ?? 9999));
+        setProducts(mapped);
       }
       setLoading(false);
     };
@@ -98,19 +199,47 @@ const Library = () => {
     if (selectedCategory !== "Todas") {
       result = result.filter((p) => p.category === selectedCategory);
     }
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case "date_desc": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case "date_asc": return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case "price_desc": return b.purchase_price - a.purchase_price;
-        case "price_asc": return a.purchase_price - b.purchase_price;
-        case "name_asc": return a.name.localeCompare(b.name);
-        case "favorites": return (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0);
-        default: return 0;
-      }
-    });
+    if (sortBy !== "custom") {
+      result.sort((a, b) => {
+        switch (sortBy) {
+          case "date_desc": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          case "date_asc": return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          case "price_desc": return b.purchase_price - a.purchase_price;
+          case "price_asc": return a.purchase_price - b.purchase_price;
+          case "name_asc": return a.name.localeCompare(b.name);
+          case "favorites": return (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0);
+          default: return 0;
+        }
+      });
+    }
     return result;
   }, [products, search, selectedCategory, sortBy]);
+
+  const isDraggable = sortBy === "custom" && !search.trim() && selectedCategory === "Todas";
+
+  const persistOrder = useCallback(
+    async (orderedIds: string[]) => {
+      if (!user) return;
+      const updates = orderedIds.map((id, i) =>
+        supabase.from("products" as any).update({ sort_order: i + 1 } as any).eq("id", id).eq("user_id", user.id)
+      );
+      await Promise.all(updates);
+    },
+    [user]
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setProducts((prev) => {
+      const oldIndex = prev.findIndex((p) => p.id === active.id);
+      const newIndex = prev.findIndex((p) => p.id === over.id);
+      const next = arrayMove(prev, oldIndex, newIndex);
+      persistOrder(next.map((p) => p.id));
+      return next;
+    });
+  };
 
   const isEmpty = !loading && products.length === 0;
   const noResults = !loading && products.length > 0 && filtered.length === 0;
@@ -145,7 +274,6 @@ const Library = () => {
 
       {/* Search + filters */}
       <div className="max-w-lg mx-auto px-6 pt-4 pb-2 space-y-3">
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" strokeWidth={1.5} />
           <input
@@ -161,7 +289,6 @@ const Library = () => {
           )}
         </div>
 
-        {/* Filter chips + Sort */}
         <div className="flex items-center gap-2">
           <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 pb-0.5">
             {CATEGORIES.map((cat) => (
@@ -181,21 +308,36 @@ const Library = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="shrink-0 h-8 w-8 flex items-center justify-center rounded-sm bg-muted text-muted-foreground">
+              <button
+                className={`shrink-0 h-8 w-8 flex items-center justify-center rounded-sm transition-colors ${
+                  sortBy !== "custom" ? "bg-foreground text-btn-dark-fg" : "bg-muted text-muted-foreground"
+                }`}
+              >
                 <SlidersHorizontal className="w-3.5 h-3.5" strokeWidth={1.5} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
                 {SORT_OPTIONS.map((opt) => (
                   <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-sm font-body">
                     {opt.label}
+                    {opt.value === "custom" && (
+                      <span className="ml-1.5 text-[10px] text-muted-foreground">arraste ✦</span>
+                    )}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        {/* Hint when drag is active */}
+        {isDraggable && products.length > 1 && (
+          <p className="font-body text-[11px] text-muted-foreground flex items-center gap-1.5">
+            <GripVertical className="w-3 h-3" strokeWidth={1.5} />
+            Segure e arraste para reordenar
+          </p>
+        )}
       </div>
 
       {/* Loading */}
@@ -242,18 +384,50 @@ const Library = () => {
             {filtered.length} produto{filtered.length !== 1 ? "s" : ""}
             {selectedCategory !== "Todas" && ` · ${selectedCategory}`}
           </p>
-          {viewMode === "grid" ? (
-            <div className="grid grid-cols-2 gap-3">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} viewMode="grid" onClick={() => navigate(`/product/${product.id}`)} />
-              ))}
-            </div>
+
+          {isDraggable ? (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext
+                items={filtered.map((p) => p.id)}
+                strategy={viewMode === "grid" ? rectSortingStrategy : verticalListSortingStrategy}
+              >
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    {filtered.map((product) => (
+                      <SortableGridItem
+                        key={product.id}
+                        product={product}
+                        onClick={() => navigate(`/product/${product.id}`)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filtered.map((product) => (
+                      <SortableListItem
+                        key={product.id}
+                        product={product}
+                        onClick={() => navigate(`/product/${product.id}`)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </SortableContext>
+            </DndContext>
           ) : (
-            <div className="flex flex-col gap-2">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} viewMode="list" onClick={() => navigate(`/product/${product.id}`)} />
-              ))}
-            </div>
+            viewMode === "grid" ? (
+              <div className="grid grid-cols-2 gap-3">
+                {filtered.map((product) => (
+                  <ProductCard key={product.id} product={product} viewMode="grid" onClick={() => navigate(`/product/${product.id}`)} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {filtered.map((product) => (
+                  <ProductCard key={product.id} product={product} viewMode="list" onClick={() => navigate(`/product/${product.id}`)} />
+                ))}
+              </div>
+            )
           )}
         </div>
       )}
