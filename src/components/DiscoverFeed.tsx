@@ -339,23 +339,23 @@ const DiscoverFeed = () => {
 
                 {/* Creator row */}
                 <div
-                  className="flex items-center justify-between px-2 pb-2"
+                  className="flex items-center justify-between px-2 pb-2 pt-0.5 gap-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    className="flex items-center gap-1 min-w-0"
+                    className="flex items-center gap-1.5 min-w-0 flex-1"
                     onClick={(e) => { e.stopPropagation(); navigate(`/user/${set.user_id}`); }}
                   >
                     {set.creator_avatar ? (
-                      <img src={set.creator_avatar} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+                      <img src={set.creator_avatar} alt="" className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
                     ) : (
-                      <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <span className="font-body text-[7px] text-muted-foreground font-medium">
+                      <div className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center shrink-0">
+                        <span className="font-body text-[8px] text-muted-foreground font-medium">
                           {(set.creator_name || "?")[0].toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span className="font-body text-[9px] text-muted-foreground truncate">
+                    <span className="font-body text-[10px] text-foreground/70 truncate font-medium">
                       {set.creator_name || "Usuária"}
                     </span>
                   </button>
