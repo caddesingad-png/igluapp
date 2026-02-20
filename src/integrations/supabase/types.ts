@@ -117,6 +117,7 @@ export type Database = {
           display_name: string | null
           id: string
           monthly_budget: number | null
+          onboarding_completed: boolean
           updated_at: string
           user_id: string
         }
@@ -127,6 +128,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           monthly_budget?: number | null
+          onboarding_completed?: boolean
           updated_at?: string
           user_id: string
         }
@@ -137,6 +139,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           monthly_budget?: number | null
+          onboarding_completed?: boolean
           updated_at?: string
           user_id?: string
         }
