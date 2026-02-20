@@ -115,6 +115,7 @@ const AvatarCropModal = ({ imageSrc, onConfirm, onCancel }: AvatarCropModalProps
             ref={imgRef}
             src={imageSrc}
             onLoad={onImageLoad}
+            crossOrigin="anonymous"
             alt="Crop"
             style={{ maxHeight: "75vh", maxWidth: "100%", display: "block" }}
           />
