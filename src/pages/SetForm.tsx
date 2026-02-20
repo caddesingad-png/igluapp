@@ -57,7 +57,7 @@ const SetForm = () => {
   const [productSearch, setProductSearch] = useState("");
 
   const [layers, setLayers] = useState<Record<number, LayerState>>(defaultLayers);
-  const [layersSectionOpen, setLayersSectionOpen] = useState(false);
+  const [layersSectionOpen, setLayersSectionOpen] = useState(!isEdit);
   const [linkingLayer, setLinkingLayer] = useState<number | null>(null);
 
   useEffect(() => {
