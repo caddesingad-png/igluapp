@@ -89,7 +89,8 @@ const DiscoverFeed = () => {
       const setIds = mapped.map((s) => s.id);
 
       const [profilesRes, likesRes, followsRes] = await Promise.all([
-        supabase.from("profiles").select("user_id, display_name, avatar_url").in("user_id", userIds),
+        // Usa profiles_public (view sem monthly_budget) para dados de outros usuários
+        (supabase.from("profiles_public" as any) as any).select("user_id, display_name, avatar_url").in("user_id", userIds),
         user ? (supabase.from("set_likes" as any) as any).select("set_id").eq("user_id", user.id).in("set_id", setIds) : Promise.resolve({ data: [] }),
         user ? (supabase.from("user_follows" as any) as any).select("following_id").eq("follower_id", user.id).in("following_id", userIds) : Promise.resolve({ data: [] }),
       ]);
