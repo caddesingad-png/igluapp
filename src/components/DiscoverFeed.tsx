@@ -289,39 +289,44 @@ const DiscoverFeed = () => {
 
                   {/* Style capsule — 4 products + "+X more" slot */}
                   {set.total_products > 0 && (
-                    <div className="flex gap-1 mt-2">
-                      {/* Show up to 4 product photos */}
-                      {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
-                        const photo = set.product_photos[i];
-                        return photo ? (
-                          <img
-                            key={i}
-                            src={photo}
-                            alt=""
-                            className="flex-1 aspect-square object-cover rounded-[4px]"
-                          />
-                        ) : (
-                          <div
-                            key={i}
-                            className="flex-1 aspect-square rounded-[4px] bg-muted"
-                          />
-                        );
-                      })}
+                    <div className="mt-2">
+                      <p className="font-body text-[8px] uppercase tracking-[0.08em] text-muted-foreground mb-1">
+                        Produtos usados
+                      </p>
+                      <div className="flex gap-1">
+                        {/* Show up to 4 product photos */}
+                        {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
+                          const photo = set.product_photos[i];
+                          return photo ? (
+                            <img
+                              key={i}
+                              src={photo}
+                              alt=""
+                              className="flex-1 aspect-square object-cover rounded-[4px]"
+                            />
+                          ) : (
+                            <div
+                              key={i}
+                              className="flex-1 aspect-square rounded-[4px] bg-muted"
+                            />
+                          );
+                        })}
 
-                      {/* "+X" overflow slot */}
-                      {set.total_products > 4 && (
-                        <div
-                          className="flex-1 aspect-square rounded-[4px] flex items-center justify-center"
-                          style={{ backgroundColor: "hsl(var(--foreground))" }}
-                        >
-                          <span
-                            className="font-body font-medium leading-none"
-                            style={{ fontSize: "9px", color: "hsl(var(--btn-primary-fg))" }}
+                        {/* "+X" overflow slot */}
+                        {set.total_products > 4 && (
+                          <div
+                            className="flex-1 aspect-square rounded-[4px] flex items-center justify-center"
+                            style={{ backgroundColor: "hsl(var(--foreground))" }}
                           >
-                            +{set.total_products - 4}
-                          </span>
-                        </div>
-                      )}
+                            <span
+                              className="font-body font-medium leading-none"
+                              style={{ fontSize: "9px", color: "hsl(var(--btn-primary-fg))" }}
+                            >
+                              +{set.total_products - 4}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
