@@ -116,7 +116,7 @@ const Library = () => {
   const noResults = !loading && products.length > 0 && filtered.length === 0;
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="min-h-screen pb-24 bg-background screen-enter">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="max-w-lg mx-auto px-6 h-full flex items-center justify-between">

@@ -320,7 +320,7 @@ const ProductDetail = () => {
   const visiblePurchases = showAllPurchases ? purchases : purchases.slice(0, 3);
 
   return (
-    <div className="min-h-screen pb-10 bg-background">
+    <div className="min-h-screen pb-10 bg-background screen-enter">
       {/* Header */}
       <header className="sticky top-0 z-40 glass border-b border-border px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">

@@ -139,4 +139,30 @@
     letter-spacing: 0.12em;
     color: hsl(var(--muted-foreground));
   }
+
+  /* Card press */
+  .card-press {
+    transition: transform 150ms ease;
+  }
+  .card-press:active {
+    transform: scale(0.98);
+  }
+
+  /* Screen fade-in */
+  .screen-enter {
+    animation: screen-fade 200ms ease both;
+  }
+
+  /* Button press */
+  .btn-press {
+    transition: opacity 100ms ease;
+  }
+  .btn-press:active {
+    opacity: 0.8;
+  }
+}
+
+@keyframes screen-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

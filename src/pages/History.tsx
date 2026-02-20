@@ -78,7 +78,7 @@ const History = () => {
   const totalSpend = purchases.reduce((sum, p) => sum + p.price, 0);
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
+    <div className="min-h-screen pb-20 bg-background screen-enter">
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="max-w-lg mx-auto px-6 h-full flex items-center justify-between">
           <h1 className="font-display text-[18px] font-normal text-foreground">Histórico de Compras</h1>

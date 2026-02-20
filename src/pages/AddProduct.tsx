@@ -181,7 +181,7 @@ const AddProduct = () => {
         <BarcodeScanner onDetected={handleBarcodeDetected} onClose={() => setShowScanner(false)} />
       )}
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background screen-enter">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center gap-3 max-w-lg mx-auto px-4 h-full">
             <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">

@@ -88,7 +88,7 @@ const Sets = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
+    <div className="min-h-screen pb-20 bg-background screen-enter">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "auto" }}>
         <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
