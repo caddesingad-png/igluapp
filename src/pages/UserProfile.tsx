@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
-  Settings, Pencil, Check, X, LogOut,
+  Settings, Pencil, Check, X, LogOut, Camera,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -69,6 +69,8 @@ const UserProfile = () => {
   const [nameInput, setNameInput] = useState("");
   const [editingBio, setEditingBio] = useState(false);
   const [bioInput, setBioInput] = useState("");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Follow modals
   const [showFollowers, setShowFollowers] = useState(false);
@@ -169,6 +171,30 @@ const UserProfile = () => {
     toast.success("Sessão encerrada");
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `avatars/${userId}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("product-photos")
+        .upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
+      const avatarUrl = urlData.publicUrl;
+      await supabase.from("profiles").update({ avatar_url: avatarUrl } as any).eq("user_id", userId);
+      setProfile((p) => p ? { ...p, avatar_url: avatarUrl } : p);
+      toast.success("Foto atualizada!");
+    } catch {
+      toast.error("Erro ao enviar foto");
+    } finally {
+      setUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
+  };
+
   const loadFollowers = async () => {
     if (!userId) return;
     const { data } = await (supabase.from("user_follows" as any) as any).select("follower_id").eq("following_id", userId);
@@ -211,7 +237,7 @@ const UserProfile = () => {
 
   // Prepare orbital photos — up to 8 shown
   const orbitPhotos = productPhotos.slice(0, 8);
-  const orbitPositions = getOrbitalPositions(orbitPhotos.length, 115);
+  const orbitPositions = getOrbitalPositions(orbitPhotos.length, 125);
 
   return (
     <>
@@ -247,15 +273,15 @@ const UserProfile = () => {
           {/* ── Orbital hero ─────────────────────────────────── */}
           <div className="flex flex-col items-center pt-8 pb-2">
             {/* Orbital container */}
-            <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
+            <div className="relative flex items-center justify-center" style={{ width: 300, height: 300 }}>
               {/* Orbit rings */}
               <div
                 className="absolute rounded-full border border-border/40"
-                style={{ width: 230, height: 230 }}
+                style={{ width: 240, height: 240 }}
               />
               <div
                 className="absolute rounded-full border border-border/20"
-                style={{ width: 280, height: 280 }}
+                style={{ width: 290, height: 290 }}
               />
 
               {/* Orbital product photos */}
@@ -285,16 +311,44 @@ const UserProfile = () => {
                 );
               })}
 
-              {/* Center avatar */}
-              <div className="relative z-10 w-[96px] h-[96px] rounded-full overflow-hidden border-[3px] border-background"
-                style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
-              >
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <span className="font-body font-medium text-[28px] text-muted-foreground">{initials}</span>
-                  </div>
+              {/* Center avatar — clickable to upload for own profile */}
+              <div className="relative z-10">
+                <div
+                  className="w-[120px] h-[120px] rounded-full overflow-hidden border-[3px] border-background"
+                  style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
+                >
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <span className="font-body font-medium text-[34px] text-muted-foreground">{initials}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload button overlay — own profile only */}
+                {isOwnProfile && (
+                  <>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                    />
+                    <button
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center border-2 border-background transition-opacity"
+                      style={{ backgroundColor: "hsl(var(--foreground))" }}
+                    >
+                      {uploadingAvatar ? (
+                        <div className="w-3.5 h-3.5 border border-background border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Camera className="w-3.5 h-3.5" style={{ color: "hsl(var(--background))" }} strokeWidth={2} />
+                      )}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
