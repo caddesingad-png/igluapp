@@ -119,7 +119,7 @@ const Sets = () => {
               tab === "discover" ? "bg-card text-foreground" : "text-muted-foreground"
             }`}
           >
-            ✨ Descobrir
+            Descobrir
           </button>
         </div>
       </header>

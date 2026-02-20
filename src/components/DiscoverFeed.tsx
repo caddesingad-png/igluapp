@@ -236,50 +236,42 @@ const DiscoverFeed = () => {
                 style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
                 onClick={() => navigate(`/sets/${set.id}`)}
               >
-                {/* Cover photo */}
-                {set.photo_url ? (
-                  <img src={set.photo_url} alt={set.name} className="w-full aspect-[4/5] object-cover" />
-                ) : (
-                  <div className="w-full aspect-square bg-muted/50 grid grid-cols-2 gap-0.5 p-0.5">
-                    {Array.from({ length: 4 }).map((_, i) => {
-                      const photo = set.product_photos[i];
-                      return photo ? (
-                        <img key={i} src={photo} alt="" className="w-full aspect-square object-cover" />
-                      ) : (
-                        <div key={i} className="w-full aspect-square bg-muted" />
-                      );
-                    })}
-                  </div>
-                )}
+                {/* Cover photo — full width, hero */}
+                <div className="relative">
+                  {set.photo_url ? (
+                    <img src={set.photo_url} alt={set.name} className="w-full aspect-[4/5] object-cover" />
+                  ) : (
+                    <div className="w-full aspect-[4/5] bg-muted flex items-center justify-center">
+                      <Layers className="w-8 h-8 text-muted-foreground/30" strokeWidth={1.5} />
+                    </div>
+                  )}
+                  {/* Occasion badge overlay */}
+                  {set.occasion && (
+                    <div className="absolute top-2 left-2">
+                      <span
+                        className="font-body text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-sm"
+                        style={{ backgroundColor: "rgba(253,250,247,0.92)", color: "hsl(var(--foreground))" }}
+                      >
+                        {set.occasion}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                {/* Occasion badge on top */}
-                {set.occasion && (
-                  <div className="px-2.5 pt-2">
-                    <span
-                      className="font-body text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-sm"
-                      style={{ backgroundColor: "rgba(253,250,247,0.9)", color: "hsl(var(--foreground))" }}
-                    >
-                      {set.occasion}
-                    </span>
-                  </div>
-                )}
-
-                {/* Product strip (if has cover photo) */}
-                {set.photo_url && set.product_photos.some(Boolean) && (
-                  <div className="flex gap-0.5 px-2 pb-0.5 pt-1">
-                    {Array.from({ length: 3 }).map((_, i) => {
-                      const photo = set.product_photos[i];
-                      return photo ? (
-                        <img key={i} src={photo} alt="" className="flex-1 aspect-square object-cover rounded-sm" />
-                      ) : (
-                        <div key={i} className="flex-1 aspect-square rounded-sm bg-muted" />
-                      );
-                    })}
-                  </div>
-                )}
+                {/* Product thumbnails strip — same layout as Meus SETs */}
+                <div className="flex gap-0.5 px-1.5 pt-1.5 pb-0.5">
+                  {Array.from({ length: 4 }).map((_, i) => {
+                    const photo = set.product_photos[i];
+                    return photo ? (
+                      <img key={i} src={photo} alt="" className="flex-1 aspect-square object-cover rounded-sm" />
+                    ) : (
+                      <div key={i} className="flex-1 aspect-square rounded-sm bg-muted/60" />
+                    );
+                  })}
+                </div>
 
                 {/* Info */}
-                <div className="p-2.5">
+                <div className="px-2.5 pt-1.5 pb-2">
                   <div className="flex items-start justify-between gap-1 mb-1.5">
                     <p className="font-body font-medium text-[12px] text-foreground line-clamp-2 leading-snug flex-1">{set.name}</p>
                     <button onClick={(e) => toggleLike(set, e)} className="shrink-0 flex items-center gap-0.5 mt-0.5">
@@ -295,11 +287,15 @@ const DiscoverFeed = () => {
                   {/* Creator row */}
                   <div className="flex items-center gap-1.5 justify-between" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1 min-w-0">
-                      <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <span className="font-body text-[8px] text-muted-foreground font-medium">
-                          {(set.creator_name || "?")[0].toUpperCase()}
-                        </span>
-                      </div>
+                      {set.creator_avatar ? (
+                        <img src={set.creator_avatar} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
+                          <span className="font-body text-[8px] text-muted-foreground font-medium">
+                            {(set.creator_name || "?")[0].toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                       <span className="font-body text-[10px] text-muted-foreground truncate">
                         {set.creator_name || "Usuária"}
                       </span>
