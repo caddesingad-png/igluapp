@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LogOut, TrendingUp, TrendingDown, Minus, Pencil, Check } from "lucide-react";
+import { LogOut, TrendingUp, TrendingDown, Minus, Pencil, Check, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -21,8 +22,12 @@ const fmt = (v: number) =>
 const MONTH_NAMES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [bio, setBio] = useState("");
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioInput, setBioInput] = useState("");
   const [userId, setUserId] = useState("");
   const [purchases, setPurchases] = useState<PurchaseRow[]>([]);
   const [products, setProducts] = useState<{ id: string; name: string; purchase_price: number; pao_months: number; category: string }[]>([]);
@@ -52,6 +57,8 @@ const Profile = () => {
 
       if (profileRes.data) {
         setDisplayName(profileRes.data.display_name || "");
+        setBio((profileRes.data as any).bio ?? "");
+        setBioInput((profileRes.data as any).bio ?? "");
         setMonthlyBudget((profileRes.data as any).monthly_budget ?? null);
         setBudgetInput(String((profileRes.data as any).monthly_budget ?? ""));
       }
@@ -127,6 +134,13 @@ const Profile = () => {
     toast.success("Sessão encerrada");
   };
 
+  const saveBio = async () => {
+    await supabase.from("profiles").update({ bio: bioInput } as any).eq("user_id", userId);
+    setBio(bioInput);
+    setEditingBio(false);
+    toast.success("Bio atualizada");
+  };
+
   const saveBudget = async () => {
     const val = parseFloat(budgetInput.replace(",", "."));
     const budget = isNaN(val) ? null : val;
@@ -159,15 +173,52 @@ const Profile = () => {
       </header>
 
       <div className="max-w-lg mx-auto px-6 pt-6 space-y-5 animate-fade-in">
-        {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <span className="font-body font-medium text-[15px] text-muted-foreground">{initials}</span>
+        {/* Avatar + profile info */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <span className="font-body font-medium text-[18px] text-muted-foreground">{initials}</span>
+            </div>
+            <div>
+              <h2 className="font-body font-medium text-[15px] text-foreground">{displayName || "Usuária"}</h2>
+              <p className="font-body font-light text-[11px] text-muted-foreground">{email}</p>
+              {/* Bio */}
+              {editingBio ? (
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <input
+                    autoFocus
+                    value={bioInput}
+                    onChange={(e) => setBioInput(e.target.value)}
+                    maxLength={80}
+                    placeholder="Bio curta..."
+                    className="h-7 text-[12px] bg-muted rounded-md px-2 border border-border font-body text-foreground outline-none w-[160px]"
+                  />
+                  <button onClick={saveBio} className="w-6 h-6 flex items-center justify-center text-foreground"><Check className="w-3.5 h-3.5" strokeWidth={2} /></button>
+                  <button onClick={() => setEditingBio(false)} className="w-6 h-6 flex items-center justify-center text-muted-foreground"><X className="w-3.5 h-3.5" strokeWidth={2} /></button>
+                </div>
+              ) : (
+                <button
+                  className="flex items-center gap-1 mt-1"
+                  onClick={() => { setBioInput(bio); setEditingBio(true); }}
+                >
+                  <span className="font-body font-light text-[12px] text-muted-foreground">
+                    {bio || "Adicionar bio..."}
+                  </span>
+                  <Pencil className="w-2.5 h-2.5 text-muted-foreground/50" strokeWidth={1.5} />
+                </button>
+              )}
+            </div>
           </div>
-          <div>
-            <h2 className="font-body font-medium text-[15px] text-foreground">{displayName || "Usuária"}</h2>
-            <p className="font-body font-light text-[12px] text-muted-foreground">{email}</p>
-          </div>
+          {/* Ver perfil público */}
+          {userId && (
+            <button
+              onClick={() => navigate(`/user/${userId}`)}
+              className="shrink-0 flex items-center gap-1 h-8 px-3 rounded-lg border border-border font-body text-[11px] text-muted-foreground transition-colors hover:bg-muted"
+            >
+              <ExternalLink className="w-3 h-3" strokeWidth={1.5} />
+              Ver perfil
+            </button>
+          )}
         </div>
 
         {loading ? (

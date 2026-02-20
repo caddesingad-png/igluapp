@@ -19,6 +19,7 @@ import ProductDetail from "./pages/ProductDetail";
 import SetForm from "./pages/SetForm";
 import SetDetail from "./pages/SetDetail";
 import PublicSetView from "./pages/PublicSetView";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,7 @@ const AppRoutes = () => {
         <Route path="/sets/:id" element={<SetDetail />} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/user/:userId" element={<UserProfile />} />
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="*" element={<NotFound />} />

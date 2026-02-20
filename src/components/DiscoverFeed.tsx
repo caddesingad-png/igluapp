@@ -341,7 +341,10 @@ const DiscoverFeed = () => {
                   className="flex items-center justify-between px-2 pb-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center gap-1 min-w-0">
+                  <button
+                    className="flex items-center gap-1 min-w-0"
+                    onClick={(e) => { e.stopPropagation(); navigate(`/user/${set.user_id}`); }}
+                  >
                     {set.creator_avatar ? (
                       <img src={set.creator_avatar} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
                     ) : (
@@ -354,7 +357,7 @@ const DiscoverFeed = () => {
                     <span className="font-body text-[9px] text-muted-foreground truncate">
                       {set.creator_name || "Usuária"}
                     </span>
-                  </div>
+                  </button>
 
                   {!isOwn && (
                     <button
