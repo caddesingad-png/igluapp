@@ -26,6 +26,8 @@ const AppRoutes = () => {
   const { user, loading } = useAuth();
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  // Para não-logadas: mostrar onboarding até que decidam criar conta/entrar
+  const [preAuthOnboardingDone, setPreAuthOnboardingDone] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -54,7 +56,16 @@ const AppRoutes = () => {
     );
   }
 
+  // Não logada: mostrar onboarding primeiro, depois auth
   if (!user) {
+    if (!preAuthOnboardingDone) {
+      return (
+        <Onboarding
+          preAuth
+          onComplete={() => setPreAuthOnboardingDone(true)}
+        />
+      );
+    }
     return (
       <Routes>
         <Route path="/sets/:id/public" element={<PublicSetView />} />
@@ -63,6 +74,7 @@ const AppRoutes = () => {
     );
   }
 
+  // Logada mas onboarding pós-cadastro ainda pendente
   if (showOnboarding) {
     return (
       <Onboarding
