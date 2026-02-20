@@ -4,7 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
+import Onboarding from "@/components/Onboarding";
 import Auth from "./pages/Auth";
 import Library from "./pages/Library";
 import Sets from "./pages/Sets";
@@ -21,8 +24,29 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (!user) {
+      setOnboardingChecked(false);
+      setShowOnboarding(false);
+      return;
+    }
+    supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data && !data.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+        setOnboardingChecked(true);
+      });
+  }, [user]);
+
+  if (loading || (user && !onboardingChecked)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -36,6 +60,15 @@ const AppRoutes = () => {
         <Route path="/sets/:id/public" element={<PublicSetView />} />
         <Route path="*" element={<Auth />} />
       </Routes>
+    );
+  }
+
+  if (showOnboarding) {
+    return (
+      <Onboarding
+        userId={user.id}
+        onComplete={() => setShowOnboarding(false)}
+      />
     );
   }
 
