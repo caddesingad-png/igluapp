@@ -148,7 +148,7 @@ const AddProduct = () => {
         photoUrl = urlData.publicUrl;
       }
 
-      const { error } = await (supabase.from("products" as any) as any).insert({
+      const { data: productData, error } = await (supabase.from("products" as any) as any).insert({
         user_id: user.id,
         name: name.trim(),
         brand: brand.trim(),
@@ -161,9 +161,23 @@ const AddProduct = () => {
         usage_frequency: usageFrequency,
         notes: notes.trim() || null,
         photo_url: photoUrl,
-      });
+      }).select("id").single();
 
       if (error) throw error;
+
+      // Registrar o preço de compra como primeiro registro de compra
+      if (productData?.id) {
+        await supabase.from("purchase_history").insert({
+          user_id: user.id,
+          product_id: productData.id,
+          price: parseFloat(purchasePrice),
+          purchase_date: format(purchaseDate, "yyyy-MM-dd"),
+          color_code: colorCodes[0] || null,
+          notes: null,
+          store: null,
+        });
+      }
+
       toast.success("Produto adicionado! 💄");
       navigate("/library");
     } catch (error: any) {
