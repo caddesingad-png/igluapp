@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
-import { Plus, LayoutGrid, List, Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { Plus, LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "@/components/ProductCard";
+import igluLogo from "@/assets/iglu-logo.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -119,7 +120,12 @@ const Library = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="max-w-lg mx-auto px-6 h-full flex items-center justify-between">
-          <h1 className="font-display text-[18px] font-normal text-foreground">Library</h1>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-[22px]"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}

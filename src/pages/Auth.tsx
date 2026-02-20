@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import igluLogo from "@/assets/iglu-logo.svg";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,11 +41,13 @@ const Auth = () => {
       <div className="w-full max-w-sm animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted mb-5">
-            <Sparkles className="w-6 h-6 text-primary" />
-          </div>
-          <h1 className="font-display text-[32px] font-normal text-foreground tracking-[0.02em]">Glambook</h1>
-          <p className="font-body font-light text-[14px] text-muted-foreground mt-2">Your beauty collection, organized</p>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-10 mx-auto mb-6"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
+          <p className="font-body font-light text-[14px] text-muted-foreground">Your beauty collection, organized</p>
         </div>
 
         {/* Form */}

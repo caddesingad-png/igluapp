@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, X, Sparkles, BookOpen, TrendingUp, Layers, Plus } from "lucide-react";
+import { ChevronRight, X, BookOpen, TrendingUp, Layers, Plus } from "lucide-react";
+import igluLogo from "@/assets/iglu-logo.svg";
 import welcomeImg from "@/assets/onboarding-welcome.png";
 import libraryImg from "@/assets/onboarding-library.png";
 import spendingImg from "@/assets/onboarding-spending.png";
@@ -26,11 +27,11 @@ interface SlideData {
 const slides: SlideData[] = [
   {
     image: welcomeImg,
-    icon: <Sparkles className="w-3.5 h-3.5" />,
+    icon: null,
     tag: "Welcome",
     title: "Your beauty world,\nall in one place",
     description:
-      "Glambook helps you organise your makeup collection, track spending, and build stunning looks — effortlessly.",
+      "IGLU helps you organise your makeup collection, track spending, and build stunning looks — effortlessly.",
     bgColor: "hsl(30 25% 93%)",
   },
   {
@@ -123,6 +124,15 @@ const Onboarding = ({ userId, onComplete }: OnboardingProps) => {
           className="relative flex-1 flex items-center justify-center px-8 pt-16 pb-4"
           style={{ backgroundColor: slide.bgColor }}
         >
+          {/* IGLU logo watermark on slide 0 */}
+          {current === 0 && (
+            <img
+              src={igluLogo}
+              alt="IGLU"
+              className="absolute top-6 left-6 h-6 opacity-70"
+              style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+            />
+          )}
           <img
             src={slide.image}
             alt={slide.tag}
