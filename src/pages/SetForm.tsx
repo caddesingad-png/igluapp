@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Camera, Globe, Lock, Plus, X, Check, ChevronDown, ChevronUp, Link2 } from "lucide-react";
+import { ArrowLeft, Camera, Globe, Lock, X, Check, ChevronDown, ChevronUp, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +16,6 @@ interface Product {
   photo_url: string | null;
 }
 
-// Pre-defined layers — always in this order
 const PREDEFINED_LAYERS = [
   { order: 1, name: "Skincare", icon: "🧴" },
   { order: 2, name: "Primer", icon: "🫧" },
@@ -34,6 +33,9 @@ interface LayerState {
   note: string;
   expanded: boolean;
 }
+
+const defaultLayers = (): Record<number, LayerState> =>
+  Object.fromEntries(PREDEFINED_LAYERS.map((l) => [l.order, { product_ids: [], note: "", expanded: false }]));
 
 const SetForm = () => {
   const { id } = useParams<{ id?: string }>();
@@ -54,12 +56,8 @@ const SetForm = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [productSearch, setProductSearch] = useState("");
 
-  // Layer state: keyed by layer order (1–9)
-  const [layers, setLayers] = useState<Record<number, LayerState>>(() =>
-    Object.fromEntries(PREDEFINED_LAYERS.map((l) => [l.order, { product_ids: [], note: "", expanded: false }]))
-  );
-
-  // Bottom sheet state
+  const [layers, setLayers] = useState<Record<number, LayerState>>(defaultLayers);
+  const [layersSectionOpen, setLayersSectionOpen] = useState(false);
   const [linkingLayer, setLinkingLayer] = useState<number | null>(null);
 
   useEffect(() => {
@@ -91,12 +89,12 @@ const SetForm = () => {
           if (data) setSelectedIds(new Set(data.map((r: any) => r.product_id)));
         });
 
-      // Load existing layers
       (supabase.from("set_layers" as any) as any)
         .select("*")
         .eq("set_id", id)
         .then(({ data }: any) => {
           if (data && data.length > 0) {
+            setLayersSectionOpen(true);
             setLayers((prev) => {
               const next = { ...prev };
               data.forEach((row: any) => {
@@ -132,9 +130,9 @@ const SetForm = () => {
   const toggleProduct = (pid: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      next.has(pid) ? next.delete(pid) : next.add(pid);
-      // If unselecting, also remove from all layers
-      if (next.has(pid) === false) {
+      if (next.has(pid)) {
+        next.delete(pid);
+        // Remove from all layers when deselecting a product
         setLayers((prevL) => {
           const nl = { ...prevL };
           PREDEFINED_LAYERS.forEach(({ order }) => {
@@ -142,6 +140,8 @@ const SetForm = () => {
           });
           return nl;
         });
+      } else {
+        next.add(pid);
       }
       return next;
     });
@@ -187,7 +187,6 @@ const SetForm = () => {
       await (supabase.from("set_products" as any) as any).insert(rows);
     }
 
-    // Save layers — delete existing first, then upsert non-empty
     if (setId) {
       await (supabase.from("set_layers" as any) as any).delete().eq("set_id", setId);
       const layerRows = PREDEFINED_LAYERS
@@ -216,9 +215,12 @@ const SetForm = () => {
       p.brand.toLowerCase().includes(productSearch.toLowerCase())
   );
 
-  // Products available for linking = only those selected for this set
   const linkableProducts = myProducts.filter((p) => selectedIds.has(p.id));
   const linkingLayerObj = linkingLayer !== null ? PREDEFINED_LAYERS.find((l) => l.order === linkingLayer) : null;
+
+  const filledLayersCount = PREDEFINED_LAYERS.filter(
+    (l) => layers[l.order].product_ids.length > 0 || layers[l.order].note.trim().length > 0
+  ).length;
 
   return (
     <div className="min-h-screen pb-10 bg-background">
@@ -365,130 +367,155 @@ const SetForm = () => {
           </div>
         </div>
 
-        {/* ── CAMADAS ── */}
+        {/* ── CAMADAS (collapsible) ── */}
         <div>
-          <p
-            className="font-body mb-3"
-            style={{
-              fontSize: "11px",
-              fontWeight: 400,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#8C8480",
-            }}
+          {/* Toggle button */}
+          <button
+            className="w-full flex items-center justify-between py-1"
+            onClick={() => setLayersSectionOpen((v) => !v)}
           >
-            Camadas
-          </p>
+            <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 400, fontSize: "13px", color: "#8C8480" }}>
+              {layersSectionOpen
+                ? "Camadas"
+                : filledLayersCount > 0
+                  ? `${filledLayersCount} camada${filledLayersCount !== 1 ? "s" : ""} adicionada${filledLayersCount !== 1 ? "s" : ""}`
+                  : "+ Adicionar camadas"}
+            </span>
+            <ChevronDown
+              className="w-4 h-4 transition-transform"
+              strokeWidth={1.5}
+              style={{
+                color: "#8C8480",
+                transform: layersSectionOpen ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.2s",
+              }}
+            />
+          </button>
 
-          <div className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
-            {PREDEFINED_LAYERS.map((layer) => {
-              const state = layers[layer.order];
-              const isFilled = state.product_ids.length > 0 || state.note.trim().length > 0;
+          {/* Expanded section */}
+          {layersSectionOpen && (
+            <div className="mt-3">
+              <p
+                className="mb-3"
+                style={{
+                  fontFamily: "DM Sans, sans-serif",
+                  fontWeight: 300,
+                  fontSize: "11px",
+                  fontStyle: "italic",
+                  color: "#B8B0AA",
+                }}
+              >
+                Opcional — documente sua técnica
+              </p>
 
-              return (
-                <div
-                  key={layer.order}
-                  style={{
-                    opacity: isFilled ? 1 : 0.5,
-                    borderLeft: isFilled ? "2px solid #C9A96E" : "2px solid transparent",
-                    transition: "opacity 0.2s, border-color 0.2s",
-                  }}
-                >
-                  {/* Row header */}
-                  <button
-                    className="w-full flex items-center gap-3 px-6 text-left hover:bg-muted/30 transition-colors"
-                    style={{ minHeight: "56px" }}
-                    onClick={() => toggleLayerExpanded(layer.order)}
-                  >
-                    <span className="text-[18px] leading-none shrink-0">{layer.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-body font-medium text-[13px] text-foreground">{layer.name}</p>
-                      {state.product_ids.length > 0 && (
-                        <p className="font-body font-light text-[11px] text-muted-foreground">
-                          {state.product_ids.length} produto{state.product_ids.length !== 1 ? "s" : ""}
-                          {state.note.trim() && " · nota"}
-                        </p>
-                      )}
-                    </div>
-                    {state.expanded ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                    )}
-                  </button>
+              <div
+                className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border"
+                style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
+              >
+                {PREDEFINED_LAYERS.map((layer) => {
+                  const state = layers[layer.order];
+                  const isFilled = state.product_ids.length > 0 || state.note.trim().length > 0;
 
-                  {/* Expanded content */}
-                  {state.expanded && (
-                    <div className="px-6 pb-4 space-y-3">
-                      {/* Selected product chips */}
-                      {state.product_ids.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {state.product_ids.map((pid) => {
-                            const prod = myProducts.find((p) => p.id === pid);
-                            if (!prod) return null;
-                            return (
-                              <div
-                                key={pid}
-                                className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1"
-                              >
-                                {prod.photo_url && (
-                                  <img src={prod.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
-                                )}
-                                <span className="font-body text-[11px] text-foreground">{prod.name}</span>
-                                <button
-                                  onClick={() => toggleLayerProduct(layer.order, pid)}
-                                  className="text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* Link product button */}
+                  return (
+                    <div
+                      key={layer.order}
+                      style={{
+                        opacity: isFilled ? 1 : 0.5,
+                        borderLeft: isFilled ? "2px solid #C9A96E" : "2px solid transparent",
+                        transition: "opacity 0.2s, border-color 0.2s",
+                      }}
+                    >
+                      {/* Row header */}
                       <button
-                        className="flex items-center gap-2 font-body text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setLinkingLayer(layer.order)}
-                        disabled={selectedIds.size === 0}
+                        className="w-full flex items-center gap-3 px-6 text-left hover:bg-muted/30 transition-colors"
+                        style={{ minHeight: "56px" }}
+                        onClick={() => toggleLayerExpanded(layer.order)}
                       >
-                        <Link2 className="w-3.5 h-3.5" strokeWidth={1.5} />
-                        {state.product_ids.length > 0 ? "Editar produtos" : "Vincular produto"}
-                        {selectedIds.size === 0 && <span className="text-muted-foreground/50 ml-1">(selecione produtos acima)</span>}
+                        <span className="text-[18px] leading-none shrink-0">{layer.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-body font-medium text-[13px] text-foreground">{layer.name}</p>
+                          {state.product_ids.length > 0 && (
+                            <p className="font-body font-light text-[11px] text-muted-foreground">
+                              {state.product_ids.length} produto{state.product_ids.length !== 1 ? "s" : ""}
+                              {state.note.trim() && " · nota"}
+                            </p>
+                          )}
+                        </div>
+                        {state.expanded ? (
+                          <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                        )}
                       </button>
 
-                      {/* Note field */}
-                      <input
-                        type="text"
-                        maxLength={200}
-                        placeholder="Adicione uma dica ou técnica..."
-                        value={state.note}
-                        onChange={(e) => updateLayerNote(layer.order, e.target.value)}
-                        className="w-full h-[38px] px-3 rounded-md border border-border bg-background font-body text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
-                      />
+                      {/* Expanded content */}
+                      {state.expanded && (
+                        <div className="px-6 pb-4 space-y-3">
+                          {/* Selected product chips */}
+                          {state.product_ids.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {state.product_ids.map((pid) => {
+                                const prod = myProducts.find((p) => p.id === pid);
+                                if (!prod) return null;
+                                return (
+                                  <div key={pid} className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1">
+                                    {prod.photo_url && (
+                                      <img src={prod.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                                    )}
+                                    <span className="font-body text-[11px] text-foreground">{prod.name}</span>
+                                    <button
+                                      onClick={() => toggleLayerProduct(layer.order, pid)}
+                                      className="text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Link product button */}
+                          <button
+                            className="flex items-center gap-2 font-body text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                            onClick={() => setLinkingLayer(layer.order)}
+                            disabled={selectedIds.size === 0}
+                          >
+                            <Link2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                            {state.product_ids.length > 0 ? "Editar produtos" : "Vincular produto"}
+                            {selectedIds.size === 0 && (
+                              <span className="text-muted-foreground/50 ml-1">(selecione produtos acima)</span>
+                            )}
+                          </button>
+
+                          {/* Note field */}
+                          <input
+                            type="text"
+                            maxLength={200}
+                            placeholder="Adicione uma dica ou técnica..."
+                            value={state.note}
+                            onChange={(e) => updateLayerNote(layer.order, e.target.value)}
+                            className="w-full h-[38px] px-3 rounded-md border border-border bg-background font-body text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Bottom sheet: link products to layer */}
       {linkingLayer !== null && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-foreground/20" onClick={() => setLinkingLayer(null)} />
-
           <div className="relative bg-background rounded-t-2xl max-h-[70vh] flex flex-col" style={{ boxShadow: "0 -4px 20px rgba(26,23,20,0.12)" }}>
-            {/* Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
-
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <span className="text-[20px]">{linkingLayerObj?.icon}</span>
@@ -498,8 +525,6 @@ const SetForm = () => {
                 <X className="w-4 h-4" strokeWidth={1.5} />
               </button>
             </div>
-
-            {/* Product list */}
             <div className="overflow-y-auto flex-1 divide-y divide-border">
               {linkableProducts.length === 0 && (
                 <p className="font-body font-light text-[13px] text-muted-foreground px-6 py-6 text-center">
@@ -536,8 +561,6 @@ const SetForm = () => {
                 );
               })}
             </div>
-
-            {/* Done button */}
             <div className="px-6 py-4 border-t border-border">
               <Button className="w-full" onClick={() => setLinkingLayer(null)}>
                 Confirmar
