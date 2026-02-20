@@ -223,7 +223,7 @@ const SetForm = () => {
   ).length;
 
   return (
-    <div className="min-h-screen pb-10 bg-background">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom, 20px) + 60px)" }}>
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
           <button onClick={() => navigate("/sets")} className="w-8 h-8 flex items-center justify-center text-foreground">
