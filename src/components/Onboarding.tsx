@@ -20,54 +20,54 @@ interface SlideData {
   tag: string;
   title: string;
   description: string;
-  accent: string;
+  bgColor: string;
 }
 
 const slides: SlideData[] = [
   {
     image: welcomeImg,
-    icon: <Sparkles className="w-4 h-4" />,
+    icon: <Sparkles className="w-3.5 h-3.5" />,
     tag: "Welcome",
     title: "Your beauty world,\nall in one place",
     description:
       "Glambook helps you organise your makeup collection, track spending, and build stunning looks — effortlessly.",
-    accent: "from-primary/20 to-accent/20",
+    bgColor: "hsl(30 25% 93%)",
   },
   {
     image: libraryImg,
-    icon: <BookOpen className="w-4 h-4" />,
+    icon: <BookOpen className="w-3.5 h-3.5" />,
     tag: "Library",
     title: "Your makeup\ncatalog",
     description:
       "Scan barcodes or add products manually. Never forget what you own — and never buy a duplicate again.",
-    accent: "from-rose-glow/20 to-primary/10",
+    bgColor: "hsl(30 30% 90%)",
   },
   {
     image: spendingImg,
-    icon: <TrendingUp className="w-4 h-4" />,
+    icon: <TrendingUp className="w-3.5 h-3.5" />,
     tag: "Spending",
     title: "Know where\nyour money goes",
     description:
       "Set a monthly beauty budget, track purchases, and get insights on your most-used (and most-expensive) products.",
-    accent: "from-nude/40 to-secondary/60",
+    bgColor: "hsl(30 25% 92%)",
   },
   {
     image: setsImg,
-    icon: <Layers className="w-4 h-4" />,
+    icon: <Layers className="w-3.5 h-3.5" />,
     tag: "SETs",
     title: "Curate your\nperfect look",
     description:
       "Group products into SETs for any occasion — daily glow, night out, work polish. Share your favourites with the world.",
-    accent: "from-accent/25 to-primary/15",
+    bgColor: "hsl(38 30% 90%)",
   },
   {
     image: addImg,
-    icon: <Plus className="w-4 h-4" />,
+    icon: <Plus className="w-3.5 h-3.5" />,
     tag: "Get started",
     title: "Add your first\nproduct",
     description:
       "Your collection is waiting to be built. Scan a barcode or fill in details manually — it takes less than a minute.",
-    accent: "from-primary/15 to-rose-glow/20",
+    bgColor: "hsl(30 25% 93%)",
   },
 ];
 
@@ -105,89 +105,82 @@ const Onboarding = ({ userId, onComplete }: OnboardingProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden">
-      {/* Skip button */}
-      <div className="absolute top-4 right-4 z-10">
+      {/* Skip */}
+      <div className="absolute top-5 right-5 z-10">
         <button
           onClick={handleSkip}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-muted"
+          className="flex items-center gap-1 font-body text-[13px] text-muted-foreground px-3 py-1.5 rounded-md hover:bg-muted transition-colors"
         >
           <X className="w-3.5 h-3.5" />
           Skip
         </button>
       </div>
 
-      {/* Slide content */}
-      <div
-        key={current}
-        className="flex flex-col flex-1 animate-fade-in"
-      >
+      {/* Slide */}
+      <div key={current} className="flex flex-col flex-1 animate-fade-in">
         {/* Image area */}
-        <div className={`relative flex-1 flex items-center justify-center bg-gradient-to-br ${slide.accent} px-8 pt-16 pb-4`}>
+        <div
+          className="relative flex-1 flex items-center justify-center px-8 pt-16 pb-4"
+          style={{ backgroundColor: slide.bgColor }}
+        >
           <img
             src={slide.image}
             alt={slide.tag}
             className="w-full max-w-xs object-contain drop-shadow-xl"
-            style={{ maxHeight: "55vh" }}
+            style={{ maxHeight: "52vh" }}
           />
         </div>
 
         {/* Text + actions */}
-        <div className="flex flex-col px-6 pt-6 pb-10 gap-4 bg-background">
-          {/* Tag pill */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-widest">
+        <div className="flex flex-col px-6 pt-7 pb-10 gap-4 bg-background">
+          {/* Tag */}
+          <div className="flex items-center gap-1.5 text-primary uppercase tracking-[0.12em]" style={{ fontSize: "10px", fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}>
             {slide.icon}
             {slide.tag}
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-foreground leading-tight whitespace-pre-line">
+          <h2 className="font-display text-[26px] font-normal text-foreground leading-tight whitespace-pre-line">
             {slide.title}
           </h2>
 
           {/* Description */}
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <p className="font-body font-light text-[14px] text-muted-foreground leading-relaxed">
             {slide.description}
           </p>
 
           {/* Progress dots */}
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="flex items-center gap-1.5">
             {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className="transition-all duration-300"
-              >
+              <button key={i} onClick={() => setCurrent(i)}>
                 <div
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === current
-                      ? "w-6 bg-primary"
+                  className="h-[3px] rounded-full transition-all duration-300"
+                  style={{
+                    width: i === current ? "24px" : "6px",
+                    backgroundColor: i === current
+                      ? "hsl(var(--foreground))"
                       : i < current
-                      ? "w-1.5 bg-primary/40"
-                      : "w-1.5 bg-muted"
-                  }`}
+                      ? "hsl(var(--foreground)/0.3)"
+                      : "hsl(var(--border))",
+                  }}
                 />
               </button>
             ))}
           </div>
 
-          {/* CTA button */}
-          <Button
-            onClick={handleNext}
-            disabled={saving}
-            className="w-full h-13 text-base font-semibold mt-2 flex items-center justify-center gap-2"
-            style={{ height: "52px" }}
-          >
+          {/* CTA */}
+          <Button onClick={handleNext} disabled={saving} className="w-full gap-2">
             {saving ? (
               "Please wait..."
             ) : isLast ? (
               <>
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 Add my first product
               </>
             ) : (
               <>
                 Next
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               </>
             )}
           </Button>

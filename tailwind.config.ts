@@ -60,11 +60,31 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        /* Status dots */
+        "status-green": "hsl(var(--status-green))",
+        "status-yellow": "hsl(var(--status-yellow))",
+        "status-red": "hsl(var(--status-red))",
+        /* Dark button */
+        "btn-dark": "hsl(var(--btn-primary-bg))",
+        "btn-dark-fg": "hsl(var(--btn-primary-fg))",
+        /* Tag surface */
+        tag: "hsl(var(--muted))",
+        "tag-foreground": "hsl(var(--muted-foreground))",
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "12px",
+        md: "8px",
+        sm: "4px",
+        xl: "12px",
+        "2xl": "20px",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(26, 23, 20, 0.06)",
+        modal: "0 -4px 24px rgba(26, 23, 20, 0.08)",
+      },
+      fontFamily: {
+        display: ["'Playfair Display'", "Georgia", "serif"],
+        body: ["'DM Sans'", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
@@ -41,18 +40,18 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background">
       <div className="w-full max-w-sm animate-fade-in">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <Sparkles className="w-8 h-8 text-primary" />
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted mb-5">
+            <Sparkles className="w-6 h-6 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Glambook</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Your beauty collection, organized</p>
+          <h1 className="font-display text-[32px] font-normal text-foreground tracking-[0.02em]">Glambook</h1>
+          <p className="font-body font-light text-[14px] text-muted-foreground mt-2">Your beauty collection, organized</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <div className="space-y-1.5">
+            <label className="label-overline block">Email</label>
             <Input
               id="email"
               type="email"
@@ -60,11 +59,10 @@ const Auth = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="h-12"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+          <div className="space-y-1.5">
+            <label className="label-overline block">Password</label>
             <Input
               id="password"
               type="password"
@@ -73,21 +71,22 @@ const Auth = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="h-12"
             />
           </div>
 
-          <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
-            {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
-          </Button>
+          <div className="pt-2">
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+            </Button>
+          </div>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center font-body text-[13px] text-muted-foreground mt-6">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="text-primary font-medium hover:underline"
+            className="text-foreground font-medium hover:underline"
           >
             {isLogin ? "Sign Up" : "Sign In"}
           </button>

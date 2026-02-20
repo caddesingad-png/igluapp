@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Layers, Plus, Lock, Globe, Pencil, Trash2, Share2,
+  Layers, Plus, Pencil, Trash2, Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,9 +80,7 @@ const Sets = () => {
 
   const handleShare = async (set: SetItem) => {
     if (!set.is_public) {
-      await (supabase.from("sets" as any) as any)
-        .update({ is_public: true })
-        .eq("id", set.id);
+      await (supabase.from("sets" as any) as any).update({ is_public: true }).eq("id", set.id);
       setSets((prev) => prev.map((s) => s.id === set.id ? { ...s, is_public: true } : s));
       set = { ...set, is_public: true };
     }
@@ -91,39 +89,34 @@ const Sets = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-background">
-      <header className="sticky top-0 z-40 glass border-b border-border px-5 py-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">SETs</h1>
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "auto" }}>
+        <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="font-display text-[18px] font-normal text-foreground">SETs</h1>
           {tab === "my" && (
-            <Button
-              size="sm"
-              className="rounded-full gap-1.5 text-xs h-8"
+            <button
               onClick={() => navigate("/sets/new")}
+              className="w-8 h-8 flex items-center justify-center text-foreground"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Novo set
-            </Button>
+              <Plus className="w-[20px] h-[20px]" strokeWidth={1.5} />
+            </button>
           )}
         </div>
 
         {/* Sub-tabs */}
-        <div className="max-w-lg mx-auto mt-3 flex gap-1 bg-muted/50 rounded-xl p-1">
+        <div className="max-w-lg mx-auto px-6 pb-3 flex gap-1 bg-muted/40 mx-6 rounded-md p-1" style={{ margin: "0 24px 12px" }}>
           <button
             onClick={() => setTab("my")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-              tab === "my"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
+            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
+              tab === "my" ? "bg-card text-foreground" : "text-muted-foreground"
             }`}
           >
             Meus SETs
           </button>
           <button
             onClick={() => setTab("discover")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-              tab === "discover"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
+            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
+              tab === "discover" ? "bg-card text-foreground" : "text-muted-foreground"
             }`}
           >
             ✨ Descobrir
@@ -135,51 +128,48 @@ const Sets = () => {
         <DiscoverFeed />
       ) : loading ? (
         <div className="flex items-center justify-center pt-32">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
         </div>
       ) : sets.length === 0 ? (
-        <div className="flex flex-col items-center justify-center px-6 pt-32 animate-fade-in">
-          <div className="w-20 h-20 rounded-3xl bg-accent/30 flex items-center justify-center mb-6">
-            <Layers className="w-10 h-10 text-accent-foreground" />
+        <div className="flex flex-col items-center justify-center px-6 pt-32 animate-fade-in text-center">
+          <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-6">
+            <Layers className="w-7 h-7 text-muted-foreground/50" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground mb-2">Nenhum set ainda</h2>
-          <p className="text-muted-foreground text-center text-sm max-w-[260px] mb-6">
+          <h2 className="font-display text-[20px] font-normal text-foreground mb-3">Nenhum set ainda</h2>
+          <p className="font-body font-light text-[14px] text-muted-foreground leading-relaxed max-w-[240px] mb-6">
             Crie sets para organizar seus produtos em looks e rotinas
           </p>
-          <Button className="rounded-full gap-2" onClick={() => navigate("/sets/new")}>
+          <Button className="gap-2" onClick={() => navigate("/sets/new")}>
             <Plus className="w-4 h-4" /> Criar primeiro set
           </Button>
         </div>
       ) : (
-        <div className="max-w-lg mx-auto px-4 pt-4 grid grid-cols-2 gap-3">
+        <div className="max-w-lg mx-auto px-6 pt-4 grid grid-cols-2 gap-3">
           {sets.map((set) => (
             <div
               key={set.id}
-              className="rounded-2xl border border-border bg-card overflow-hidden cursor-pointer group"
+              className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer"
+              style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
               onClick={() => navigate(`/sets/${set.id}`)}
             >
               {/* Collage preview */}
-              <div className="relative flex gap-1 p-2 bg-muted/30">
+              <div className="relative flex gap-1 p-1.5 bg-muted/20">
                 <div className="w-[52%] shrink-0">
                   {set.photo_url ? (
-                    <img
-                      src={set.photo_url}
-                      alt={set.name}
-                      className="w-full aspect-square object-cover rounded-xl"
-                    />
+                    <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover rounded-[8px]" />
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Layers className="w-8 h-8 text-primary/40" />
+                    <div className="w-full aspect-square rounded-[8px] bg-muted flex items-center justify-center">
+                      <Layers className="w-7 h-7 text-muted-foreground/30" />
                     </div>
                   )}
                 </div>
-                <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-1">
+                <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-0.5">
                   {Array.from({ length: 6 }).map((_, i) => {
                     const photo = set.product_photos?.[i];
                     return photo ? (
-                      <img key={i} src={photo} alt="" className="w-full aspect-square object-cover rounded-lg" />
+                      <img key={i} src={photo} alt="" className="w-full aspect-square object-cover rounded-sm" />
                     ) : (
-                      <div key={i} className="w-full aspect-square rounded-lg bg-muted" />
+                      <div key={i} className="w-full aspect-square rounded-sm bg-muted" />
                     );
                   })}
                 </div>
@@ -187,41 +177,41 @@ const Sets = () => {
 
               {/* Info */}
               <div className="px-3 pt-2 pb-1">
-                <p className="text-sm font-semibold text-foreground leading-tight line-clamp-1">{set.name}</p>
+                <p className="font-body font-medium text-[13px] text-foreground leading-tight line-clamp-1">{set.name}</p>
                 {set.occasion && (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{set.occasion}</p>
+                  <p className="font-body font-light text-[11px] text-muted-foreground truncate mt-0.5">{set.occasion}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="font-body text-[11px] text-muted-foreground mt-0.5">
                   {set.product_count} produto{set.product_count !== 1 ? "s" : ""}
                 </p>
               </div>
 
               {/* Actions */}
               <div className="flex items-center justify-end px-1 pb-1" onClick={(e) => e.stopPropagation()}>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleShare(set)}>
-                  <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate(`/sets/${set.id}/edit`)}>
-                  <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
-                </Button>
+                <button className="h-7 w-7 flex items-center justify-center text-muted-foreground" onClick={() => handleShare(set)}>
+                  <Share2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                </button>
+                <button className="h-7 w-7 flex items-center justify-center text-muted-foreground" onClick={() => navigate(`/sets/${set.id}/edit`)}>
+                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
+                </button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </Button>
+                    <button className="h-7 w-7 flex items-center justify-center">
+                      <Trash2 className="w-3.5 h-3.5 text-destructive" strokeWidth={1.5} />
+                    </button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="rounded-[20px]">
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Deletar set?</AlertDialogTitle>
-                      <AlertDialogDescription>
+                      <AlertDialogTitle className="font-display text-[18px] font-normal">Deletar set?</AlertDialogTitle>
+                      <AlertDialogDescription className="font-body font-light text-[14px]">
                         Isso removerá permanentemente <strong>{set.name}</strong>.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogCancel className="font-body">Cancelar</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(set.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-body"
                       >
                         Deletar
                       </AlertDialogAction>

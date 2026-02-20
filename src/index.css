@@ -2,94 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
 @layer base {
   :root {
-    --background: 20 25% 97%;
-    --foreground: 350 25% 15%;
+    /* Page & surface */
+    --background: 30 25% 93%;          /* #F5F0EB */
+    --foreground: 26 14% 10%;          /* #1A1714 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 350 25% 15%;
+    --card: 30 33% 98%;                /* #FDFAF7 */
+    --card-foreground: 26 14% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 350 25% 15%;
+    --popover: 30 33% 98%;
+    --popover-foreground: 26 14% 10%;
 
-    --primary: 350 55% 65%;
-    --primary-foreground: 0 0% 100%;
+    /* Accent gold */
+    --primary: 38 47% 60%;             /* #C9A96E */
+    --primary-foreground: 26 14% 10%;  /* dark text on gold */
 
     --secondary: 30 25% 93%;
-    --secondary-foreground: 350 25% 25%;
+    --secondary-foreground: 26 14% 10%;
 
-    --muted: 350 15% 94%;
-    --muted-foreground: 350 10% 50%;
+    --muted: 30 18% 90%;               /* #EDE8E3 */
+    --muted-foreground: 16 5% 54%;     /* #8C8480 */
 
-    --accent: 330 35% 75%;
-    --accent-foreground: 350 30% 18%;
+    --accent: 30 18% 90%;
+    --accent-foreground: 26 14% 10%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 6 66% 47%;          /* #C0392B */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 350 15% 90%;
-    --input: 350 15% 88%;
-    --ring: 350 55% 65%;
+    --border: 28 18% 88%;              /* #E8E2DC */
+    --input: 28 18% 88%;
+    --ring: 38 47% 60%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar (unchanged) */
+    --sidebar-background: 30 33% 98%;
+    --sidebar-foreground: 26 14% 10%;
+    --sidebar-primary: 38 47% 60%;
+    --sidebar-primary-foreground: 26 14% 10%;
+    --sidebar-accent: 30 18% 90%;
+    --sidebar-accent-foreground: 26 14% 10%;
+    --sidebar-border: 28 18% 88%;
+    --sidebar-ring: 38 47% 60%;
 
     /* Custom tokens */
-    --rose-glow: 350 60% 72%;
-    --nude: 25 30% 85%;
-    --blush: 350 40% 92%;
+    --rose-glow: 38 47% 60%;
+    --nude: 30 25% 93%;
+    --blush: 30 33% 98%;
+
+    /* Button primary dark */
+    --btn-primary-bg: 26 14% 10%;      /* #1A1714 */
+    --btn-primary-fg: 30 25% 93%;      /* #F5F0EB */
+
+    /* Status dots */
+    --status-green: 124 14% 54%;       /* #7D9B76 */
+    --status-yellow: 38 47% 60%;       /* #C9A96E */
+    --status-red: 6 66% 47%;           /* #C0392B */
   }
 
   .dark {
-    --background: 350 15% 8%;
-    --foreground: 20 20% 92%;
-
-    --card: 350 15% 11%;
-    --card-foreground: 20 20% 92%;
-
-    --popover: 350 15% 11%;
-    --popover-foreground: 20 20% 92%;
-
-    --primary: 350 55% 65%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 350 15% 16%;
-    --secondary-foreground: 20 20% 90%;
-
-    --muted: 350 10% 18%;
-    --muted-foreground: 350 10% 60%;
-
-    --accent: 330 30% 30%;
-    --accent-foreground: 20 20% 92%;
-
-    --destructive: 0 62.8% 30.6%;
+    --background: 26 14% 10%;
+    --foreground: 30 25% 93%;
+    --card: 26 12% 13%;
+    --card-foreground: 30 25% 93%;
+    --popover: 26 12% 13%;
+    --popover-foreground: 30 25% 93%;
+    --primary: 38 47% 60%;
+    --primary-foreground: 26 14% 10%;
+    --secondary: 26 12% 16%;
+    --secondary-foreground: 30 25% 90%;
+    --muted: 26 10% 18%;
+    --muted-foreground: 16 5% 54%;
+    --accent: 26 12% 20%;
+    --accent-foreground: 30 25% 90%;
+    --destructive: 6 66% 47%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 350 10% 18%;
-    --input: 350 10% 20%;
-    --ring: 350 55% 65%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    --rose-glow: 350 50% 55%;
-    --nude: 25 15% 30%;
-    --blush: 350 20% 15%;
+    --border: 26 10% 20%;
+    --input: 26 10% 20%;
+    --ring: 38 47% 60%;
+    --sidebar-background: 26 14% 10%;
+    --sidebar-foreground: 30 25% 93%;
+    --sidebar-primary: 38 47% 60%;
+    --sidebar-primary-foreground: 26 14% 10%;
+    --sidebar-accent: 26 12% 16%;
+    --sidebar-accent-foreground: 30 25% 90%;
+    --sidebar-border: 26 10% 20%;
+    --sidebar-ring: 38 47% 60%;
+    --rose-glow: 38 40% 50%;
+    --nude: 26 12% 20%;
+    --blush: 26 12% 13%;
+    --btn-primary-bg: 30 25% 93%;
+    --btn-primary-fg: 26 14% 10%;
   }
 }
 
@@ -100,14 +106,37 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 400;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.02em;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-card/80 backdrop-blur-md;
+    @apply bg-card/90 backdrop-blur-md;
   }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Font helpers */
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.02em;
+  }
+  .font-body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .label-overline {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: hsl(var(--muted-foreground));
+  }
 }

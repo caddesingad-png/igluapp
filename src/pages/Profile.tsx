@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LogOut, User, TrendingUp, TrendingDown, Minus, Pencil, Check } from "lucide-react";
+import { LogOut, TrendingUp, TrendingDown, Minus, Pencil, Check } from "lucide-react";
 import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -60,7 +60,6 @@ const Profile = () => {
     load();
   }, []);
 
-  // ── Metrics ────────────────────────────────────────────────────────────────
   const now = new Date();
   const thisYear = now.getFullYear();
   const thisMonth = now.getMonth();
@@ -84,7 +83,6 @@ const Profile = () => {
       })
       .reduce((s, p) => s + Number(p.price), 0);
 
-    // Spent by category (from purchase_history)
     const catMap: Record<string, number> = {};
     for (const p of purchases) {
       const cat = p.products?.category || "Other";
@@ -95,17 +93,14 @@ const Profile = () => {
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
-    // Most expensive product
     const mostExpensive = [...products].sort((a, b) => b.purchase_price - a.purchase_price)[0] ?? null;
 
-    // Best cost-benefit: price / (pao_months * 30) = R$/day
     const withCpd = products
       .filter((p) => p.pao_months > 0)
       .map((p) => ({ ...p, cpd: p.purchase_price / (p.pao_months * 30) }))
       .sort((a, b) => a.cpd - b.cpd);
     const bestCpb = withCpd[0] ?? null;
 
-    // Last 6 months line chart
     const last6: { month: string; value: number }[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(thisYear, thisMonth - i, 1);
@@ -155,74 +150,72 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 bg-background">
-      <header className="sticky top-0 z-40 glass border-b border-border px-5 py-4">
-        <div className="max-w-lg mx-auto">
-          <h1 className="text-xl font-bold text-foreground">Perfil & Finanças</h1>
+      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+        <div className="max-w-lg mx-auto px-6 h-full flex items-center">
+          <h1 className="font-display text-[18px] font-normal text-foreground">Perfil & Finanças</h1>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 pt-6 space-y-5 animate-fade-in">
-
+      <div className="max-w-lg mx-auto px-6 pt-6 space-y-5 animate-fade-in">
         {/* Avatar */}
-        <div className="flex items-center gap-4 px-1">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-lg font-bold text-primary">{initials}</span>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <span className="font-body font-medium text-[15px] text-muted-foreground">{initials}</span>
           </div>
           <div>
-            <h2 className="text-base font-semibold text-foreground">{displayName || "Usuária"}</h2>
-            <p className="text-xs text-muted-foreground">{email}</p>
+            <h2 className="font-body font-medium text-[15px] text-foreground">{displayName || "Usuária"}</h2>
+            <p className="font-body font-light text-[12px] text-muted-foreground">{email}</p>
           </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center pt-10">
-            <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>
-            {/* ── Top KPI row ── */}
+            {/* KPI row */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-border bg-card p-4">
-                <p className="text-xs text-muted-foreground mb-1">Total gasto</p>
-                <p className="text-xl font-bold text-foreground">{fmt(metrics.totalSpent)}</p>
-                <p className="text-xs text-muted-foreground mt-1">em maquiagens</p>
+              <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+                <p className="label-overline mb-2">Total gasto</p>
+                <p className="font-body font-medium text-[22px] text-foreground">{fmt(metrics.totalSpent)}</p>
+                <p className="font-body font-light text-[11px] text-muted-foreground mt-1">em maquiagens</p>
               </div>
-              <div className="rounded-2xl border border-border bg-card p-4">
-                <p className="text-xs text-muted-foreground mb-1">Este mês</p>
-                <p className="text-xl font-bold text-foreground">{fmt(metrics.thisMonthSpent)}</p>
+              <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+                <p className="label-overline mb-2">Este mês</p>
+                <p className="font-body font-medium text-[22px] text-foreground">{fmt(metrics.thisMonthSpent)}</p>
                 {momPct !== null && (
-                  <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${momDiff > 0 ? "text-destructive" : momDiff < 0 ? "text-green-600" : "text-muted-foreground"}`}>
+                  <div className={`flex items-center gap-1 mt-1 font-body text-[11px] ${momDiff > 0 ? "text-destructive" : momDiff < 0 ? "text-status-green" : "text-muted-foreground"}`}>
                     {momDiff > 0 ? <TrendingUp className="w-3 h-3" /> : momDiff < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
                     {momPct}% vs mês passado
                   </div>
                 )}
-                {momPct === null && <p className="text-xs text-muted-foreground mt-1">sem dados mês passado</p>}
               </div>
             </div>
 
-            {/* ── Budget ── */}
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-foreground">Orçamento mensal</p>
+            {/* Budget */}
+            <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="font-display text-[16px] font-normal text-foreground">Orçamento mensal</p>
                 <button
                   className="text-muted-foreground"
                   onClick={() => { setEditingBudget((v) => !v); setBudgetInput(String(monthlyBudget ?? "")); }}
                 >
-                  <Pencil className="w-3.5 h-3.5" />
+                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
                 </button>
               </div>
 
               {editingBudget ? (
-                <div className="flex gap-2 mb-3">
+                <div className="flex gap-2 mb-4">
                   <Input
                     placeholder="Ex: 500"
                     value={budgetInput}
                     onChange={(e) => setBudgetInput(e.target.value)}
-                    className="h-9 text-sm"
+                    className="h-[44px] text-sm"
                     type="number"
                     inputMode="decimal"
                   />
-                  <Button size="sm" className="h-9 px-3" onClick={saveBudget}>
+                  <Button size="sm" className="h-[44px] px-3" onClick={saveBudget}>
                     <Check className="w-4 h-4" />
                   </Button>
                 </div>
@@ -230,17 +223,24 @@ const Profile = () => {
 
               {monthlyBudget ? (
                 <>
-                  <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                  <div className="flex justify-between font-body text-[12px] text-muted-foreground mb-2">
                     <span>{fmt(metrics.thisMonthSpent)} gastos</span>
                     <span>{fmt(monthlyBudget)} limite</span>
                   </div>
-                  <div className="w-full h-3 rounded-full bg-muted overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${budgetOver ? "bg-destructive" : budgetWarn ? "bg-orange-400" : "bg-primary"}`}
-                      style={{ width: `${budgetPct}%` }}
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${budgetPct}%`,
+                        backgroundColor: budgetOver
+                          ? "hsl(var(--destructive))"
+                          : budgetWarn
+                          ? "hsl(38 70% 55%)"
+                          : "hsl(var(--primary))",
+                      }}
                     />
                   </div>
-                  <p className={`text-xs mt-2 font-medium ${budgetOver ? "text-destructive" : budgetWarn ? "text-orange-500" : "text-muted-foreground"}`}>
+                  <p className={`font-body text-[12px] mt-2 ${budgetOver ? "text-destructive" : budgetWarn ? "text-primary" : "text-muted-foreground"}`}>
                     {budgetOver
                       ? `⚠️ Orçamento ultrapassado em ${fmt(metrics.thisMonthSpent - monthlyBudget)}`
                       : `${budgetPct}% do orçamento usado — faltam ${fmt(monthlyBudget - metrics.thisMonthSpent)}`}
@@ -248,82 +248,74 @@ const Profile = () => {
                 </>
               ) : (
                 !editingBudget && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="font-body font-light text-[13px] text-muted-foreground">
                     Defina um orçamento mensal para acompanhar seus gastos.
                   </p>
                 )
               )}
             </div>
 
-            {/* ── Avg spend + Line chart ── */}
-            <div className="rounded-2xl border border-border bg-card p-4">
+            {/* Line chart */}
+            <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
               <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-semibold text-foreground">Gastos mensais</p>
-                <p className="text-xs text-muted-foreground">Média: <span className="font-medium text-foreground">{fmt(metrics.avg6)}</span>/mês</p>
+                <p className="font-display text-[16px] font-normal text-foreground">Gastos mensais</p>
+                <p className="font-body text-[11px] text-muted-foreground">Média: <span className="text-foreground">{fmt(metrics.avg6)}</span>/mês</p>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">Últimos 6 meses</p>
+              <p className="label-overline mb-4">Últimos 6 meses</p>
               <ResponsiveContainer width="100%" height={140}>
                 <LineChart data={metrics.last6} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontFamily: "'DM Sans'" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontFamily: "'DM Sans'" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
                   <Tooltip
                     formatter={(v: number) => [fmt(v), "Gasto"]}
-                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12, fontFamily: "'DM Sans'" }}
                   />
-                  <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ fill: "hsl(var(--primary))", r: 3 }} />
+                  <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            {/* ── By category ── */}
+            {/* By category */}
             {metrics.byCategory.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-4">
-                <p className="text-sm font-semibold text-foreground mb-3">Por categoria</p>
+              <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+                <p className="font-display text-[16px] font-normal text-foreground mb-4">Por categoria</p>
                 <ResponsiveContainer width="100%" height={metrics.byCategory.length * 36 + 8}>
-                  <BarChart
-                    data={metrics.byCategory}
-                    layout="vertical"
-                    margin={{ top: 0, right: 12, left: 0, bottom: 0 }}
-                    barSize={16}
-                  >
-                    <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }} axisLine={false} tickLine={false} width={80} />
+                  <BarChart data={metrics.byCategory} layout="vertical" margin={{ top: 0, right: 12, left: 0, bottom: 0 }} barSize={14}>
+                    <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontFamily: "'DM Sans'" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--foreground))", fontFamily: "'DM Sans'" }} axisLine={false} tickLine={false} width={80} />
                     <Tooltip
                       formatter={(v: number) => [fmt(v), "Gasto"]}
-                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12, fontFamily: "'DM Sans'" }}
                     />
-                    <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 8, 8, 0]} opacity={0.85} />
+                    <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 6, 6, 0]} opacity={0.9} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             )}
 
-            {/* ── Highlights ── */}
+            {/* Highlights */}
             <div className="grid grid-cols-2 gap-3">
               {metrics.mostExpensive && (
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground mb-2">💎 Mais caro</p>
-                  <p className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">{metrics.mostExpensive.name}</p>
-                  <p className="text-lg font-bold text-primary mt-1">{fmt(metrics.mostExpensive.purchase_price)}</p>
+                <div className="rounded-xl border border-border bg-card p-4" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+                  <p className="label-overline mb-2">💎 Mais caro</p>
+                  <p className="font-body font-medium text-[13px] text-foreground line-clamp-2 leading-snug">{metrics.mostExpensive.name}</p>
+                  <p className="font-body font-medium text-[18px] text-foreground mt-1">{fmt(metrics.mostExpensive.purchase_price)}</p>
                 </div>
               )}
               {metrics.bestCpb && (
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <p className="text-xs text-muted-foreground mb-2">⭐ Melhor custo-benefício</p>
-                  <p className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">{metrics.bestCpb.name}</p>
-                  <p className="text-lg font-bold text-primary mt-1">{fmt(metrics.bestCpb.cpd)}<span className="text-xs font-normal text-muted-foreground">/dia</span></p>
+                <div className="rounded-xl border border-border bg-card p-4" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+                  <p className="label-overline mb-2">⭐ Melhor custo</p>
+                  <p className="font-body font-medium text-[13px] text-foreground line-clamp-2 leading-snug">{metrics.bestCpb.name}</p>
+                  <p className="font-body font-medium text-[18px] text-foreground mt-1">{fmt(metrics.bestCpb.cpd)}<span className="text-[11px] font-light text-muted-foreground">/dia</span></p>
                 </div>
               )}
             </div>
 
-            {/* ── Account ── */}
-            <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
-              <User className="w-5 h-5 text-muted-foreground shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Conta</p>
-                <p className="text-xs text-muted-foreground truncate">{email}</p>
-              </div>
+            {/* Account */}
+            <div className="rounded-xl border border-border bg-card p-4" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+              <p className="font-body font-medium text-[13px] text-foreground">Conta</p>
+              <p className="font-body font-light text-[12px] text-muted-foreground mt-0.5 truncate">{email}</p>
             </div>
           </>
         )}
@@ -331,9 +323,9 @@ const Profile = () => {
         <Button
           variant="outline"
           onClick={handleSignOut}
-          className="w-full h-12 gap-2 text-destructive border-destructive/20 hover:bg-destructive/5"
+          className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/5"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-4 h-4" strokeWidth={1.5} />
           Sair
         </Button>
       </div>
