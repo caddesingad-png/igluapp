@@ -371,18 +371,25 @@ const SetForm = () => {
         <div>
           {/* Toggle button */}
           <button
-            className="w-full flex items-center justify-between py-1"
+            className="w-full flex items-start justify-between py-2"
             onClick={() => setLayersSectionOpen((v) => !v)}
           >
-            <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 400, fontSize: "13px", color: "#8C8480" }}>
-              {layersSectionOpen
-                ? "Camadas"
-                : filledLayersCount > 0
-                  ? `${filledLayersCount} camada${filledLayersCount !== 1 ? "s" : ""} adicionada${filledLayersCount !== 1 ? "s" : ""}`
-                  : "+ Adicionar camadas"}
-            </span>
+            <div className="flex flex-col items-start gap-0.5 text-left">
+              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: "14px", color: "#1A1714" }}>
+                Camadas{" "}
+                <span style={{ fontWeight: 400, fontSize: "13px", color: "#8C8480" }}>(opcional)</span>
+                {!layersSectionOpen && filledLayersCount > 0 && (
+                  <span style={{ fontWeight: 400, fontSize: "12px", color: "#C9A96E", marginLeft: "6px" }}>
+                    · {filledLayersCount} adicionada{filledLayersCount !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </span>
+              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 300, fontSize: "12px", fontStyle: "italic", color: "#B8B0AA" }}>
+                Registre e documente sua técnica
+              </span>
+            </div>
             <ChevronDown
-              className="w-4 h-4 transition-transform"
+              className="w-4 h-4 mt-1 shrink-0 transition-transform"
               strokeWidth={1.5}
               style={{
                 color: "#8C8480",
@@ -395,18 +402,6 @@ const SetForm = () => {
           {/* Expanded section */}
           {layersSectionOpen && (
             <div className="mt-3">
-              <p
-                className="mb-3"
-                style={{
-                  fontFamily: "DM Sans, sans-serif",
-                  fontWeight: 300,
-                  fontSize: "11px",
-                  fontStyle: "italic",
-                  color: "#B8B0AA",
-                }}
-              >
-                Opcional — documente sua técnica
-              </p>
 
               <div
                 className="rounded-xl border border-border bg-card overflow-hidden divide-y divide-border"
