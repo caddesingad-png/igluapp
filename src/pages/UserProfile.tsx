@@ -213,23 +213,8 @@ const UserProfile = () => {
   const orbitPhotos = productPhotos.slice(0, 8);
   const orbitPositions = getOrbitalPositions(orbitPhotos.length, 115);
 
-  const orbitStyle = `
-    @keyframes orbit-cw {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-    @keyframes orbit-ccw {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(-360deg); }
-    }
-    .orbit-ring { animation: orbit-cw 40s linear infinite; }
-    .orbit-photo { animation: orbit-ccw 40s linear infinite; }
-  `;
-
-
   return (
     <>
-      <style>{orbitStyle}</style>
       <div className="min-h-screen pb-24 bg-background">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
@@ -265,46 +250,40 @@ const UserProfile = () => {
             <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
               {/* Orbit rings */}
               <div
-                className="absolute rounded-full"
-                style={{ width: 160, height: 160, border: "1px solid hsl(var(--foreground) / 0.08)" }}
+                className="absolute rounded-full border border-border/40"
+                style={{ width: 230, height: 230 }}
               />
               <div
-                className="absolute rounded-full"
-                style={{ width: 230, height: 230, border: "1.5px solid hsl(var(--foreground) / 0.18)" }}
-              />
-              <div
-                className="absolute rounded-full"
-                style={{ width: 280, height: 280, border: "1px solid hsl(var(--foreground) / 0.10)" }}
+                className="absolute rounded-full border border-border/20"
+                style={{ width: 280, height: 280 }}
               />
 
-              {/* Rotating orbit layer */}
-              <div className="orbit-ring absolute" style={{ width: 280, height: 280 }}>
-                {orbitPhotos.map((photo, i) => {
-                  const pos = orbitPositions[i];
-                  return (
-                    <div
-                      key={photo.id}
-                      className="orbit-photo absolute rounded-full overflow-hidden border-2 border-background"
-                      style={{
-                        width: 52,
-                        height: 52,
-                        left: "50%",
-                        top: "50%",
-                        transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`,
-                        boxShadow: "0 2px 10px rgba(26,23,20,0.15)",
-                      }}
-                    >
-                      {photo.photo_url ? (
-                        <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Orbital product photos */}
+              {orbitPhotos.map((photo, i) => {
+                const pos = orbitPositions[i];
+                return (
+                  <div
+                    key={photo.id}
+                    className="absolute rounded-full overflow-hidden border-2 border-background"
+                    style={{
+                      width: 52,
+                      height: 52,
+                      left: "50%",
+                      top: "50%",
+                      transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px))`,
+                      boxShadow: "0 2px 8px rgba(26,23,20,0.12)",
+                    }}
+                  >
+                    {photo.photo_url ? (
+                      <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
               {/* Center avatar */}
               <div className="relative z-10 w-[96px] h-[96px] rounded-full overflow-hidden border-[3px] border-background"
