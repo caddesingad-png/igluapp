@@ -8,6 +8,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import AvatarCropModal from "@/components/AvatarCropModal";
 
 interface ProfileData {
   user_id: string;
@@ -71,6 +72,7 @@ const UserProfile = () => {
   const [editingBio, setEditingBio] = useState(false);
   const [bioInput, setBioInput] = useState("");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Follow modals
@@ -172,27 +174,35 @@ const UserProfile = () => {
     toast.success("Sessão encerrada");
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
+    // Abre o modal de crop antes de fazer upload
+    const objectUrl = URL.createObjectURL(file);
+    setCropImageSrc(objectUrl);
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const handleCropConfirm = async (blob: Blob) => {
+    if (!userId) return;
+    setCropImageSrc(null);
     setUploadingAvatar(true);
     try {
-      const compressed = await compressImage(file, 600, 0.88);
       const path = `avatars/${userId}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from("product-photos")
-        .upload(path, compressed, { upsert: true });
+        .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
-      const avatarUrl = urlData.publicUrl;
-      await supabase.from("profiles").update({ avatar_url: avatarUrl } as any).eq("user_id", userId);
+      // Cache busting para forçar reload da imagem
+      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      await supabase.from("profiles").update({ avatar_url: urlData.publicUrl } as any).eq("user_id", userId);
       setProfile((p) => p ? { ...p, avatar_url: avatarUrl } : p);
       toast.success("Foto atualizada!");
     } catch {
       toast.error("Erro ao enviar foto");
     } finally {
       setUploadingAvatar(false);
-      if (avatarInputRef.current) avatarInputRef.current.value = "";
     }
   };
 
@@ -548,6 +558,18 @@ const UserProfile = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Avatar Crop Modal */}
+      {cropImageSrc && (
+        <AvatarCropModal
+          imageSrc={cropImageSrc}
+          onConfirm={handleCropConfirm}
+          onCancel={() => {
+            URL.revokeObjectURL(cropImageSrc);
+            setCropImageSrc(null);
+          }}
+        />
       )}
     </>
   );
