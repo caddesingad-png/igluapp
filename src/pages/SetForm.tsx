@@ -512,7 +512,7 @@ const SetForm = () => {
       {linkingLayer !== null && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div className="absolute inset-0 bg-foreground/20" onClick={() => setLinkingLayer(null)} />
-          <div className="relative bg-background rounded-t-2xl max-h-[70vh] flex flex-col" style={{ boxShadow: "0 -4px 20px rgba(26,23,20,0.12)" }}>
+          <div className="relative bg-background rounded-t-2xl flex flex-col" style={{ boxShadow: "0 -4px 20px rgba(26,23,20,0.12)", maxHeight: "calc(70vh - env(safe-area-inset-bottom, 0px))" }}>
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
@@ -561,7 +561,7 @@ const SetForm = () => {
                 );
               })}
             </div>
-            <div className="px-6 py-4 border-t border-border">
+            <div className="px-6 pt-4 border-t border-border" style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 16px) + 60px)" }}>
               <Button className="w-full" onClick={() => setLinkingLayer(null)}>
                 Confirmar
               </Button>
