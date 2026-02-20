@@ -38,12 +38,24 @@ const AppRoutes = () => {
     }
     supabase
       .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed, display_name, created_at")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         if (data && !data.onboarding_completed) {
-          setShowOnboarding(true);
+          // Só mostra onboarding se a conta foi criada há menos de 2 minutos
+          // (usuário realmente novo), evitando mostrar para usuários já existentes
+          const createdAt = data.created_at ? new Date(data.created_at).getTime() : 0;
+          const isNewUser = Date.now() - createdAt < 2 * 60 * 1000;
+          if (isNewUser) {
+            setShowOnboarding(true);
+          } else {
+            // Marca como completo silenciosamente para usuários antigos
+            supabase
+              .from("profiles")
+              .update({ onboarding_completed: true } as any)
+              .eq("user_id", user.id);
+          }
         }
         setOnboardingChecked(true);
       });
