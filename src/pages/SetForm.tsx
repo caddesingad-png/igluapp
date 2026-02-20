@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Camera, Globe, Lock, Plus, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,14 +70,14 @@ const SetForm = () => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     setUploadingPhoto(true);
-    const ext = file.name.split(".").pop();
-    const path = `sets/${user.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: true });
+    const compressed = await compressImage(file);
+    const path = `sets/${user.id}/${Date.now()}.jpg`;
+    const { error } = await supabase.storage.from("product-photos").upload(path, compressed, { upsert: true });
     if (!error) {
       const { data } = supabase.storage.from("product-photos").getPublicUrl(path);
       setPhotoUrl(data.publicUrl);
     } else {
-      toast({ title: "Photo upload failed", variant: "destructive" });
+      toast({ title: "Erro ao subir foto", variant: "destructive" });
     }
     setUploadingPhoto(false);
   };

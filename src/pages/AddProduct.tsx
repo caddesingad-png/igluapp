@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { compressImage } from "@/lib/compressImage";
 import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -87,13 +88,14 @@ const AddProduct = () => {
     setColorCodes(colorCodes.filter((c) => c !== code));
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPhoto(file);
+      const compressed = await compressImage(file);
+      setPhoto(compressed);
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressed);
     }
   };
 
@@ -140,8 +142,7 @@ const AddProduct = () => {
       let photoUrl: string | null = null;
 
       if (photo) {
-        const ext = photo.name.split(".").pop();
-        const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+        const filePath = `${user.id}/${crypto.randomUUID()}.jpg`;
         const { error: uploadError } = await supabase.storage.from("product-photos").upload(filePath, photo);
         if (uploadError) throw uploadError;
         const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(filePath);
