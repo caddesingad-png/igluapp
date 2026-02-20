@@ -218,7 +218,7 @@ const UserProfile = () => {
     const { data } = await (supabase.from("user_follows" as any) as any).select("follower_id").eq("following_id", userId);
     if (!data?.length) { setFollowersList([]); return; }
     const ids = data.map((r: any) => r.follower_id);
-    const { data: profiles } = await supabase.from("profiles").select("user_id, display_name, avatar_url").in("user_id", ids);
+    const { data: profiles } = await (supabase.from("profiles_public" as any) as any).select("user_id, display_name, avatar_url").in("user_id", ids);
     setFollowersList((profiles ?? []).map((p: any) => ({ ...p, id: p.user_id })));
   };
 
@@ -227,7 +227,7 @@ const UserProfile = () => {
     const { data } = await (supabase.from("user_follows" as any) as any).select("following_id").eq("follower_id", userId);
     if (!data?.length) { setFollowingList([]); return; }
     const ids = data.map((r: any) => r.following_id);
-    const { data: profiles } = await supabase.from("profiles").select("user_id, display_name, avatar_url").in("user_id", ids);
+    const { data: profiles } = await (supabase.from("profiles_public" as any) as any).select("user_id, display_name, avatar_url").in("user_id", ids);
     setFollowingList((profiles ?? []).map((p: any) => ({ ...p, id: p.user_id })));
   };
 
