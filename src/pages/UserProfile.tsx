@@ -188,18 +188,24 @@ const UserProfile = () => {
     setCropImageSrc(null);
     setUploadingAvatar(true);
     try {
+      // Converte Blob → File com metadados corretos para o storage
+      const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
       const path = `avatars/${userId}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from("product-photos")
-        .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
-      if (uploadError) throw uploadError;
+        .upload(path, file, { upsert: true, contentType: "image/jpeg" });
+      if (uploadError) {
+        console.error("Avatar upload error:", uploadError);
+        throw uploadError;
+      }
       const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
-      // Cache busting para forçar reload da imagem
-      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      // Cache busting para forçar reload da imagem no browser
+      const avatarUrlDisplay = `${urlData.publicUrl}?t=${Date.now()}`;
       await supabase.from("profiles").update({ avatar_url: urlData.publicUrl } as any).eq("user_id", userId);
-      setProfile((p) => p ? { ...p, avatar_url: avatarUrl } : p);
+      setProfile((p) => p ? { ...p, avatar_url: avatarUrlDisplay } : p);
       toast.success("Foto atualizada!");
-    } catch {
+    } catch (err) {
+      console.error("handleCropConfirm error:", err);
       toast.error("Erro ao enviar foto");
     } finally {
       setUploadingAvatar(false);
