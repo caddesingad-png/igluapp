@@ -149,7 +149,7 @@ const Profile = () => {
   const budgetWarn = monthlyBudget ? metrics.thisMonthSpent >= monthlyBudget * 0.8 : false;
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="min-h-screen pb-24 bg-background screen-enter">
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
         <div className="max-w-lg mx-auto px-6 h-full flex items-center">
           <h1 className="font-display text-[18px] font-normal text-foreground">Perfil & Finanças</h1>

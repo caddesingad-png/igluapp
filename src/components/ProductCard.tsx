@@ -59,7 +59,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
     return (
       <div
         onClick={onClick}
-        className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 cursor-pointer active:scale-[0.99] transition-transform"
+        className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 cursor-pointer card-press"
         style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
       >
         {/* Thumbnail */}
@@ -110,7 +110,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
   return (
     <div
       onClick={onClick}
-      className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
+      className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer card-press"
       style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
     >
       {/* Photo */}
