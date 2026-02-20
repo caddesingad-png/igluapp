@@ -32,17 +32,17 @@ interface Product {
 }
 
 const CATEGORIES = [
-  "All", "Foundation", "Lipstick", "Eyeshadow", "Blush", "Mascara",
-  "Concealer", "Highlighter", "Contour", "Primer", "Setting Spray", "Other",
+  "Todas", "Base", "Batom", "Sombra", "Blush", "Máscara",
+  "Corretivo", "Iluminador", "Contorno", "Primer", "Fixador", "Outro",
 ];
 
 const SORT_OPTIONS = [
-  { value: "date_desc", label: "Newest first" },
-  { value: "date_asc", label: "Oldest first" },
-  { value: "price_desc", label: "Price: high → low" },
-  { value: "price_asc", label: "Price: low → high" },
-  { value: "name_asc", label: "Name A → Z" },
-  { value: "favorites", label: "Favorites first" },
+  { value: "date_desc", label: "Mais recentes" },
+  { value: "date_asc", label: "Mais antigas" },
+  { value: "price_desc", label: "Preço: maior → menor" },
+  { value: "price_asc", label: "Preço: menor → maior" },
+  { value: "name_asc", label: "Nome A → Z" },
+  { value: "favorites", label: "Favoritas primeiro" },
 ];
 
 const Library = () => {
@@ -52,7 +52,7 @@ const Library = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("Todas");
   const [sortBy, setSortBy] = useState("date_desc");
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const Library = () => {
         (p) => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
       );
     }
-    if (selectedCategory !== "All") {
+    if (selectedCategory !== "Todas") {
       result = result.filter((p) => p.category === selectedCategory);
     }
     result.sort((a, b) => {
@@ -149,7 +149,7 @@ const Library = () => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" strokeWidth={1.5} />
           <input
-            placeholder="Search by name or brand…"
+            placeholder="Buscar por nome ou marca…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full h-[44px] pl-9 pr-9 rounded-md border border-border bg-card text-[14px] font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors"
@@ -211,13 +211,13 @@ const Library = () => {
           <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-6">
             <Sparkles className="w-7 h-7 text-primary" />
           </div>
-          <h2 className="font-display text-[20px] font-normal text-foreground mb-3">Your collection is empty</h2>
+          <h2 className="font-display text-[20px] font-normal text-foreground mb-3">Sua coleção está vazia</h2>
           <p className="font-body font-light text-[14px] text-muted-foreground leading-relaxed max-w-[240px] mb-8">
-            Start building your beauty library by adding your first product
+            Comece a construir sua biblioteca de beleza adicionando seu primeiro produto
           </p>
           <Button onClick={() => navigate("/add-product")} className="gap-2 px-8">
             <Plus className="w-4 h-4" />
-            Add your first product
+            Adicionar primeiro produto
           </Button>
         </div>
       )}
@@ -225,12 +225,12 @@ const Library = () => {
       {/* No results */}
       {noResults && (
         <div className="flex flex-col items-center justify-center px-6 pt-24 text-center">
-          <p className="font-body text-[14px] text-muted-foreground">No products match your search</p>
+          <p className="font-body text-[14px] text-muted-foreground">Nenhum produto encontrado</p>
           <button
-            onClick={() => { setSearch(""); setSelectedCategory("All"); }}
+            onClick={() => { setSearch(""); setSelectedCategory("Todas"); }}
             className="font-body text-[13px] text-foreground mt-2 underline underline-offset-2"
           >
-            Clear filters
+            Limpar filtros
           </button>
         </div>
       )}
@@ -239,8 +239,8 @@ const Library = () => {
       {!loading && filtered.length > 0 && (
         <div className="max-w-lg mx-auto px-6 pt-4 animate-fade-in">
           <p className="font-body text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-3">
-            {filtered.length} product{filtered.length !== 1 ? "s" : ""}
-            {selectedCategory !== "All" && ` · ${selectedCategory}`}
+            {filtered.length} produto{filtered.length !== 1 ? "s" : ""}
+            {selectedCategory !== "Todas" && ` · ${selectedCategory}`}
           </p>
           {viewMode === "grid" ? (
             <div className="grid grid-cols-2 gap-3">

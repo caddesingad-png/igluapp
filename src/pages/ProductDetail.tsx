@@ -73,7 +73,7 @@ const isValidColor = (c: string) => {
 };
 
 const formatCurrency = (val: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -149,9 +149,9 @@ const ProductDetail = () => {
     const { error } = await (supabase.from("products" as any) as any)
       .delete().eq("id", product.id);
     if (error) {
-      toast({ title: "Error", description: "Could not delete product.", variant: "destructive" });
+      toast({ title: "Erro", description: "Não foi possível excluir o produto.", variant: "destructive" });
     } else {
-      toast({ title: "Product deleted" });
+      toast({ title: "Produto excluído" });
       navigate("/library");
     }
   };
@@ -177,7 +177,7 @@ const ProductDetail = () => {
       setNewNote("");
       setAddingColor(false);
     } else {
-      toast({ title: "Error", description: "Could not add color code.", variant: "destructive" });
+      toast({ title: "Erro", description: "Não foi possível adicionar código de cor.", variant: "destructive" });
     }
     setSavingColor(false);
   };
@@ -221,7 +221,7 @@ const ProductDetail = () => {
     if (!purchaseForm.price || !user || !id) return;
     const priceNum = parseFloat(purchaseForm.price);
     if (isNaN(priceNum) || priceNum < 0) {
-      toast({ title: "Invalid price", variant: "destructive" });
+      toast({ title: "Preço inválido", variant: "destructive" });
       return;
     }
     setSavingPurchase(true);
@@ -247,9 +247,9 @@ const ProductDetail = () => {
         notes: "",
       });
       setAddingPurchase(false);
-      toast({ title: "Purchase recorded!" });
+      toast({ title: "Compra registrada!" });
     } else {
-      toast({ title: "Error", description: "Could not save purchase.", variant: "destructive" });
+      toast({ title: "Erro", description: "Não foi possível salvar a compra.", variant: "destructive" });
     }
     setSavingPurchase(false);
   };
@@ -269,10 +269,10 @@ const ProductDetail = () => {
     if (Math.abs(diff) < 0.01) return null;
     const sign = diff > 0 ? "↑" : "↓";
     const color = diff > 0 ? "text-destructive" : "text-green-600 dark:text-green-400";
-    const label = diff > 0 ? "more expensive" : "cheaper";
+    const label = diff > 0 ? "mais caro" : "mais barato";
     return (
       <span className={`text-xs font-medium ${color}`}>
-        {sign} {formatCurrency(Math.abs(diff))} {label} than last time
+        {sign} {formatCurrency(Math.abs(diff))} {label} que na última vez
       </span>
     );
   };
@@ -290,7 +290,7 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Product not found.</p>
+        <p className="text-muted-foreground">Produto não encontrado.</p>
       </div>
     );
   }
@@ -346,18 +346,18 @@ const ProductDetail = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete product?</AlertDialogTitle>
+                  <AlertDialogTitle>Excluir produto?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently remove <strong>{product.name}</strong> from your library.
+                    Isso vai remover permanentemente <strong>{product.name}</strong> da sua biblioteca.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Delete
+                    Excluir
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -388,7 +388,7 @@ const ProductDetail = () => {
         {/* ── Color Codes Section ── */}
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border">
-            <h2 className="text-sm font-semibold text-foreground">Color Codes</h2>
+            <h2 className="text-sm font-semibold text-foreground">Códigos de Cor</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -402,7 +402,7 @@ const ProductDetail = () => {
 
           {colorCodes.length === 0 && !addingColor && (
             <p className="text-sm text-muted-foreground px-4 py-4">
-              No color codes yet. Tap Add to track your shades.
+              Nenhum código de cor ainda. Toque em Adicionar para registrar suas tonalidades.
             </p>
           )}
 
@@ -421,7 +421,7 @@ const ProductDetail = () => {
                         <span className="text-sm font-mono font-medium text-foreground">{cc.code}</span>
                         {cc.is_current && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
-                            Current
+                            Atual
                           </span>
                         )}
                       </div>
@@ -453,14 +453,14 @@ const ProductDetail = () => {
                           {cc.note ? (
                             <span className="text-xs text-muted-foreground italic">{cc.note}</span>
                           ) : (
-                            <span className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors">+ add note</span>
+                            <span className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors">+ adicionar nota</span>
                           )}
                         </button>
                       )}
                     </div>
                     <div className="flex items-center gap-0.5 shrink-0">
                       {!cc.is_current && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7" title="Set as current" onClick={() => handleSetCurrent(cc.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" title="Definir como atual" onClick={() => handleSetCurrent(cc.id)}>
                           <Check className="w-3.5 h-3.5 text-muted-foreground" />
                         </Button>
                       )}
@@ -472,12 +472,12 @@ const ProductDetail = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete color code?</AlertDialogTitle>
-                            <AlertDialogDescription>Remove <strong>{cc.code}</strong> from this product.</AlertDialogDescription>
+                            <AlertDialogTitle>Excluir código de cor?</AlertDialogTitle>
+                            <AlertDialogDescription>Remover <strong>{cc.code}</strong> deste produto.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteColor(cc.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteColor(cc.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -490,7 +490,7 @@ const ProductDetail = () => {
 
           {addingColor && (
             <div className="px-4 py-3 border-t border-border bg-muted/30">
-              <p className="text-xs font-medium text-foreground mb-2">New color code</p>
+              <p className="text-xs font-medium text-foreground mb-2">Novo código de cor</p>
               <div className="flex gap-2 mb-2">
                 <Input
                   ref={newCodeRef}
@@ -505,7 +505,7 @@ const ProductDetail = () => {
                 )}
               </div>
               <Input
-                placeholder="Note (optional) — e.g. too orange for summer"
+                placeholder="Nota (opcional) — ex: laranja demais para o verão"
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddColor(); if (e.key === "Escape") setAddingColor(false); }}
@@ -513,10 +513,10 @@ const ProductDetail = () => {
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleAddColor} disabled={!newCode.trim() || savingColor} className="rounded-full flex-1">
-                  {savingColor ? "Saving…" : "Save"}
+                  {savingColor ? "Salvando…" : "Salvar"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => { setAddingColor(false); setNewCode(""); setNewNote(""); }} className="rounded-full">
-                  Cancel
+                  Cancelar
                 </Button>
               </div>
             </div>
@@ -528,7 +528,7 @@ const ProductDetail = () => {
           <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Purchase History</h2>
+              <h2 className="text-sm font-semibold text-foreground">Histórico de Compras</h2>
               {purchases.length > 0 && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
                   {purchases.length}
@@ -542,13 +542,13 @@ const ProductDetail = () => {
               className="h-7 px-2 text-xs gap-1 text-primary hover:text-primary"
             >
               <Plus className="w-3.5 h-3.5" />
-              Register
+              Registrar
             </Button>
           </div>
 
           {purchases.length === 0 && !addingPurchase && (
             <p className="text-sm text-muted-foreground px-4 py-4">
-              No purchases recorded yet.
+              Nenhuma compra registrada ainda.
             </p>
           )}
 
@@ -563,14 +563,14 @@ const ProductDetail = () => {
                         {formatCurrency(p.price)}
                       </span>
                       {idx === 0 && purchases.length > 1 && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
-                          Latest
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
+                            Mais recente
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className="text-xs text-muted-foreground">
-                        {new Date(p.purchase_date + "T00:00:00").toLocaleDateString("en-US", {
+                        {new Date(p.purchase_date + "T00:00:00").toLocaleDateString("pt-BR", {
                           year: "numeric", month: "short", day: "numeric",
                         })}
                       </span>
@@ -602,20 +602,20 @@ const ProductDetail = () => {
                         <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete purchase?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Remove this purchase record from the history.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDeletePurchase(p.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Delete
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir compra?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Remover este registro de compra do histórico.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeletePurchase(p.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Excluir
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -630,10 +630,10 @@ const ProductDetail = () => {
               onClick={() => setShowAllPurchases(!showAllPurchases)}
               className="w-full flex items-center justify-center gap-1 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors border-t border-border"
             >
-              {showAllPurchases ? (
-                <><ChevronUp className="w-3.5 h-3.5" /> Show less</>
+            {showAllPurchases ? (
+                <><ChevronUp className="w-3.5 h-3.5" /> Ver menos</>
               ) : (
-                <><ChevronDown className="w-3.5 h-3.5" /> Show {purchases.length - 3} more</>
+                <><ChevronDown className="w-3.5 h-3.5" /> Ver mais {purchases.length - 3}</>
               )}
             </button>
           )}
@@ -641,24 +641,24 @@ const ProductDetail = () => {
           {/* Add purchase form */}
           {addingPurchase && (
             <div className="px-4 py-3 border-t border-border bg-muted/30">
-              <p className="text-xs font-medium text-foreground mb-3">New purchase</p>
+              <p className="text-xs font-medium text-foreground mb-3">Nova compra</p>
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="text-xs text-muted-foreground mb-1 block">Price *</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Preço *</label>
                     <Input
                       autoFocus
                       type="number"
                       step="0.01"
                       min="0"
-                      placeholder="0.00"
+                      placeholder="0,00"
                       value={purchaseForm.price}
                       onChange={(e) => setPurchaseForm((f) => ({ ...f, price: e.target.value }))}
                       className="h-9 text-sm"
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="text-xs text-muted-foreground mb-1 block">Date *</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Data *</label>
                     <Input
                       type="date"
                       value={purchaseForm.purchase_date}
@@ -669,18 +669,18 @@ const ProductDetail = () => {
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="text-xs text-muted-foreground mb-1 block">Color code</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Código de cor</label>
                     <Input
-                      placeholder="e.g. N30"
+                      placeholder="ex: N30"
                       value={purchaseForm.color_code}
                       onChange={(e) => setPurchaseForm((f) => ({ ...f, color_code: e.target.value }))}
                       className="h-9 text-sm font-mono"
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="text-xs text-muted-foreground mb-1 block">Store</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">Loja</label>
                     <Input
-                      placeholder="e.g. Sephora"
+                      placeholder="ex: Sephora"
                       value={purchaseForm.store}
                       onChange={(e) => setPurchaseForm((f) => ({ ...f, store: e.target.value }))}
                       className="h-9 text-sm"
@@ -688,9 +688,9 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Notes</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">Notas</label>
                   <Input
-                    placeholder="Optional note…"
+                    placeholder="Observação opcional…"
                     value={purchaseForm.notes}
                     onChange={(e) => setPurchaseForm((f) => ({ ...f, notes: e.target.value }))}
                     className="h-9 text-sm"
@@ -703,7 +703,7 @@ const ProductDetail = () => {
                     disabled={!purchaseForm.price || savingPurchase}
                     className="rounded-full flex-1"
                   >
-                    {savingPurchase ? "Saving…" : "Save purchase"}
+                    {savingPurchase ? "Salvando…" : "Salvar compra"}
                   </Button>
                   <Button
                     size="sm"
@@ -711,7 +711,7 @@ const ProductDetail = () => {
                     onClick={() => setAddingPurchase(false)}
                     className="rounded-full"
                   >
-                    Cancel
+                    Cancelar
                   </Button>
                 </div>
               </div>
@@ -721,18 +721,18 @@ const ProductDetail = () => {
 
         {/* Details card */}
         <div className="rounded-xl border border-border bg-card px-4">
-          <InfoRow icon={DollarSign} label="Purchase Price" value={`$${product.purchase_price.toFixed(2)}`} />
+          <InfoRow icon={DollarSign} label="Preço de Compra" value={formatCurrency(product.purchase_price)} />
           <InfoRow
             icon={Calendar}
-            label="Purchase Date"
-            value={new Date(product.purchase_date).toLocaleDateString("en-US", {
+            label="Data de Compra"
+            value={new Date(product.purchase_date).toLocaleDateString("pt-BR", {
               year: "numeric", month: "long", day: "numeric",
             })}
           />
-          <InfoRow icon={Clock} label="PAO (Period After Opening)" value={`${product.pao_months} months`} />
-          <InfoRow icon={Repeat} label="Usage Frequency" value={product.usage_frequency} />
+          <InfoRow icon={Clock} label="Validade após abertura (PAO)" value={`${product.pao_months} meses`} />
+          <InfoRow icon={Repeat} label="Frequência de Uso" value={product.usage_frequency} />
           {product.weight_grams != null && (
-            <InfoRow icon={Weight} label="Weight" value={`${product.weight_grams}g`} />
+            <InfoRow icon={Weight} label="Peso" value={`${product.weight_grams}g`} />
           )}
         </div>
 
@@ -741,7 +741,7 @@ const ProductDetail = () => {
           <div className="rounded-xl border border-border bg-card px-4 py-3">
             <div className="flex items-center gap-2 mb-2">
               <StickyNote className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notes</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notas</span>
             </div>
             <p className="text-sm text-foreground leading-relaxed">{product.notes}</p>
           </div>

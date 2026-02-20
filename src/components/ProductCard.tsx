@@ -15,15 +15,25 @@ interface Product {
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
+  Base: Layers,
+  Batom: Heart,
+  Sombra: Eye,
+  Blush: Sparkles,
+  Máscara: Wand2,
+  Corretivo: FlaskConical,
+  Iluminador: Sun,
+  Contorno: Palette,
+  Primer: Droplets,
+  Fixador: Wind,
+  Outro: Star,
+  // keep English keys for backward compatibility
   Foundation: Layers,
   Lipstick: Heart,
   Eyeshadow: Eye,
-  Blush: Sparkles,
   Mascara: Wand2,
   Concealer: FlaskConical,
   Highlighter: Sun,
   Contour: Palette,
-  Primer: Droplets,
   "Setting Spray": Wind,
   Other: Star,
 };
@@ -86,7 +96,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         {/* Price + Fav */}
         <div className="flex flex-col items-end gap-1 shrink-0">
           <span className="font-body font-medium text-[15px] text-foreground">
-            ${product.purchase_price.toFixed(2)}
+            R$ {product.purchase_price.toFixed(2).replace('.', ',')}
           </span>
           {product.is_favorite && (
             <Heart className="w-3.5 h-3.5 text-primary fill-primary" />
@@ -126,7 +136,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
             {product.category}
           </span>
           <span className="font-body font-medium text-[15px] text-foreground">
-            ${product.purchase_price.toFixed(2)}
+            R$ {product.purchase_price.toFixed(2).replace('.', ',')}
           </span>
         </div>
 

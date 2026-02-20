@@ -20,19 +20,19 @@ import { toast } from "sonner";
 import BarcodeScanner from "@/components/BarcodeScanner";
 
 const CATEGORIES = [
-  "Foundation", "Lipstick", "Eyeshadow", "Blush", "Mascara",
-  "Concealer", "Highlighter", "Contour", "Primer", "Setting Spray", "Other",
+  "Base", "Batom", "Sombra", "Blush", "Máscara",
+  "Corretivo", "Iluminador", "Contorno", "Primer", "Fixador", "Outro",
 ];
 
 const PAO_OPTIONS = [
-  { value: "3", label: "3 months" },
-  { value: "6", label: "6 months" },
-  { value: "12", label: "12 months" },
-  { value: "18", label: "18 months" },
-  { value: "24", label: "24 months" },
+  { value: "3", label: "3 meses" },
+  { value: "6", label: "6 meses" },
+  { value: "12", label: "12 meses" },
+  { value: "18", label: "18 meses" },
+  { value: "24", label: "24 meses" },
 ];
 
-const FREQUENCY_OPTIONS = ["Daily", "Weekly", "Occasional"];
+const FREQUENCY_OPTIONS = ["Diária", "Semanal", "Ocasional"];
 
 const mapCategory = (tags: string[] = []): string => {
   const joined = tags.join(" ").toLowerCase();
@@ -67,7 +67,7 @@ const AddProduct = () => {
   const [weightGrams, setWeightGrams] = useState("");
   const [purchaseDate, setPurchaseDate] = useState<Date>(new Date());
   const [paoMonths, setPaoMonths] = useState("12");
-  const [usageFrequency, setUsageFrequency] = useState("Occasional");
+  const [usageFrequency, setUsageFrequency] = useState("Ocasional");
   const [notes, setNotes] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -131,7 +131,7 @@ const AddProduct = () => {
     e.preventDefault();
     if (!user) return;
     if (!name.trim() || !brand.trim() || !category || !purchasePrice) {
-      toast.error("Please fill in all required fields");
+      toast.error("Por favor preencha todos os campos obrigatórios");
       return;
     }
 
@@ -164,10 +164,10 @@ const AddProduct = () => {
       });
 
       if (error) throw error;
-      toast.success("Product added! 💄");
+      toast.success("Produto adicionado! 💄");
       navigate("/library");
     } catch (error: any) {
-      toast.error(error.message || "Failed to save product");
+      toast.error(error.message || "Erro ao salvar produto");
     } finally {
       setSaving(false);
     }
@@ -187,7 +187,7 @@ const AddProduct = () => {
             <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
               <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
             </button>
-            <h1 className="font-display text-[18px] font-normal text-foreground">Add Product</h1>
+            <h1 className="font-display text-[18px] font-normal text-foreground">Adicionar Produto</h1>
           </div>
         </header>
 
@@ -195,7 +195,7 @@ const AddProduct = () => {
           <div className="space-y-6">
             {/* Photo Upload */}
             <div>
-              <FieldLabel>Photo</FieldLabel>
+            <FieldLabel>Foto</FieldLabel>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
                 <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
@@ -215,7 +215,7 @@ const AddProduct = () => {
                   className="w-28 h-28 rounded-xl border border-dashed border-border flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:border-foreground/30 transition-colors"
                 >
                   <Camera className="w-6 h-6" strokeWidth={1.5} />
-                  <span className="font-body text-[10px] uppercase tracking-[0.08em]">Add photo</span>
+                  <span className="font-body text-[10px] uppercase tracking-[0.08em]">Adicionar foto</span>
                 </button>
               )}
             </div>
@@ -223,7 +223,7 @@ const AddProduct = () => {
             {/* Name + barcode */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <FieldLabel>Product Name *</FieldLabel>
+                <FieldLabel>Nome do Produto *</FieldLabel>
                 <button
                   type="button"
                   onClick={() => setShowScanner(true)}
@@ -246,7 +246,7 @@ const AddProduct = () => {
 
             {/* Brand */}
             <div>
-              <FieldLabel>Brand *</FieldLabel>
+              <FieldLabel>Marca *</FieldLabel>
               <Input
                 id="brand"
                 placeholder="e.g. MAC Cosmetics"
@@ -259,10 +259,10 @@ const AddProduct = () => {
 
             {/* Category */}
             <div>
-              <FieldLabel>Category *</FieldLabel>
+              <FieldLabel>Categoria *</FieldLabel>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="h-[52px] font-body text-[15px] rounded-md border-border bg-card focus:ring-0 focus:border-primary">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Selecionar categoria" />
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map((cat) => (
@@ -274,7 +274,7 @@ const AddProduct = () => {
 
             {/* Color Codes */}
             <div>
-              <FieldLabel>Color Codes</FieldLabel>
+              <FieldLabel>Códigos de Cor</FieldLabel>
               <div className="flex gap-2">
                 <Input
                   placeholder="e.g. #C41E3A or Red 01"
@@ -312,26 +312,26 @@ const AddProduct = () => {
             {/* Price & Weight */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <FieldLabel>Price *</FieldLabel>
+                <FieldLabel>Preço *</FieldLabel>
                 <Input
                   id="price"
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="0.00"
+                  placeholder="0,00"
                   value={purchasePrice}
                   onChange={(e) => setPurchasePrice(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <FieldLabel>Weight (g)</FieldLabel>
+                <FieldLabel>Peso (g)</FieldLabel>
                 <Input
                   id="weight"
                   type="number"
                   step="0.1"
                   min="0"
-                  placeholder="Optional"
+                  placeholder="Opcional"
                   value={weightGrams}
                   onChange={(e) => setWeightGrams(e.target.value)}
                 />
@@ -340,7 +340,7 @@ const AddProduct = () => {
 
             {/* Purchase Date */}
             <div>
-              <FieldLabel>Purchase Date</FieldLabel>
+              <FieldLabel>Data de Compra</FieldLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <button
@@ -351,7 +351,7 @@ const AddProduct = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-                    {purchaseDate ? format(purchaseDate, "PPP") : "Pick a date"}
+                    {purchaseDate ? format(purchaseDate, "dd/MM/yyyy") : "Escolher data"}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -369,7 +369,7 @@ const AddProduct = () => {
 
             {/* PAO */}
             <div>
-              <FieldLabel>Expiry after opening (PAO)</FieldLabel>
+              <FieldLabel>Validade após abertura (PAO)</FieldLabel>
               <Select value={paoMonths} onValueChange={setPaoMonths}>
                 <SelectTrigger className="h-[52px] font-body text-[15px] rounded-md border-border bg-card focus:ring-0 focus:border-primary">
                   <SelectValue />
@@ -384,7 +384,7 @@ const AddProduct = () => {
 
             {/* Usage Frequency */}
             <div>
-              <FieldLabel>Usage Frequency</FieldLabel>
+              <FieldLabel>Frequência de Uso</FieldLabel>
               <Select value={usageFrequency} onValueChange={setUsageFrequency}>
                 <SelectTrigger className="h-[52px] font-body text-[15px] rounded-md border-border bg-card focus:ring-0 focus:border-primary">
                   <SelectValue />
@@ -399,10 +399,10 @@ const AddProduct = () => {
 
             {/* Notes */}
             <div>
-              <FieldLabel>Notes</FieldLabel>
+              <FieldLabel>Notas</FieldLabel>
               <Textarea
                 id="notes"
-                placeholder="Any notes about this product..."
+                placeholder="Observações sobre este produto..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
@@ -412,7 +412,7 @@ const AddProduct = () => {
             </div>
 
             <Button type="submit" className="w-full mt-2" disabled={!isValid || saving}>
-              {saving ? "Saving..." : "Save Product"}
+              {saving ? "Salvando..." : "Salvar Produto"}
             </Button>
           </div>
         </form>
