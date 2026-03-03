@@ -497,7 +497,7 @@ const UserProfile = () => {
                 >
                   <div className="relative">
                     {set.photo_url ? (
-                      <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
+                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
                     ) : (
                       <div className="w-full aspect-square bg-muted flex items-center justify-center">
                         <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />
@@ -634,7 +634,7 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
                 <button key={person.id} className="flex items-center gap-3 w-full text-left" onClick={() => onNavigate(person.user_id)}>
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                     {person.avatar_url ? (
-                      <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <ShimmerImage src={person.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <span className="font-body font-medium text-[13px] text-muted-foreground">{initials}</span>
                     )}
