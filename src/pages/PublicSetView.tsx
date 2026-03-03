@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Globe, Share2 } from "lucide-react";
+import igluLogo from "@/assets/iglu-logo.svg";
 import ShimmerImage from "@/components/ShimmerImage";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -131,6 +132,16 @@ const PublicSetView = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Brand header */}
+      <div className="w-full flex justify-center py-3 border-b border-border bg-background">
+        <img
+          src={igluLogo}
+          alt="IGLU"
+          className="h-[20px]"
+          style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+        />
+      </div>
+
       {/* Cover photo */}
       {set?.photo_url && (
         <div className="w-full h-64 overflow-hidden">

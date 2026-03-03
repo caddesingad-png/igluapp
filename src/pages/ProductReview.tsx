@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { ArrowLeft, Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import igluLogo from "@/assets/iglu-logo.svg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -151,7 +152,12 @@ const ProductReview = () => {
           <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
             <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
           </button>
-          <h1 className="font-display text-[18px] font-normal text-foreground">Consultar Produto</h1>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-[22px]"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
         </div>
       </header>
 

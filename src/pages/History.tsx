@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import igluLogo from "@/assets/iglu-logo.svg";
 import { Clock, ShoppingBag, Store, ChevronRight, TrendingUp, TrendingDown, Minus, Pencil, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -191,9 +192,12 @@ const History = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "auto" }}>
         <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="font-display text-[18px] font-normal text-foreground">
-            {tab === "historico" ? "Histórico" : "Finanças"}
-          </h1>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-[22px]"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
           {tab === "historico" && purchases.length > 0 && (
             <p className="font-body text-[11px] text-muted-foreground">
               {fmt(purchases.reduce((s, p) => s + p.price, 0))} total

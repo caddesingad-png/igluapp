@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import igluLogo from "@/assets/iglu-logo.svg";
 import ShimmerImage from "@/components/ShimmerImage";
 import {
   Layers, Plus, Pencil, Trash2, Share2,
@@ -93,7 +94,12 @@ const Sets = () => {
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "auto" }}>
         <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="font-display text-[18px] font-normal text-foreground">SETs</h1>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-[22px]"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
           {tab === "my" && (
             <button
               onClick={() => navigate("/sets/new")}
