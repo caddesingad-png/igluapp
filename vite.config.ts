@@ -39,9 +39,9 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       manifest: {
-        name: "Glambook",
-        short_name: "Glambook",
-        description: "Your beauty collection, organized",
+        name: "Iglu",
+        short_name: "Iglu",
+        description: "Seu cantinho de maquiagem, organizado",
         theme_color: "#f5f0ed",
         background_color: "#f5f0ed",
         display: "standalone",
