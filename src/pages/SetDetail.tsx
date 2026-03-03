@@ -147,7 +147,7 @@ const SetDetail = () => {
   if (!set) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="font-body text-muted-foreground">Set not found.</p>
+        <p className="font-body text-muted-foreground">Set não encontrado.</p>
       </div>
     );
   }
