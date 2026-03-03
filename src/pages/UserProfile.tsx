@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -319,7 +320,7 @@ const UserProfile = () => {
                     }}
                   >
                     {photo.photo_url ? (
-                      <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
+                      <ShimmerImage src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
                         <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
@@ -336,7 +337,7 @@ const UserProfile = () => {
                   style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
                 >
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <ShimmerImage src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
                       <span className="font-body font-medium text-[34px] text-muted-foreground">{initials}</span>
