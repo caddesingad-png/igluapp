@@ -312,8 +312,6 @@ const DiscoverFeed = () => {
                               className="w-9 h-9 rounded-[4px] shrink-0"
                             />
                           ) : (
-                            />
-                          ) : (
                             <div
                               key={i}
                               className="w-9 h-9 rounded-[4px] bg-muted shrink-0"
