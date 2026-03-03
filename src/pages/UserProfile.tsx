@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import AvatarCropModal from "@/components/AvatarCropModal";
+import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/optimizedImage";
 
 interface ProfileData {
   user_id: string;
@@ -319,7 +320,7 @@ const UserProfile = () => {
                     }}
                   >
                     {photo.photo_url ? (
-                      <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
+                      <img src={getOptimizedImageUrl(photo.photo_url, IMAGE_SIZES.smallAvatar)} alt={photo.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
                         <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
@@ -336,7 +337,7 @@ const UserProfile = () => {
                   style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
                 >
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <img src={getOptimizedImageUrl(profile.avatar_url, IMAGE_SIZES.mediumAvatar)} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
                       <span className="font-body font-medium text-[34px] text-muted-foreground">{initials}</span>
@@ -496,7 +497,7 @@ const UserProfile = () => {
                 >
                   <div className="relative">
                     {set.photo_url ? (
-                      <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
+                      <img src={getOptimizedImageUrl(set.photo_url, IMAGE_SIZES.gridThumb)} alt={set.name} className="w-full aspect-square object-cover" />
                     ) : (
                       <div className="w-full aspect-square bg-muted flex items-center justify-center">
                         <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />
