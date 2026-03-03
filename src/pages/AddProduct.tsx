@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { compressImage } from "@/lib/compressImage";
-import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2, Sparkles } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
