@@ -164,6 +164,7 @@ const ProductReview = () => {
       <div className="max-w-lg mx-auto px-6 pt-6 pb-28">
         {/* Input Section */}
         <div className="space-y-4">
+          <h1 className="font-heading text-xl font-semibold text-foreground">Consultar Produto</h1>
           <p className="font-body text-sm text-muted-foreground">
             Digite o nome do produto ou tire uma foto para receber uma review com opiniões públicas e comparação com seus produtos.
           </p>
