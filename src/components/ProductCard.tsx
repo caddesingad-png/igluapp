@@ -121,7 +121,10 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
       {/* Photo */}
       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
         {product.photo_url ? (
-          <img src={product.photo_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} />
+          <>
+            {!imgLoaded && <div className="absolute inset-0 animate-pulse bg-muted z-[1]" />}
+            <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} onLoad={() => setImgLoaded(true)} />
+          </>
         ) : (
           <Icon className="w-10 h-10 text-muted-foreground/20" />
         )}
