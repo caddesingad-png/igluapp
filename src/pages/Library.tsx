@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { getCached, setCache } from "@/lib/apiCache";
 import ProductCard from "@/components/ProductCard";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import igluLogo from "@/assets/iglu-logo.svg";
@@ -158,6 +159,12 @@ const Library = () => {
 
   useEffect(() => {
     if (!user) return;
+    const cacheKey = `library:${user.id}`;
+    const cached = getCached<Product[]>(cacheKey);
+    if (cached) {
+      setProducts(cached);
+      setLoading(false);
+    }
     const fetchProducts = async () => {
       const [productsRes, colorsRes] = await Promise.all([
         supabase
@@ -182,9 +189,9 @@ const Library = () => {
           ...p,
           current_color: currentByProduct[p.id] ?? null,
         }));
-        // Sort by sort_order initially
         mapped.sort((a, b) => (a.sort_order ?? 9999) - (b.sort_order ?? 9999));
         setProducts(mapped);
+        setCache(cacheKey, mapped);
       }
       setLoading(false);
     };

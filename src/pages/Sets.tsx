@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { getCached, setCache } from "@/lib/apiCache";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -41,6 +42,12 @@ const Sets = () => {
 
   useEffect(() => {
     if (!user) return;
+    const cacheKey = `sets:${user.id}`;
+    const cached = getCached<SetItem[]>(cacheKey);
+    if (cached) {
+      setSets(cached);
+      setLoading(false);
+    }
     const load = async () => {
       const { data, error } = await (supabase.from("sets" as any) as any)
         .select("id, name, occasion, photo_url, is_public, created_at")
@@ -49,7 +56,7 @@ const Sets = () => {
 
       if (!error && data) {
         const ids = (data as SetItem[]).map((s) => s.id);
-        if (!ids.length) { setSets([]); setLoading(false); return; }
+        if (!ids.length) { setSets([]); setLoading(false); setCache(cacheKey, []); return; }
 
         const { data: setProducts } = await (supabase.from("set_products" as any) as any)
           .select("set_id, products(photo_url)")
@@ -64,11 +71,13 @@ const Sets = () => {
             photosMap[r.set_id].push(r.products?.photo_url ?? null);
           }
         }
-        setSets((data as SetItem[]).map((s) => ({
+        const result = (data as SetItem[]).map((s) => ({
           ...s,
           product_count: countMap[s.id] ?? 0,
           product_photos: photosMap[s.id] ?? [],
-        })));
+        }));
+        setSets(result);
+        setCache(cacheKey, result);
       }
       setLoading(false);
     };
@@ -76,9 +85,14 @@ const Sets = () => {
   }, [user]);
 
   const handleDelete = async (id: string) => {
+    // Optimistic: remove immediately
+    const prev = sets;
+    setSets((s) => s.filter((x) => x.id !== id));
     const { error } = await (supabase.from("sets" as any) as any).delete().eq("id", id);
-    if (!error) setSets((prev) => prev.filter((s) => s.id !== id));
-    else toast({ title: "Error deleting set", variant: "destructive" });
+    if (error) {
+      setSets(prev); // rollback
+      toast({ title: "Erro ao deletar set", variant: "destructive" });
+    }
   };
 
   const handleShare = async (set: SetItem) => {
