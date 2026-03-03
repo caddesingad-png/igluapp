@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Camera, Globe, Lock, X, Check, ChevronDown, ChevronUp, Link2 } from "lucide-react";
