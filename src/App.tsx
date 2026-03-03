@@ -124,6 +124,7 @@ const AppRoutes = () => {
         <Route path="*" element={<Navigate to="/library" replace />} />
       </Routes>
       <BottomNav />
+      <InstallPrompt />
     </>
   );
 };
