@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Layers, Clock, User } from "lucide-react";
+import { BookOpen, Layers, Clock, User, Sparkles } from "lucide-react";
 
 const tabs = [
   { path: "/library", label: "Library", icon: BookOpen },
   { path: "/sets", label: "SETs", icon: Layers },
+  { path: "/review", label: "Review", icon: Sparkles },
   { path: "/history", label: "History", icon: Clock },
   { path: "/profile", label: "Profile", icon: User },
 ];

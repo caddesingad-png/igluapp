@@ -20,6 +20,7 @@ import SetForm from "./pages/SetForm";
 import SetDetail from "./pages/SetDetail";
 import PublicSetView from "./pages/PublicSetView";
 import UserProfile from "./pages/UserProfile";
+import ProductReview from "./pages/ProductReview";
 
 const queryClient = new QueryClient();
 
@@ -113,6 +114,7 @@ const AppRoutes = () => {
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/edit-product/:id" element={<AddProduct />} />
+        <Route path="/review" element={<ProductReview />} />
         <Route path="*" element={<Navigate to="/library" replace />} />
       </Routes>
       <BottomNav />
