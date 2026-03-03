@@ -371,6 +371,19 @@ const UserProfile = () => {
               </div>
             </div>
 
+            {/* Nudge to set display name */}
+            {isOwnProfile && !editingName && (!profile?.display_name || profile.display_name === profile.user_id?.split("@")[0]) && (
+              <button
+                onClick={() => { setNameInput(""); setEditingName(true); }}
+                className="flex items-center gap-2 mt-2 mb-1 px-4 py-2.5 rounded-xl bg-primary/10 border border-primary/20 transition-colors hover:bg-primary/15"
+              >
+                <Pencil className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                <span className="font-body text-[13px] text-primary font-medium">
+                  Adicione seu nome para que outros te encontrem!
+                </span>
+              </button>
+            )}
+
             {/* Name */}
             {isOwnProfile && editingName ? (
               <div className="flex items-center gap-2 mt-1">
