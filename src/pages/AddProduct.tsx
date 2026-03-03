@@ -78,6 +78,7 @@ const AddProduct = () => {
   const [saving, setSaving] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
+  const [identifying, setIdentifying] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEdit);
 
   useEffect(() => {
