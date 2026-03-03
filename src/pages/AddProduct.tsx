@@ -320,14 +320,29 @@ const AddProduct = () => {
             <FieldLabel>Foto</FieldLabel>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
-                <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
-                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                <div className="flex items-end gap-3">
+                  <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={removePhoto}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-foreground/80 flex items-center justify-center"
+                    >
+                      <X className="w-3 h-3 text-btn-dark-fg" />
+                    </button>
+                  </div>
                   <button
                     type="button"
-                    onClick={removePhoto}
-                    className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-foreground/80 flex items-center justify-center"
+                    onClick={handleIdentifyProduct}
+                    disabled={identifying}
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary/10 text-primary font-body text-[13px] font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
                   >
-                    <X className="w-3 h-3 text-btn-dark-fg" />
+                    {identifying ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-3.5 h-3.5" />
+                    )}
+                    {identifying ? "Identificando…" : "✨ Identificar"}
                   </button>
                 </div>
               ) : (
