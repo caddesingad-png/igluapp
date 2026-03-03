@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Heart, UserPlus, UserCheck, Layers } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import OptimizedImage from "@/components/OptimizedImage";
+import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/optimizedImage";
 
 const PAGE_SIZE = 10;
 
