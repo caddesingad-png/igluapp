@@ -59,7 +59,8 @@ const AddProduct = () => {
   const { id } = useParams<{ id?: string }>();
   const isEdit = Boolean(id);
   const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
