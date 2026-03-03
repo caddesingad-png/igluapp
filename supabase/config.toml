@@ -2,3 +2,6 @@ project_id = "hsjwzymmyfmjexwdezoa"
 
 [functions.identify-product]
 verify_jwt = false
+
+[functions.review-product]
+verify_jwt = false
