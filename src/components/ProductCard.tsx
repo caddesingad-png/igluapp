@@ -64,7 +64,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
       >
         <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center overflow-hidden shrink-0 relative">
           {product.photo_url ? (
-            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" shimmerClassName="rounded-[10px]" />
+            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" shimmerClassName="rounded-[10px]" width={56} height={56} responsive sizes="56px" />
           ) : (
             <Icon className="w-6 h-6 text-muted-foreground/40" />
           )}
@@ -104,7 +104,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
     >
       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
         {product.photo_url ? (
-          <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" style={{ borderRadius: "10px 10px 0 0" }} />
+          <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" style={{ borderRadius: "10px 10px 0 0" }} width={200} height={200} responsive sizes="(max-width: 640px) 50vw, 200px" />
         ) : (
           <Icon className="w-10 h-10 text-muted-foreground/20" />
         )}
