@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import Onboarding from "@/components/Onboarding";
+import InstallPrompt from "@/components/InstallPrompt";
 import Auth from "./pages/Auth";
 import Library from "./pages/Library";
 import Sets from "./pages/Sets";
@@ -123,6 +124,7 @@ const AppRoutes = () => {
         <Route path="*" element={<Navigate to="/library" replace />} />
       </Routes>
       <BottomNav />
+      <InstallPrompt />
     </>
   );
 };
