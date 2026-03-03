@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { shareSet } from "@/lib/shareSet";
 import { useToast } from "@/hooks/use-toast";
+import SkeletonSetDetail from "@/components/SkeletonSetDetail";
 
 interface SetLayer {
   id: string;
@@ -137,11 +138,7 @@ const SetDetail = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <SkeletonSetDetail />;
   }
 
   if (!set) {
