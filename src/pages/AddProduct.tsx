@@ -318,7 +318,7 @@ const AddProduct = () => {
             {/* Photo Upload */}
             <div>
             <FieldLabel>Foto</FieldLabel>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
                 <div className="flex items-end gap-3">
                   <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
