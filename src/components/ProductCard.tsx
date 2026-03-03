@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Sparkles, FlaskConical, Eye, Wind, Wand2,
   Layers, Sun, Droplets, Star, Heart, Palette
@@ -54,6 +55,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) => {
   const Icon = categoryIcons[product.category] ?? Star;
   const hasValidSwatch = product.current_color && isValidColor(product.current_color);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   if (viewMode === "list") {
     return (
@@ -65,7 +67,10 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         {/* Thumbnail */}
         <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center overflow-hidden shrink-0">
           {product.photo_url ? (
-            <img src={product.photo_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+            <>
+              {!imgLoaded && <div className="absolute inset-0 animate-pulse bg-muted rounded-[10px]" />}
+              <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" onLoad={() => setImgLoaded(true)} />
+            </>
           ) : (
             <Icon className="w-6 h-6 text-muted-foreground/40" />
           )}
@@ -116,7 +121,10 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
       {/* Photo */}
       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
         {product.photo_url ? (
-          <img src={product.photo_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} />
+          <>
+            {!imgLoaded && <div className="absolute inset-0 animate-pulse bg-muted z-[1]" />}
+            <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} onLoad={() => setImgLoaded(true)} />
+          </>
         ) : (
           <Icon className="w-10 h-10 text-muted-foreground/20" />
         )}
