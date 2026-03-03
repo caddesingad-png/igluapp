@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Globe, Lock, Pencil, Share2, Heart, UserPlus, UserCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -191,7 +192,9 @@ const SetDetail = () => {
       <div className="max-w-lg mx-auto">
         {set.photo_url && (
           <div className="flex justify-center px-6 pt-6">
-            <img src={set.photo_url} alt={set.name} className="w-48 h-48 object-cover rounded-xl" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }} />
+            <div className="w-48 h-48 rounded-xl overflow-hidden relative" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
+              <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-cover" />
+            </div>
           </div>
         )}
 
@@ -216,7 +219,7 @@ const SetDetail = () => {
               >
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                   {creator.avatar_url ? (
-                    <img src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <ShimmerImage src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <span className="font-body font-medium text-[13px] text-muted-foreground">
                       {(creator.display_name || "?")[0].toUpperCase()}
@@ -261,7 +264,9 @@ const SetDetail = () => {
                 onClick={() => isOwner && navigate(`/product/${p.id}`)}
               >
                 {p.photo_url ? (
-                  <img src={p.photo_url} alt={p.name} className="w-11 h-11 rounded-[8px] object-cover shrink-0" />
+                  <div className="w-11 h-11 rounded-[8px] overflow-hidden shrink-0 relative">
+                    <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                  </div>
                 ) : (
                   <div className="w-11 h-11 rounded-[8px] bg-muted shrink-0" />
                 )}
