@@ -252,6 +252,10 @@ const DiscoverFeed = () => {
                         src={set.photo_url}
                         alt={set.name}
                         className="w-full aspect-[4/5] object-cover"
+                        width={200}
+                        height={250}
+                        responsive
+                        sizes="(max-width: 640px) 50vw, 200px"
                       />
                     ) : (
                       <div className="w-full aspect-[4/5] bg-muted flex items-center justify-center">
@@ -301,7 +305,7 @@ const DiscoverFeed = () => {
                           const photo = set.product_photos[i];
                           return photo ? (
                             <div key={i} className="w-9 h-9 rounded-[4px] shrink-0 overflow-hidden relative">
-                              <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" />
+                              <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" width={36} height={36} responsive sizes="36px" />
                             </div>
                           ) : (
                             <div
@@ -346,7 +350,7 @@ const DiscoverFeed = () => {
                   >
                     {set.creator_avatar ? (
                       <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-border relative">
-                        <ShimmerImage src={set.creator_avatar} alt="" className="w-full h-full object-cover" />
+                        <ShimmerImage src={set.creator_avatar} alt="" className="w-full h-full object-cover" width={20} height={20} />
                       </div>
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center shrink-0">
