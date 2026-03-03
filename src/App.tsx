@@ -64,8 +64,13 @@ const AppRoutes = () => {
 
   if (loading || (user && !onboardingChecked)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <img
+          src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
+          alt="IGLU"
+          className="h-8 opacity-60 animate-pulse"
+          style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+        />
       </div>
     );
   }

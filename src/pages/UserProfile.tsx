@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "@/components/ShimmerImage";
+import igluLogo from "@/assets/iglu-logo.svg";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -268,7 +269,12 @@ const UserProfile = () => {
                 <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
               </button>
             ) : (
-              <div className="w-8" />
+              <img
+                src={igluLogo}
+                alt="IGLU"
+                className="h-[22px]"
+                style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+              />
             )}
 
             <span className="font-display text-[16px] font-normal text-foreground">
