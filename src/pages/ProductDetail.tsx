@@ -138,12 +138,13 @@ const ProductDetail = () => {
 
   const toggleFavorite = async () => {
     if (!product) return;
-    setFavoriteLoading(true);
+    // Optimistic update
+    const prev = product.is_favorite;
+    setProduct((p) => p ? { ...p, is_favorite: !p.is_favorite } : p);
     const { error } = await (supabase.from("products" as any) as any)
-      .update({ is_favorite: !product.is_favorite })
+      .update({ is_favorite: !prev })
       .eq("id", product.id);
-    if (!error) setProduct((p) => p ? { ...p, is_favorite: !p.is_favorite } : p);
-    setFavoriteLoading(false);
+    if (error) setProduct((p) => p ? { ...p, is_favorite: prev } : p);
   };
 
   const handleDelete = async () => {
