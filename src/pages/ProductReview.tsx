@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import igluLogo from "@/assets/iglu-logo.svg";
+import { Button } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,8 +62,8 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const ProductReview = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
