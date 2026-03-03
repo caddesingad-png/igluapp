@@ -17,8 +17,13 @@ const Profile = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+      <img
+        src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
+        alt="IGLU"
+        className="h-8 opacity-60 animate-pulse"
+        style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+      />
     </div>
   );
 };

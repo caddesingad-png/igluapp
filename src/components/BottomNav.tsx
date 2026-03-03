@@ -9,6 +9,22 @@ const tabs = [
   { path: "/profile", label: "Perfil", icon: User },
 ];
 
+// Prefetch route modules on hover/focus
+const prefetchedRoutes = new Set<string>();
+const routeModules: Record<string, () => Promise<unknown>> = {
+  "/library": () => import("@/pages/Library"),
+  "/sets": () => import("@/pages/Sets"),
+  "/review": () => import("@/pages/ProductReview"),
+  "/history": () => import("@/pages/History"),
+  "/profile": () => import("@/pages/Profile"),
+};
+
+const prefetchRoute = (path: string) => {
+  if (prefetchedRoutes.has(path)) return;
+  prefetchedRoutes.add(path);
+  routeModules[path]?.();
+};
+
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,7 +41,9 @@ const BottomNav = () => {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className="flex flex-col items-center justify-center flex-1 h-full transition-colors gap-0.5"
+              onPointerEnter={() => prefetchRoute(path)}
+              onFocus={() => prefetchRoute(path)}
+              className="flex flex-col items-center justify-center flex-1 h-full transition-colors gap-0.5 btn-press"
             >
               <Icon
                 className="w-5 h-5"
