@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Heart, UserPlus, UserCheck, Layers } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import OptimizedImage from "@/components/OptimizedImage";
-import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/optimizedImage";
 
 const PAGE_SIZE = 10;
 
@@ -249,12 +247,10 @@ const DiscoverFeed = () => {
                 <div className="p-2 pb-1">
                   <div className="relative rounded-[8px] overflow-hidden">
                     {set.photo_url ? (
-                      <OptimizedImage
+                      <img
                         src={set.photo_url}
-                        width={IMAGE_SIZES.discoverCard.width}
-                        quality={IMAGE_SIZES.discoverCard.quality}
                         alt={set.name}
-                        className="w-full aspect-[4/5]"
+                        className="w-full aspect-[4/5] object-cover"
                       />
                     ) : (
                       <div className="w-full aspect-[4/5] bg-muted flex items-center justify-center">
@@ -303,13 +299,11 @@ const DiscoverFeed = () => {
                         {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
                           const photo = set.product_photos[i];
                           return photo ? (
-                            <OptimizedImage
+                            <img
                               key={i}
                               src={photo}
-                              width={IMAGE_SIZES.miniThumb.width}
-                              quality={IMAGE_SIZES.miniThumb.quality}
                               alt=""
-                              className="w-9 h-9 rounded-[4px] shrink-0"
+                              className="w-9 h-9 object-cover rounded-[4px] shrink-0"
                             />
                           ) : (
                             <div
@@ -353,7 +347,7 @@ const DiscoverFeed = () => {
                     onClick={(e) => { e.stopPropagation(); navigate(`/user/${set.user_id}`); }}
                   >
                     {set.creator_avatar ? (
-                      <img src={getOptimizedImageUrl(set.creator_avatar, IMAGE_SIZES.tinyAvatar)} alt="" className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
+                      <img src={set.creator_avatar} alt="" className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center shrink-0">
                         <span className="font-body text-[8px] text-muted-foreground font-medium">

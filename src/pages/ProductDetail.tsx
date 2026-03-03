@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { getOptimizedImageUrl, IMAGE_SIZES } from "@/lib/optimizedImage";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -371,7 +370,7 @@ const ProductDetail = () => {
         {/* Photo / Hero */}
         <div className="w-full aspect-square rounded-2xl bg-muted overflow-hidden flex items-center justify-center">
           {product.photo_url ? (
-            <img src={getOptimizedImageUrl(product.photo_url, IMAGE_SIZES.detail)} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.photo_url} alt={product.name} className="w-full h-full object-cover" />
           ) : (
             <Icon className="w-20 h-20 text-muted-foreground/20" />
           )}
