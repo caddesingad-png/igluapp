@@ -113,7 +113,7 @@ const AppRoutes = () => {
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/edit-product/:id" element={<AddProduct />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/library" replace />} />
       </Routes>
       <BottomNav />
     </>
