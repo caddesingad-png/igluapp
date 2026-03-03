@@ -285,24 +285,14 @@ const SetDetail = () => {
         {/* ── CAMADAS (read-only) ── */}
         {layers.length > 0 && (
           <div className="px-6 mt-6">
-            <p
-              className="font-body mb-4"
-              style={{
-                fontSize: "11px",
-                fontWeight: 400,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#8C8480",
-              }}
-            >
+            <p className="label-overline mb-4">
               Camadas
             </p>
 
             <div className="relative">
               {/* Timeline vertical line */}
               <div
-                className="absolute left-[11px] top-0 bottom-0 w-px"
-                style={{ backgroundColor: "#E8E2DC" }}
+                className="absolute left-[11px] top-0 bottom-0 w-px bg-border"
               />
 
               <div className="space-y-0">
@@ -312,8 +302,8 @@ const SetDetail = () => {
                     <div key={layer.id} className="relative">
                       {/* Timeline dot */}
                       <div
-                        className="absolute left-0 top-4 w-[23px] h-[23px] rounded-full flex items-center justify-center text-[11px] bg-background"
-                        style={{ border: "1px solid #E8E2DC", zIndex: 1 }}
+                        className="absolute left-0 top-4 w-[23px] h-[23px] rounded-full flex items-center justify-center text-[11px] bg-background border border-border"
+                        style={{ zIndex: 1 }}
                       >
                         <span>{layer.layer_icon}</span>
                       </div>
@@ -322,27 +312,10 @@ const SetDetail = () => {
                       <div className="pl-10 pb-5">
                         {/* Layer header */}
                         <div className="flex items-center gap-1.5 pt-3.5 mb-2">
-                          <span
-                            className="font-body"
-                            style={{
-                              fontSize: "11px",
-                              color: "#8C8480",
-                              fontWeight: 400,
-                              marginRight: "2px",
-                            }}
-                          >
+                          <span className="font-body text-[11px] text-muted-foreground mr-0.5">
                             {layer.layer_order}
                           </span>
-                          <p
-                            className="font-body"
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: 500,
-                              color: "#1A1714",
-                              textTransform: "uppercase",
-                              letterSpacing: "0.05em",
-                            }}
-                          >
+                          <p className="font-body text-[13px] font-medium text-foreground uppercase tracking-[0.05em]">
                             {layer.layer_name}
                           </p>
                         </div>
@@ -369,22 +342,14 @@ const SetDetail = () => {
 
                         {/* Note */}
                         {layer.note && (
-                          <p
-                            className="font-body"
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: 300,
-                              fontStyle: "italic",
-                              color: "#8C8480",
-                            }}
-                          >
+                          <p className="font-body text-[13px] font-light italic text-muted-foreground">
                             {layer.note}
                           </p>
                         )}
 
                         {/* Divider (not after last) */}
                         {idx < layers.length - 1 && (
-                          <div className="mt-4" style={{ height: "1px", backgroundColor: "#E8E2DC" }} />
+                          <div className="mt-4 h-px bg-border" />
                         )}
                       </div>
                     </div>

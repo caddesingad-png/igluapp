@@ -378,24 +378,23 @@ const SetForm = () => {
             onClick={() => setLayersSectionOpen((v) => !v)}
           >
             <div className="flex flex-col items-start gap-0.5 text-left">
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: "14px", color: "#1A1714" }}>
+              <span className="font-body font-medium text-[14px] text-foreground">
                 Camadas{" "}
-                <span style={{ fontWeight: 400, fontSize: "13px", color: "#8C8480" }}>(opcional)</span>
+                <span className="font-normal text-[13px] text-muted-foreground">(opcional)</span>
                 {!layersSectionOpen && filledLayersCount > 0 && (
-                  <span style={{ fontWeight: 400, fontSize: "12px", color: "#C9A96E", marginLeft: "6px" }}>
+                  <span className="font-normal text-[12px] text-primary ml-1.5">
                     · {filledLayersCount} adicionada{filledLayersCount !== 1 ? "s" : ""}
                   </span>
                 )}
               </span>
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 300, fontSize: "12px", fontStyle: "italic", color: "#B8B0AA" }}>
+              <span className="font-body font-light text-[12px] italic text-muted-foreground">
                 Registre e documente sua técnica
               </span>
             </div>
             <ChevronDown
-              className="w-4 h-4 mt-1 shrink-0 transition-transform"
+              className="w-4 h-4 mt-1 shrink-0 text-muted-foreground transition-transform"
               strokeWidth={1.5}
               style={{
-                color: "#8C8480",
                 transform: layersSectionOpen ? "rotate(180deg)" : "rotate(0deg)",
                 transition: "transform 0.2s",
               }}

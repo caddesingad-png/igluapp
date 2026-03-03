@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
+import { Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import igluLogo from "@/assets/iglu-logo.svg";
 import { Button } from "@/components/ui/button";
