@@ -138,6 +138,60 @@ const AddProduct = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleIdentifyProduct = async () => {
+    const imageSource = photo || (existingPhotoUrl ? existingPhotoUrl : null);
+    if (!imageSource) return;
+
+    setIdentifying(true);
+    try {
+      let base64: string;
+
+      if (imageSource instanceof File) {
+        const compressed = await compressImage(imageSource);
+        base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(compressed);
+        });
+      } else {
+        // Fetch existing URL and convert
+        const resp = await fetch(imageSource);
+        const blob = await resp.blob();
+        const file = new File([blob], "photo.jpg", { type: blob.type });
+        const compressed = await compressImage(file);
+        base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(compressed);
+        });
+      }
+
+      const { data, error } = await supabase.functions.invoke("identify-product", {
+        body: { imageBase64: base64 },
+      });
+
+      if (error) throw error;
+
+      if (data?.name) setName(data.name);
+      if (data?.brand) setBrand(data.brand);
+      if (data?.category && CATEGORIES.includes(data.category)) setCategory(data.category);
+      if (data?.color_codes?.length) setColorCodes(data.color_codes);
+
+      toast.success("Produto identificado! Confira os dados. ✨");
+    } catch (err: any) {
+      console.error("Identify error:", err);
+      toast.error(err?.message || "Não foi possível identificar o produto");
+    } finally {
+      setIdentifying(false);
+    }
+  };
+
   const handleBarcodeDetected = async (barcode: string) => {
     setShowScanner(false);
     setLookingUp(true);
