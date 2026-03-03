@@ -55,6 +55,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) => {
   const Icon = categoryIcons[product.category] ?? Star;
   const hasValidSwatch = product.current_color && isValidColor(product.current_color);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   if (viewMode === "list") {
     return (
