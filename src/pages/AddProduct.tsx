@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { compressImage } from "@/lib/compressImage";
-import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, X, Plus, ScanBarcode, Loader2, Sparkles } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,6 +78,7 @@ const AddProduct = () => {
   const [saving, setSaving] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
+  const [identifying, setIdentifying] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEdit);
 
   useEffect(() => {
@@ -135,6 +136,60 @@ const AddProduct = () => {
     setPhotoPreview(null);
     setExistingPhotoUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleIdentifyProduct = async () => {
+    const imageSource = photo || (existingPhotoUrl ? existingPhotoUrl : null);
+    if (!imageSource) return;
+
+    setIdentifying(true);
+    try {
+      let base64: string;
+
+      if (imageSource instanceof File) {
+        const compressed = await compressImage(imageSource);
+        base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(compressed);
+        });
+      } else {
+        // Fetch existing URL and convert
+        const resp = await fetch(imageSource);
+        const blob = await resp.blob();
+        const file = new File([blob], "photo.jpg", { type: blob.type });
+        const compressed = await compressImage(file);
+        base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(compressed);
+        });
+      }
+
+      const { data, error } = await supabase.functions.invoke("identify-product", {
+        body: { imageBase64: base64 },
+      });
+
+      if (error) throw error;
+
+      if (data?.name) setName(data.name);
+      if (data?.brand) setBrand(data.brand);
+      if (data?.category && CATEGORIES.includes(data.category)) setCategory(data.category);
+      if (data?.color_codes?.length) setColorCodes(data.color_codes);
+
+      toast.success("Produto identificado! Confira os dados. ✨");
+    } catch (err: any) {
+      console.error("Identify error:", err);
+      toast.error(err?.message || "Não foi possível identificar o produto");
+    } finally {
+      setIdentifying(false);
+    }
   };
 
   const handleBarcodeDetected = async (barcode: string) => {
@@ -265,14 +320,29 @@ const AddProduct = () => {
             <FieldLabel>Foto</FieldLabel>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
-                <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
-                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                <div className="flex items-end gap-3">
+                  <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={removePhoto}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-foreground/80 flex items-center justify-center"
+                    >
+                      <X className="w-3 h-3 text-btn-dark-fg" />
+                    </button>
+                  </div>
                   <button
                     type="button"
-                    onClick={removePhoto}
-                    className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-foreground/80 flex items-center justify-center"
+                    onClick={handleIdentifyProduct}
+                    disabled={identifying}
+                    className="flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary/10 text-primary font-body text-[13px] font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
                   >
-                    <X className="w-3 h-3 text-btn-dark-fg" />
+                    {identifying ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-3.5 h-3.5" />
+                    )}
+                    {identifying ? "Identificando…" : "✨ Identificar"}
                   </button>
                 </div>
               ) : (
