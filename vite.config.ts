@@ -68,20 +68,10 @@ export default defineConfig(({ mode }) => ({
           {
             urlPattern: /^https:\/\/hsjwzymmyfmjexwdezoa\.supabase\.co\/rest\/v1\/.*/i,
             handler: "StaleWhileRevalidate",
-            method: "GET",
             options: {
               cacheName: "supabase-api",
               expiration: { maxEntries: 100, maxAgeSeconds: 60 * 10 },
               cacheableResponse: { statuses: [0, 200] },
-              plugins: [
-                {
-                  // Don't cache auth-related endpoints
-                  cacheKeyWillBeUsed: async ({ request }) => {
-                    if (request.url.includes("/auth/")) return undefined;
-                    return request;
-                  },
-                },
-              ],
             },
           },
           // Supabase Auth — network-only (never cache)
