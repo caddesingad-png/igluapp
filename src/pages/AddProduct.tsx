@@ -59,7 +59,8 @@ const AddProduct = () => {
   const { id } = useParams<{ id?: string }>();
   const isEdit = Boolean(id);
   const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -135,7 +136,8 @@ const AddProduct = () => {
     setPhoto(null);
     setPhotoPreview(null);
     setExistingPhotoUrl(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
   };
 
   const handleIdentifyProduct = async () => {
@@ -318,7 +320,8 @@ const AddProduct = () => {
             {/* Photo Upload */}
             <div>
             <FieldLabel>Foto</FieldLabel>
-              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} className="hidden" />
+              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} className="hidden" />
+              <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
                 <div className="flex items-end gap-3">
                   <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
@@ -346,14 +349,24 @@ const AddProduct = () => {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-28 h-28 rounded-xl border border-dashed border-border flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:border-foreground/30 transition-colors"
-                >
-                  <Camera className="w-6 h-6" strokeWidth={1.5} />
-                  <span className="font-body text-[10px] uppercase tracking-[0.08em]">Adicionar foto</span>
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="flex-1 h-28 rounded-xl border border-dashed border-border flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:border-foreground/30 transition-colors"
+                  >
+                    <Camera className="w-6 h-6" strokeWidth={1.5} />
+                    <span className="font-body text-[10px] uppercase tracking-[0.08em]">Câmera</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="flex-1 h-28 rounded-xl border border-dashed border-border flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:border-foreground/30 transition-colors"
+                  >
+                    <Plus className="w-6 h-6" strokeWidth={1.5} />
+                    <span className="font-body text-[10px] uppercase tracking-[0.08em]">Galeria</span>
+                  </button>
+                </div>
               )}
             </div>
 
