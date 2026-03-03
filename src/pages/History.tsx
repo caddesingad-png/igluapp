@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import igluLogo from "@/assets/iglu-logo.svg";
 import { Clock, ShoppingBag, Store, ChevronRight, TrendingUp, TrendingDown, Minus, Pencil, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { SkeletonHistoryEntry } from "@/components/SkeletonCard";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -227,8 +228,10 @@ const History = () => {
       </header>
 
       {loading ? (
-        <div className="flex items-center justify-center pt-32">
-          <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
+        <div className="max-w-lg mx-auto px-6 pt-6 space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonHistoryEntry key={i} />
+          ))}
         </div>
       ) : tab === "historico" ? (
         /* ── HISTÓRICO ── */

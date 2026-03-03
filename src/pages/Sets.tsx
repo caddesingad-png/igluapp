@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import igluLogo from "@/assets/iglu-logo.svg";
 import ShimmerImage from "@/components/ShimmerImage";
+import { SkeletonSetCard } from "@/components/SkeletonCard";
 import {
   Layers, Plus, Pencil, Trash2, Share2,
 } from "lucide-react";
@@ -134,8 +135,10 @@ const Sets = () => {
       {tab === "discover" ? (
         <DiscoverFeed />
       ) : loading ? (
-        <div className="flex items-center justify-center pt-32">
-          <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
+        <div className="max-w-lg mx-auto px-6 pt-4 grid grid-cols-2 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonSetCard key={i} />
+          ))}
         </div>
       ) : sets.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 pt-32 animate-fade-in text-center">

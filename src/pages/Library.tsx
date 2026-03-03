@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "@/components/ProductCard";
+import { SkeletonCard } from "@/components/SkeletonCard";
 import igluLogo from "@/assets/iglu-logo.svg";
 import {
   DropdownMenu,
@@ -344,8 +345,12 @@ const Library = () => {
 
       {/* Loading */}
       {loading && (
-        <div className="flex items-center justify-center pt-32">
-          <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
+        <div className="max-w-lg mx-auto px-6 pt-4">
+          <div className="grid grid-cols-2 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} viewMode={viewMode} />
+            ))}
+          </div>
         </div>
       )}
 
