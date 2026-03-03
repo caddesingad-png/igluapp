@@ -206,7 +206,7 @@ const SetForm = () => {
     }
 
     setSaving(false);
-    toast({ title: isEdit ? "Set updated!" : "Set created!" });
+    toast({ title: isEdit ? "Set atualizado!" : "Set criado!" });
     navigate("/sets");
   };
 
@@ -231,7 +231,7 @@ const SetForm = () => {
             <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
           </button>
           <h1 className="font-display text-[18px] font-normal text-foreground">
-            {isEdit ? "Edit set" : "New set"}
+            {isEdit ? "Editar set" : "Novo set"}
           </h1>
           <Button
             size="sm"
@@ -239,7 +239,7 @@ const SetForm = () => {
             onClick={handleSave}
             disabled={!name.trim() || saving}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? "Salvando…" : "Salvar"}
           </Button>
         </div>
       </header>
@@ -273,9 +273,9 @@ const SetForm = () => {
 
         {/* Name */}
         <div>
-          <label className="label-overline block mb-2">Set name *</label>
+          <label className="label-overline block mb-2">Nome do set *</label>
           <Input
-            placeholder="e.g. Summer date night look"
+            placeholder="ex: Look de verão para date"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -283,9 +283,9 @@ const SetForm = () => {
 
         {/* Occasion */}
         <div>
-          <label className="label-overline block mb-2">Occasion</label>
+          <label className="label-overline block mb-2">Ocasião</label>
           <Input
-            placeholder="e.g. Date night, Work, Festival…"
+            placeholder="ex: Date, Trabalho, Festival…"
             value={occasion}
             onChange={(e) => setOccasion(e.target.value)}
           />
@@ -304,9 +304,9 @@ const SetForm = () => {
               <Lock className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
             )}
             <div>
-              <p className="font-body font-medium text-[13px] text-foreground">{isPublic ? "Public" : "Private"}</p>
+              <p className="font-body font-medium text-[13px] text-foreground">{isPublic ? "Público" : "Privado"}</p>
               <p className="font-body font-light text-[11px] text-muted-foreground">
-                {isPublic ? "Anyone with the link can view" : "Only you can see this set"}
+                {isPublic ? "Qualquer pessoa com o link pode ver" : "Apenas você pode ver este set"}
               </p>
             </div>
           </div>
@@ -324,17 +324,17 @@ const SetForm = () => {
         {/* Product picker */}
         <div>
           <p className="font-display text-[16px] font-normal text-foreground mb-3">
-            Products <span className="font-body font-light text-[13px] text-muted-foreground">({selectedIds.size} selected)</span>
+            Produtos <span className="font-body font-light text-[13px] text-muted-foreground">({selectedIds.size} selecionado{selectedIds.size !== 1 ? "s" : ""})</span>
           </p>
           <input
-            placeholder="Search products…"
+            placeholder="Buscar produtos…"
             value={productSearch}
             onChange={(e) => setProductSearch(e.target.value)}
             className="w-full h-[44px] px-3 rounded-md border border-border bg-card font-body text-[14px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors mb-2"
           />
           <div className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
             {filtered.length === 0 && (
-              <p className="font-body font-light text-[13px] text-muted-foreground px-4 py-4">No products found.</p>
+              <p className="font-body font-light text-[13px] text-muted-foreground px-4 py-4">Nenhum produto encontrado.</p>
             )}
             {filtered.map((p) => {
               const selected = selectedIds.has(p.id);
@@ -378,24 +378,23 @@ const SetForm = () => {
             onClick={() => setLayersSectionOpen((v) => !v)}
           >
             <div className="flex flex-col items-start gap-0.5 text-left">
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: "14px", color: "#1A1714" }}>
+              <span className="font-body font-medium text-[14px] text-foreground">
                 Camadas{" "}
-                <span style={{ fontWeight: 400, fontSize: "13px", color: "#8C8480" }}>(opcional)</span>
+                <span className="font-normal text-[13px] text-muted-foreground">(opcional)</span>
                 {!layersSectionOpen && filledLayersCount > 0 && (
-                  <span style={{ fontWeight: 400, fontSize: "12px", color: "#C9A96E", marginLeft: "6px" }}>
+                  <span className="font-normal text-[12px] text-primary ml-1.5">
                     · {filledLayersCount} adicionada{filledLayersCount !== 1 ? "s" : ""}
                   </span>
                 )}
               </span>
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 300, fontSize: "12px", fontStyle: "italic", color: "#B8B0AA" }}>
+              <span className="font-body font-light text-[12px] italic text-muted-foreground">
                 Registre e documente sua técnica
               </span>
             </div>
             <ChevronDown
-              className="w-4 h-4 mt-1 shrink-0 transition-transform"
+              className="w-4 h-4 mt-1 shrink-0 text-muted-foreground transition-transform"
               strokeWidth={1.5}
               style={{
-                color: "#8C8480",
                 transform: layersSectionOpen ? "rotate(180deg)" : "rotate(0deg)",
                 transition: "transform 0.2s",
               }}

@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Camera, Plus, Star, ThumbsUp, ThumbsDown, Loader2, Sparkles, Search, ShieldCheck, AlertTriangle, XCircle } from "lucide-react";
 import igluLogo from "@/assets/iglu-logo.svg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +61,6 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const ProductReview = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -148,10 +146,7 @@ const ProductReview = () => {
   return (
     <div className="min-h-screen bg-background screen-enter">
       <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
-        <div className="flex items-center gap-3 max-w-lg mx-auto px-4 h-full">
-          <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
-            <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />
-          </button>
+        <div className="flex items-center max-w-lg mx-auto px-6 h-full">
           <img
             src={igluLogo}
             alt="IGLU"

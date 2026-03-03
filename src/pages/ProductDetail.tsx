@@ -436,7 +436,7 @@ const ProductDetail = () => {
                               if (e.key === "Enter") handleSaveNote(cc.id);
                               if (e.key === "Escape") setEditingNoteId(null);
                             }}
-                            placeholder="Add a note…"
+                            placeholder="Adicionar nota…"
                             className="h-7 text-xs px-2 py-0"
                           />
                           <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => handleSaveNote(cc.id)}>

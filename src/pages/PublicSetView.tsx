@@ -98,7 +98,7 @@ const PublicSetView = () => {
       const ogDescription = setData.occasion
         ? `${setData.occasion} · ${(prodRes.data ?? []).length} products`
         : `${(prodRes.data ?? []).length} products`;
-      setOgMeta(`${setData.name} — Glambook`, ogDescription, setData.photo_url);
+      setOgMeta(`${setData.name} — IGLU`, ogDescription, setData.photo_url);
 
       setLoading(false);
     };
@@ -156,7 +156,7 @@ const PublicSetView = () => {
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <Globe className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs text-primary font-medium">Public set</span>
+            <span className="text-xs text-primary font-medium">Set público</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">{set?.name}</h1>
           {set?.occasion && (
@@ -165,14 +165,14 @@ const PublicSetView = () => {
         </div>
         <Button variant="outline" size="sm" className="rounded-full gap-1.5 shrink-0 mt-1" onClick={handleShare}>
           <Share2 className="w-3.5 h-3.5" />
-          Share
+          Compartilhar
         </Button>
       </div>
 
       {/* Products */}
       <div className="max-w-lg mx-auto px-4 pb-12">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          {products.length} product{products.length !== 1 ? "s" : ""}
+          {products.length} produto{products.length !== 1 ? "s" : ""}
         </p>
         <div className="space-y-2">
           {products.map((p) => (
@@ -195,12 +195,17 @@ const PublicSetView = () => {
           ))}
         </div>
 
-        {/* Glambook branding footer */}
+        {/* IGLU branding footer */}
         <div className="mt-10 flex flex-col items-center gap-2">
-          <p className="text-xs text-muted-foreground">Created with</p>
-          <span className="text-sm font-bold text-foreground tracking-tight">✨ Glambook</span>
+          <p className="text-xs text-muted-foreground">Criado com</p>
+          <img
+            src={igluLogo}
+            alt="IGLU"
+            className="h-[18px]"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
           <p className="text-xs text-muted-foreground text-center max-w-[200px]">
-            Track your beauty collection, build looks, share with friends.
+            Organize sua coleção de beleza, monte looks e compartilhe.
           </p>
         </div>
       </div>
