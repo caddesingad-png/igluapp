@@ -497,7 +497,7 @@ const UserProfile = () => {
                 >
                   <div className="relative">
                     {set.photo_url ? (
-                      <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
+                      <img src={getOptimizedImageUrl(set.photo_url, IMAGE_SIZES.gridThumb)} alt={set.name} className="w-full aspect-square object-cover" />
                     ) : (
                       <div className="w-full aspect-square bg-muted flex items-center justify-center">
                         <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />
