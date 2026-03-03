@@ -21,6 +21,22 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/hsjwzymmyfmjexwdezoa\.supabase\.co\/storage\/v1\/object\/public\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "product-images",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
       },
       manifest: {
         name: "Glambook",
