@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Camera, Globe, Lock, X, Check, ChevronDown, ChevronUp, Link2 } from "lucide-react";
@@ -251,7 +252,7 @@ const SetForm = () => {
             onClick={() => photoRef.current?.click()}
           >
             {photoUrl ? (
-              <img src={photoUrl} alt="Set cover" className="w-full h-full object-cover" />
+              <ShimmerImage src={photoUrl} alt="Set cover" className="w-full h-full object-cover" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <Camera className="w-7 h-7" strokeWidth={1.5} />
@@ -353,7 +354,9 @@ const SetForm = () => {
                     {selected && <Check className="w-3 h-3 text-btn-dark-fg" />}
                   </div>
                   {p.photo_url ? (
-                    <img src={p.photo_url} alt={p.name} className="w-9 h-9 rounded-[8px] object-cover shrink-0" />
+                    <div className="w-9 h-9 rounded-[8px] overflow-hidden shrink-0 relative">
+                      <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                    </div>
                   ) : (
                     <div className="w-9 h-9 rounded-[8px] bg-muted shrink-0" />
                   )}
@@ -455,7 +458,9 @@ const SetForm = () => {
                                 return (
                                   <div key={pid} className="flex items-center gap-1.5 bg-muted rounded-full px-3 py-1">
                                     {prod.photo_url && (
-                                      <img src={prod.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                                      <div className="w-4 h-4 rounded-full overflow-hidden relative">
+                                        <ShimmerImage src={prod.photo_url} alt="" className="w-full h-full object-cover" />
+                                      </div>
                                     )}
                                     <span className="font-body text-[11px] text-foreground">{prod.name}</span>
                                     <button
@@ -544,7 +549,9 @@ const SetForm = () => {
                       {selected && <Check className="w-3 h-3 text-btn-dark-fg" />}
                     </div>
                     {p.photo_url ? (
-                      <img src={p.photo_url} alt={p.name} className="w-9 h-9 rounded-[8px] object-cover shrink-0" />
+                      <div className="w-9 h-9 rounded-[8px] overflow-hidden shrink-0 relative">
+                        <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                      </div>
                     ) : (
                       <div className="w-9 h-9 rounded-[8px] bg-muted shrink-0" />
                     )}

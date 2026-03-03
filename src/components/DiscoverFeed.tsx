@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, UserPlus, UserCheck, Layers } from "lucide-react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -247,7 +248,7 @@ const DiscoverFeed = () => {
                 <div className="p-2 pb-1">
                   <div className="relative rounded-[8px] overflow-hidden">
                     {set.photo_url ? (
-                      <img
+                      <ShimmerImage
                         src={set.photo_url}
                         alt={set.name}
                         className="w-full aspect-[4/5] object-cover"
@@ -299,12 +300,9 @@ const DiscoverFeed = () => {
                         {Array.from({ length: Math.min(4, set.total_products) }).map((_, i) => {
                           const photo = set.product_photos[i];
                           return photo ? (
-                            <img
-                              key={i}
-                              src={photo}
-                              alt=""
-                              className="w-9 h-9 object-cover rounded-[4px] shrink-0"
-                            />
+                            <div key={i} className="w-9 h-9 rounded-[4px] shrink-0 overflow-hidden relative">
+                              <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" />
+                            </div>
                           ) : (
                             <div
                               key={i}
@@ -347,7 +345,9 @@ const DiscoverFeed = () => {
                     onClick={(e) => { e.stopPropagation(); navigate(`/user/${set.user_id}`); }}
                   >
                     {set.creator_avatar ? (
-                      <img src={set.creator_avatar} alt="" className="w-5 h-5 rounded-full object-cover shrink-0 border border-border" />
+                      <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-border relative">
+                        <ShimmerImage src={set.creator_avatar} alt="" className="w-full h-full object-cover" />
+                      </div>
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-muted border border-border flex items-center justify-center shrink-0">
                         <span className="font-body text-[8px] text-muted-foreground font-medium">

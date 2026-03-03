@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -319,7 +320,7 @@ const UserProfile = () => {
                     }}
                   >
                     {photo.photo_url ? (
-                      <img src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
+                      <ShimmerImage src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
                         <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
@@ -336,7 +337,7 @@ const UserProfile = () => {
                   style={{ boxShadow: "0 4px 20px rgba(26,23,20,0.16)" }}
                 >
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <ShimmerImage src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
                       <span className="font-body font-medium text-[34px] text-muted-foreground">{initials}</span>
@@ -496,7 +497,7 @@ const UserProfile = () => {
                 >
                   <div className="relative">
                     {set.photo_url ? (
-                      <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
+                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
                     ) : (
                       <div className="w-full aspect-square bg-muted flex items-center justify-center">
                         <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />
@@ -633,7 +634,7 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
                 <button key={person.id} className="flex items-center gap-3 w-full text-left" onClick={() => onNavigate(person.user_id)}>
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                     {person.avatar_url ? (
-                      <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                      <ShimmerImage src={person.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <span className="font-body font-medium text-[13px] text-muted-foreground">{initials}</span>
                     )}

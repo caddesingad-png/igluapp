@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Pencil, Trash2, Calendar, DollarSign,
@@ -370,7 +371,7 @@ const ProductDetail = () => {
         {/* Photo / Hero */}
         <div className="w-full aspect-square rounded-2xl bg-muted overflow-hidden flex items-center justify-center">
           {product.photo_url ? (
-            <img src={product.photo_url} alt={product.name} className="w-full h-full object-cover" />
+            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" />
           ) : (
             <Icon className="w-20 h-20 text-muted-foreground/20" />
           )}
