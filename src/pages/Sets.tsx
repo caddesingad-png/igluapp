@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ShimmerImage from "@/components/ShimmerImage";
 import {
   Layers, Plus, Pencil, Trash2, Share2,
 } from "lucide-react";
@@ -156,7 +157,9 @@ const Sets = () => {
               <div className="relative flex gap-1 p-1.5 bg-muted/20">
                 <div className="w-[52%] shrink-0">
                   {set.photo_url ? (
-                    <img src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover rounded-[8px]" />
+                    <div className="w-full aspect-square rounded-[8px] overflow-hidden relative">
+                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-cover" />
+                    </div>
                   ) : (
                     <div className="w-full aspect-square rounded-[8px] bg-muted flex items-center justify-center">
                       <Layers className="w-7 h-7 text-muted-foreground/30" />
@@ -167,7 +170,9 @@ const Sets = () => {
                   {Array.from({ length: 6 }).map((_, i) => {
                     const photo = set.product_photos?.[i];
                     return photo ? (
-                      <img key={i} src={photo} alt="" className="w-full aspect-square object-cover rounded-sm" />
+                      <div key={i} className="w-full aspect-square rounded-sm overflow-hidden relative">
+                        <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" />
+                      </div>
                     ) : (
                       <div key={i} className="w-full aspect-square rounded-sm bg-muted" />
                     );
