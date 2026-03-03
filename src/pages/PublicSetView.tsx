@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Globe, Share2 } from "lucide-react";
+import ShimmerImage from "@/components/ShimmerImage";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { shareSet } from "@/lib/shareSet";
@@ -133,7 +134,9 @@ const PublicSetView = () => {
       {/* Cover photo */}
       {set?.photo_url && (
         <div className="w-full h-64 overflow-hidden">
-          <img src={set.photo_url} alt={set?.name} className="w-full h-full object-cover" />
+          <div className="w-full h-full overflow-hidden relative">
+            <ShimmerImage src={set.photo_url} alt={set?.name ?? ""} className="w-full h-full object-cover" />
+          </div>
         </div>
       )}
 
@@ -167,7 +170,9 @@ const PublicSetView = () => {
               className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
             >
               {p.photo_url ? (
-                <img src={p.photo_url} alt={p.name} className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                <div className="w-11 h-11 rounded-lg overflow-hidden shrink-0 relative">
+                  <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                </div>
               ) : (
                 <div className="w-11 h-11 rounded-lg bg-muted shrink-0" />
               )}

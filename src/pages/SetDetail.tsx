@@ -357,7 +357,9 @@ const SetDetail = () => {
                                 onClick={() => isOwner && navigate(`/product/${p.id}`)}
                               >
                                 {p.photo_url && (
-                                  <img src={p.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                                  <div className="w-4 h-4 rounded-full overflow-hidden relative">
+                                    <ShimmerImage src={p.photo_url} alt="" className="w-full h-full object-cover" />
+                                  </div>
                                 )}
                                 <span className="font-body text-[12px] text-foreground">{p.name}</span>
                               </button>
