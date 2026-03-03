@@ -10,6 +10,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import BottomNav from "@/components/BottomNav";
 import Onboarding from "@/components/Onboarding";
 import InstallPrompt from "@/components/InstallPrompt";
+import OfflineIndicator from "@/components/OfflineIndicator";
 import Auth from "./pages/Auth";
 import Library from "./pages/Library";
 import Sets from "./pages/Sets";
@@ -107,6 +108,7 @@ const AppRoutes = () => {
 
   return (
     <>
+      <OfflineIndicator />
       <Routes>
         <Route path="/" element={<Navigate to="/library" replace />} />
         <Route path="/library" element={<Library />} />
