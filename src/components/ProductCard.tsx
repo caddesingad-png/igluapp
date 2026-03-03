@@ -68,8 +68,8 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center overflow-hidden shrink-0">
           {product.photo_url ? (
             <>
-              {!imgLoaded && <div className="absolute inset-0 animate-pulse bg-muted rounded-[10px]" />}
-              <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" onLoad={() => setImgLoaded(true)} />
+              {!imgLoaded && <div className="absolute inset-0 img-shimmer rounded-[10px]" />}
+              <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" onLoad={() => setImgLoaded(true)} />
             </>
           ) : (
             <Icon className="w-6 h-6 text-muted-foreground/40" />
@@ -122,8 +122,8 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
         {product.photo_url ? (
           <>
-            {!imgLoaded && <div className="absolute inset-0 animate-pulse bg-muted z-[1]" />}
-            <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} onLoad={() => setImgLoaded(true)} />
+            {!imgLoaded && <div className="absolute inset-0 img-shimmer z-[1]" />}
+            <img src={product.photo_url} alt={product.name} className={`w-full h-full object-cover transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`} loading="lazy" style={{ borderRadius: "10px 10px 0 0" }} onLoad={() => setImgLoaded(true)} />
           </>
         ) : (
           <Icon className="w-10 h-10 text-muted-foreground/20" />
