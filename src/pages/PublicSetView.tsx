@@ -182,7 +182,7 @@ const PublicSetView = () => {
             >
               {p.photo_url ? (
                 <div className="w-11 h-11 rounded-lg overflow-hidden shrink-0 relative">
-                  <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                  <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-contain" />
                 </div>
               ) : (
                 <div className="w-11 h-11 rounded-lg bg-muted shrink-0" />
