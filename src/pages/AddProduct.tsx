@@ -324,8 +324,8 @@ const AddProduct = () => {
               <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               {photoPreview ? (
                 <div className="flex items-end gap-3">
-                  <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
-                    <img src={photoPreview} alt="Preview" className="w-full h-full object-contain" />
+                  <div className="relative max-w-[160px] rounded-xl overflow-hidden border border-border">
+                    <img src={photoPreview} alt="Preview" className="w-full h-auto block" />
                     <button
                       type="button"
                       onClick={removePhoto}
