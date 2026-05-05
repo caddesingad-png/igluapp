@@ -33,7 +33,7 @@ const buildSrcSet = (src: string): string | undefined => {
         "/storage/v1/render/image/public/"
       );
       const separator = renderUrl.includes("?") ? "&" : "?";
-      return `${renderUrl}${separator}width=${w}&resize=cover ${w}w`;
+      return `${renderUrl}${separator}width=${w}&resize=contain ${w}w`;
     })
     .join(", ");
 };

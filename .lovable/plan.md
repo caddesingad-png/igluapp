@@ -1,30 +1,30 @@
-## Problema
+Objetivo: mostrar a imagem exatamente como foi enviada — sem corte, sem zoom, sem deformação e sem fundo neutro preenchendo espaço vazio.
 
-Hoje as imagens (produtos, sets, avatar, capa) usam `object-cover`, que **preenche o container cortando as bordas** — por isso parecem "com zoom". Você quer ver a imagem inteira.
+O que vou fazer
 
-A solução é trocar para `object-contain` nos previews, mantendo a proporção original e mostrando a imagem completa (com possíveis faixas neutras nas laterais quando a proporção da foto não bate com o container).
+1. Remover o crop forçado das imagens
+- O componente `ShimmerImage` hoje gera `srcset` usando transformação remota com `resize=cover`, o que entrega uma imagem já cortada do servidor mesmo quando o CSS pede `object-contain`. Vou ajustar para não forçar crop na otimização: a imagem servida vai manter a proporção original (equivalente a `contain`), apenas redimensionada por largura.
+- Onde uso `object-cover` no CSS, vou trocar para `object-contain` nos previews/cards de produto e set.
 
-## O que vou alterar
+2. Tirar a “moldura” quadrada e o fundo neutro dos cards
+- Hoje `ProductCard.tsx` força `aspect-square` + `bg-muted`, o que cria as faixas/fundo quando a foto não é quadrada. Vou remover o quadrado fixo e o fundo, deixando o container se ajustar à proporção real da foto. O card continua com largura fixa da grid, mas a altura passa a respeitar a imagem original.
+- Mesma lógica aplicada nos previews onde o usuário precisa ver a foto inteira:
+  - `src/pages/AddProduct.tsx` (preview do upload)
+  - `src/pages/ProductReview.tsx` (preview do upload)
+  - `src/pages/ProductDetail.tsx` (foto principal)
+  - `src/pages/SetDetail.tsx` (capa)
+  - `src/pages/SetForm.tsx` (capa)
+  - `src/pages/PublicSetView.tsx` (capa)
+  - `src/pages/Sets.tsx` (capa do set na listagem)
 
-Substituir `object-cover` → `object-contain` (com fundo `bg-muted` quando faltar, para as faixas ficarem suaves) nos previews de imagem em:
+3. Manter intacto só onde faz sentido
+- Avatares circulares e a stream do scanner continuam como estão, porque ali o crop é parte do design e não tem foto de produto envolvida.
+- Miniaturas muito pequenas usadas como “chips” (ex.: avatar do criador no feed) também continuam como estão, pois não são a foto principal do produto.
 
-1. **`src/components/ProductCard.tsx`** — thumbnail do card (grid e list).
-2. **`src/components/DiscoverFeed.tsx`** — cards do feed.
-3. **`src/pages/ProductDetail.tsx`** — foto principal do produto.
-4. **`src/pages/Sets.tsx`** — capas dos sets na listagem.
-5. **`src/pages/SetDetail.tsx`** — capa e thumbnails de produtos do set.
-6. **`src/pages/SetForm.tsx`** — preview ao montar/editar set.
-7. **`src/pages/PublicSetView.tsx`** — capa pública e thumbs.
-8. **`src/pages/ProductReview.tsx`** — preview da foto enviada.
-9. **`src/pages/AddProduct.tsx`** — preview da foto antes de salvar.
+4. Considerações de layout
+- Sem `aspect-square`, a grid de produtos pode ficar com cards de alturas diferentes. Vou usar layout em colunas (estilo masonry simples com `columns-2`) na biblioteca para acomodar isso de forma natural, mantendo a estética minimalista.
+- Não vou adicionar nenhum fundo neutro novo. Onde o container atual tinha `bg-muted` só para preencher faixas, esse fundo será removido.
 
-## O que NÃO vou mexer
-
-- **`src/pages/UserProfile.tsx`** e **`AvatarCropModal`**: avatar é circular e tem crop dedicado — `object-cover` é o correto ali. Mantenho.
-- **`BarcodeScanner.tsx`**: é a stream da câmera, precisa preencher — mantenho.
-
-## Detalhes técnicos
-
-- O `ShimmerImage` repassa `className`/`style`, então a troca é direta nos chamadores.
-- Containers continuam com `aspect-square` / altura fixa para evitar CLS — só muda como a imagem se ajusta dentro.
-- Onde já existe `bg-muted` no container, as faixas laterais ficam discretas. Vou garantir esse fundo nos poucos casos que ainda não têm.
+Resultado esperado
+- A imagem aparece exatamente como foi enviada: proporção original, sem corte, sem zoom, sem fundo extra.
+- O card se adapta à foto, em vez da foto se adaptar ao card.
