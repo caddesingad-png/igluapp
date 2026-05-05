@@ -62,9 +62,9 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 cursor-pointer card-press"
         style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
       >
-        <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center overflow-hidden shrink-0 relative">
+        <div className="w-14 h-14 rounded-[10px] flex items-center justify-center overflow-hidden shrink-0 relative">
           {product.photo_url ? (
-            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" shimmerClassName="rounded-[10px]" width={56} height={56} responsive sizes="56px" />
+            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-contain" shimmerClassName="rounded-[10px]" width={56} height={56} responsive sizes="56px" />
           ) : (
             <Icon className="w-6 h-6 text-muted-foreground/40" />
           )}
@@ -102,18 +102,25 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
       className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer card-press"
       style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
     >
-      <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden relative">
-        {product.photo_url ? (
-          <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" style={{ borderRadius: "10px 10px 0 0" }} width={200} height={200} responsive sizes="(max-width: 640px) 50vw, 200px" />
-        ) : (
+      {product.photo_url ? (
+        <div className="relative">
+          <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-auto block" style={{ borderRadius: "10px 10px 0 0" }} responsive sizes="(max-width: 640px) 50vw, 200px" />
+          {product.is_favorite && (
+            <div className="absolute bottom-2 right-2">
+              <Heart className="w-4 h-4 text-primary fill-primary drop-shadow-sm" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="aspect-square flex items-center justify-center relative">
           <Icon className="w-10 h-10 text-muted-foreground/20" />
-        )}
-        {product.is_favorite && (
-          <div className="absolute bottom-2 right-2">
-            <Heart className="w-4 h-4 text-primary fill-primary drop-shadow-sm" />
-          </div>
-        )}
-      </div>
+          {product.is_favorite && (
+            <div className="absolute bottom-2 right-2">
+              <Heart className="w-4 h-4 text-primary fill-primary drop-shadow-sm" />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="p-[10px]">
         <p className="font-body font-light text-[11px] text-muted-foreground truncate uppercase tracking-[0.08em]">{product.brand}</p>

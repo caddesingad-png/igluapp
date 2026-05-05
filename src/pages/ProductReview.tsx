@@ -170,8 +170,8 @@ const ProductReview = () => {
 
           {photoPreview ? (
             <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-xl overflow-hidden border border-border flex-shrink-0">
-                <img src={photoPreview} alt="Preview" className="w-full h-full object-contain" />
+              <div className="max-w-[120px] rounded-xl overflow-hidden border border-border flex-shrink-0">
+                <img src={photoPreview} alt="Preview" className="w-full h-auto block" />
               </div>
               {identifying && (
                 <div className="flex items-center gap-2 text-primary font-body text-sm">

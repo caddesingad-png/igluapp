@@ -355,7 +355,7 @@ const SetForm = () => {
                   </div>
                   {p.photo_url ? (
                     <div className="w-9 h-9 rounded-[8px] overflow-hidden shrink-0 relative">
-                      <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                      <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-contain" />
                     </div>
                   ) : (
                     <div className="w-9 h-9 rounded-[8px] bg-muted shrink-0" />
@@ -549,7 +549,7 @@ const SetForm = () => {
                     </div>
                     {p.photo_url ? (
                       <div className="w-9 h-9 rounded-[8px] overflow-hidden shrink-0 relative">
-                        <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                        <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-contain" />
                       </div>
                     ) : (
                       <div className="w-9 h-9 rounded-[8px] bg-muted shrink-0" />
