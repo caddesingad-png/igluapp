@@ -62,9 +62,9 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 cursor-pointer card-press"
         style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}
       >
-        <div className="w-14 h-14 rounded-[10px] bg-muted flex items-center justify-center overflow-hidden shrink-0 relative">
+        <div className="w-14 h-14 rounded-[10px] flex items-center justify-center overflow-hidden shrink-0 relative">
           {product.photo_url ? (
-            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" shimmerClassName="rounded-[10px]" width={56} height={56} responsive sizes="56px" />
+            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-contain" shimmerClassName="rounded-[10px]" width={56} height={56} responsive sizes="56px" />
           ) : (
             <Icon className="w-6 h-6 text-muted-foreground/40" />
           )}
