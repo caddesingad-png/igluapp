@@ -181,7 +181,7 @@ const Sets = () => {
                 <div className="w-[52%] shrink-0">
                   {set.photo_url ? (
                     <div className="w-full aspect-square rounded-[8px] overflow-hidden relative">
-                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-contain" width={120} height={120} responsive sizes="120px" />
+                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-cover" width={120} height={120} responsive sizes="120px" />
                     </div>
                   ) : (
                     <div className="w-full aspect-square rounded-[8px] bg-muted flex items-center justify-center">
@@ -194,7 +194,7 @@ const Sets = () => {
                     const photo = set.product_photos?.[i];
                     return photo ? (
                       <div key={i} className="w-full aspect-square rounded-sm overflow-hidden relative">
-                        <ShimmerImage src={photo} alt="" className="w-full h-full object-contain" width={32} height={32} />
+                        <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" width={32} height={32} />
                       </div>
                     ) : (
                       <div key={i} className="w-full aspect-square rounded-sm bg-muted" />
