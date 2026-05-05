@@ -262,7 +262,7 @@ const SetDetail = () => {
               >
                 {p.photo_url ? (
                   <div className="w-11 h-11 rounded-[8px] overflow-hidden shrink-0 relative">
-                    <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-contain" />
+                    <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-11 h-11 rounded-[8px] bg-muted shrink-0" />
@@ -328,7 +328,7 @@ const SetDetail = () => {
                               >
                                 {p.photo_url && (
                                   <div className="w-4 h-4 rounded-full overflow-hidden relative">
-                                    <ShimmerImage src={p.photo_url} alt="" className="w-full h-full object-contain" />
+                                    <ShimmerImage src={p.photo_url} alt="" className="w-full h-full object-cover" />
                                   </div>
                                 )}
                                 <span className="font-body text-[12px] text-foreground">{p.name}</span>

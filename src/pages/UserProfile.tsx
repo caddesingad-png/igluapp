@@ -326,7 +326,7 @@ const UserProfile = () => {
                     }}
                   >
                     {photo.photo_url ? (
-                      <ShimmerImage src={photo.photo_url} alt={photo.name} className="w-full h-full object-contain" />
+                      <ShimmerImage src={photo.photo_url} alt={photo.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
                         <Layers className="w-4 h-4 text-muted-foreground/40" strokeWidth={1.5} />
@@ -503,7 +503,7 @@ const UserProfile = () => {
                 >
                   <div className="relative">
                     {set.photo_url ? (
-                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full aspect-square object-contain" />
+                      <ShimmerImage src={set.photo_url} alt={set.name} className="w-full aspect-square object-cover" />
                     ) : (
                       <div className="w-full aspect-square bg-muted flex items-center justify-center">
                         <Layers className="w-7 h-7 text-muted-foreground/30" strokeWidth={1.5} />

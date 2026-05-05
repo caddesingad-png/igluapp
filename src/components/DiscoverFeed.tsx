@@ -251,7 +251,7 @@ const DiscoverFeed = () => {
                       <ShimmerImage
                         src={set.photo_url}
                         alt={set.name}
-                        className="w-full aspect-[4/5] object-contain"
+                        className="w-full aspect-[4/5] object-cover"
                         width={200}
                         height={250}
                         responsive
@@ -305,7 +305,7 @@ const DiscoverFeed = () => {
                           const photo = set.product_photos[i];
                           return photo ? (
                             <div key={i} className="w-9 h-9 rounded-[4px] shrink-0 overflow-hidden relative">
-                              <ShimmerImage src={photo} alt="" className="w-full h-full object-contain" width={36} height={36} responsive sizes="36px" />
+                              <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" width={36} height={36} responsive sizes="36px" />
                             </div>
                           ) : (
                             <div
