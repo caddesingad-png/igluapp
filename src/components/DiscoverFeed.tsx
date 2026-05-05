@@ -251,9 +251,7 @@ const DiscoverFeed = () => {
                       <ShimmerImage
                         src={set.photo_url}
                         alt={set.name}
-                        className="w-full aspect-[4/5] object-cover"
-                        width={200}
-                        height={250}
+                        className="w-full h-auto block"
                         responsive
                         sizes="(max-width: 640px) 50vw, 200px"
                       />
