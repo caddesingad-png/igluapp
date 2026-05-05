@@ -325,7 +325,7 @@ const AddProduct = () => {
               {photoPreview ? (
                 <div className="flex items-end gap-3">
                   <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-border">
-                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-contain" />
                     <button
                       type="button"
                       onClick={removePhoto}

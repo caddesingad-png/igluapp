@@ -369,7 +369,7 @@ const ProductDetail = () => {
         {/* Photo / Hero */}
         <div className="w-full aspect-square rounded-2xl bg-muted overflow-hidden flex items-center justify-center relative">
           {product.photo_url ? (
-            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-cover" width={400} height={400} responsive sizes="(max-width: 640px) 100vw, 400px" />
+            <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-full object-contain" width={400} height={400} responsive sizes="(max-width: 640px) 100vw, 400px" />
           ) : (
             <Icon className="w-20 h-20 text-muted-foreground/20" />
           )}

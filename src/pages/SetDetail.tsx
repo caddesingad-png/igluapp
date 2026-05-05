@@ -190,7 +190,7 @@ const SetDetail = () => {
         {set.photo_url && (
           <div className="flex justify-center px-6 pt-6">
             <div className="w-48 h-48 rounded-xl overflow-hidden relative" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
-              <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-cover" />
+              <ShimmerImage src={set.photo_url} alt={set.name} className="w-full h-full object-contain" />
             </div>
           </div>
         )}
@@ -262,7 +262,7 @@ const SetDetail = () => {
               >
                 {p.photo_url ? (
                   <div className="w-11 h-11 rounded-[8px] overflow-hidden shrink-0 relative">
-                    <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-cover" />
+                    <ShimmerImage src={p.photo_url} alt={p.name} className="w-full h-full object-contain" />
                   </div>
                 ) : (
                   <div className="w-11 h-11 rounded-[8px] bg-muted shrink-0" />
@@ -328,7 +328,7 @@ const SetDetail = () => {
                               >
                                 {p.photo_url && (
                                   <div className="w-4 h-4 rounded-full overflow-hidden relative">
-                                    <ShimmerImage src={p.photo_url} alt="" className="w-full h-full object-cover" />
+                                    <ShimmerImage src={p.photo_url} alt="" className="w-full h-full object-contain" />
                                   </div>
                                 )}
                                 <span className="font-body text-[12px] text-foreground">{p.name}</span>
