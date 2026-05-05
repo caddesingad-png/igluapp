@@ -194,7 +194,7 @@ const Sets = () => {
                     const photo = set.product_photos?.[i];
                     return photo ? (
                       <div key={i} className="w-full aspect-square rounded-sm overflow-hidden relative">
-                        <ShimmerImage src={photo} alt="" className="w-full h-full object-cover" width={32} height={32} />
+                        <ShimmerImage src={photo} alt="" className="w-full h-full object-contain" width={32} height={32} />
                       </div>
                     ) : (
                       <div key={i} className="w-full aspect-square rounded-sm bg-muted" />
