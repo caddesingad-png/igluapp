@@ -24,6 +24,8 @@ import SetDetail from "./pages/SetDetail";
 import PublicSetView from "./pages/PublicSetView";
 import UserProfile from "./pages/UserProfile";
 import ProductReview from "./pages/ProductReview";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -78,9 +80,14 @@ const AppRoutes = () => {
     );
   }
 
+  // Rotas públicas de fluxo de senha — funcionam independentemente do estado de auth
+  // (reset-password é acessado via link de e-mail e cria sessão temporária)
+  const path = window.location.pathname;
+  const isPasswordFlow = path === "/forgot-password" || path === "/reset-password";
+
   // Não logada: mostrar onboarding primeiro, depois auth
   if (!user) {
-    if (!preAuthOnboardingDone) {
+    if (!preAuthOnboardingDone && !isPasswordFlow) {
       return (
         <Onboarding
           preAuth
@@ -90,8 +97,20 @@ const AppRoutes = () => {
     }
     return (
       <Routes>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/sets/:id/public" element={<PublicSetView />} />
         <Route path="*" element={<Auth />} />
+      </Routes>
+    );
+  }
+
+  // Logada via link de recovery — vai direto para definir nova senha
+  if (isPasswordFlow) {
+    return (
+      <Routes>
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     );
   }

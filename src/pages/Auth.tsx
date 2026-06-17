@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
@@ -141,6 +141,17 @@ const Auth = () => {
               {loading ? "Aguarde..." : isLogin ? "Entrar" : "Criar conta"}
             </Button>
           </div>
+
+          {isLogin && (
+            <p className="text-center pt-1">
+              <Link
+                to="/forgot-password"
+                className="font-body text-[13px] text-muted-foreground hover:text-foreground hover:underline"
+              >
+                Esqueci minha senha
+              </Link>
+            </p>
+          )}
         </form>
 
         <p className="text-center font-body text-[13px] text-muted-foreground mt-6">
