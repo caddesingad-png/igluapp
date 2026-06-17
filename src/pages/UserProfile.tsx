@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "@/components/ShimmerImage";
 import igluLogo from "@/assets/iglu-logo.svg";
 import { compressImage } from "@/lib/compressImage";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
-  Settings, Pencil, Check, X, LogOut, Camera,
+  Settings, Pencil, Check, X, LogOut, Camera, Trash2, AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +76,11 @@ const UserProfile = () => {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Delete account flow
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   // Follow modals
   const [showFollowers, setShowFollowers] = useState(false);
@@ -175,6 +180,20 @@ const UserProfile = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Sessão encerrada");
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", { body: {} });
+      if (error) throw error;
+      toast.success("Conta excluída. Sentiremos sua falta. 💌");
+      await supabase.auth.signOut();
+      navigate("/auth", { replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Falha ao excluir conta. Tente novamente.");
+      setDeleting(false);
+    }
   };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -577,10 +596,86 @@ const UserProfile = () => {
               </div>
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border font-body text-[14px] text-destructive border-destructive/30 hover:bg-destructive/5 transition-colors"
+                className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border font-body text-[14px] text-foreground border-border hover:bg-muted transition-colors"
               >
                 <LogOut className="w-4 h-4" strokeWidth={1.5} />
                 Sair
+              </button>
+
+              {/* Legal links */}
+              <div className="flex items-center justify-center gap-4 mt-5 mb-5">
+                <Link to="/termos" className="font-body text-[12px] text-muted-foreground hover:text-foreground hover:underline">
+                  Termos de Uso
+                </Link>
+                <span className="text-muted-foreground/40">·</span>
+                <Link to="/privacidade" className="font-body text-[12px] text-muted-foreground hover:text-foreground hover:underline">
+                  Política de Privacidade
+                </Link>
+              </div>
+
+              {/* Danger zone */}
+              <div className="pt-4 border-t border-border">
+                <p className="label-overline mb-2 text-destructive/80">Zona perigosa</p>
+                <button
+                  onClick={() => { setShowDeleteConfirm(true); setDeleteText(""); }}
+                  className="w-full flex items-center justify-center gap-2 h-11 rounded-xl font-body text-[14px] text-destructive hover:bg-destructive/5 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                  Excluir minha conta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete account confirmation */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+          style={{ backgroundColor: "rgba(26,23,20,0.55)" }}
+          onClick={() => !deleting && setShowDeleteConfirm(false)}
+        >
+          <div
+            className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-6 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+            </div>
+            <h3 className="font-display text-[20px] text-foreground mb-2">Excluir conta permanentemente</h3>
+            <p className="font-body text-[13px] text-muted-foreground leading-relaxed mb-4">
+              Esta ação <strong className="text-foreground">não pode ser desfeita</strong>. Sua coleção,
+              SETs, histórico de compras, fotos e todos os dados serão apagados imediatamente.
+            </p>
+            <p className="font-body text-[13px] text-muted-foreground mb-2">
+              Para confirmar, digite <strong className="text-foreground">EXCLUIR</strong> abaixo:
+            </p>
+            <input
+              type="text"
+              value={deleteText}
+              onChange={(e) => setDeleteText(e.target.value)}
+              placeholder="EXCLUIR"
+              disabled={deleting}
+              className="w-full h-11 px-3 rounded-md border border-border bg-background font-body text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-destructive/30 mb-4"
+              autoFocus
+            />
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 h-11 rounded-xl border border-border font-body text-[14px] text-foreground hover:bg-muted transition-colors disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting || deleteText !== "EXCLUIR"}
+                className="flex-1 h-11 rounded-xl bg-destructive text-destructive-foreground font-body text-[14px] hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? "Excluindo..." : "Excluir tudo"}
               </button>
             </div>
           </div>

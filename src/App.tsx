@@ -26,6 +26,8 @@ import UserProfile from "./pages/UserProfile";
 import ProductReview from "./pages/ProductReview";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -84,10 +86,11 @@ const AppRoutes = () => {
   // (reset-password é acessado via link de e-mail e cria sessão temporária)
   const path = window.location.pathname;
   const isPasswordFlow = path === "/forgot-password" || path === "/reset-password";
+  const isLegalPage = path === "/termos" || path === "/privacidade";
 
   // Não logada: mostrar onboarding primeiro, depois auth
   if (!user) {
-    if (!preAuthOnboardingDone && !isPasswordFlow) {
+    if (!preAuthOnboardingDone && !isPasswordFlow && !isLegalPage) {
       return (
         <Onboarding
           preAuth
@@ -97,6 +100,8 @@ const AppRoutes = () => {
     }
     return (
       <Routes>
+        <Route path="/termos" element={<Terms />} />
+        <Route path="/privacidade" element={<Privacy />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/sets/:id/public" element={<PublicSetView />} />
@@ -143,6 +148,8 @@ const AppRoutes = () => {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/edit-product/:id" element={<AddProduct />} />
         <Route path="/review" element={<ProductReview />} />
+        <Route path="/termos" element={<Terms />} />
+        <Route path="/privacidade" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/library" replace />} />
       </Routes>
       <BottomNav />
