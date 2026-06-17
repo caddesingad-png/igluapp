@@ -24,6 +24,8 @@ import SetDetail from "./pages/SetDetail";
 import PublicSetView from "./pages/PublicSetView";
 import UserProfile from "./pages/UserProfile";
 import ProductReview from "./pages/ProductReview";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
