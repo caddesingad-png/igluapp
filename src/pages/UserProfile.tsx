@@ -5,7 +5,7 @@ import { compressImage } from "@/lib/compressImage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
-  Settings, Pencil, Check, X, LogOut, Camera,
+  Settings, Pencil, Check, X, LogOut, Camera, Trash2, AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -76,6 +76,11 @@ const UserProfile = () => {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Delete account flow
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   // Follow modals
   const [showFollowers, setShowFollowers] = useState(false);
@@ -175,6 +180,20 @@ const UserProfile = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Sessão encerrada");
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", { body: {} });
+      if (error) throw error;
+      toast.success("Conta excluída. Sentiremos sua falta. 💌");
+      await supabase.auth.signOut();
+      navigate("/auth", { replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Falha ao excluir conta. Tente novamente.");
+      setDeleting(false);
+    }
   };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
