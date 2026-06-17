@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import ShimmerImage from "@/components/ShimmerImage";
 import igluLogo from "@/assets/iglu-logo.svg";
 import { compressImage } from "@/lib/compressImage";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, Heart, Layers, UserCheck, UserPlus, Users,
   Settings, Pencil, Check, X, LogOut, Camera, Trash2, AlertTriangle,
