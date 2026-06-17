@@ -1,30 +1,36 @@
-Objetivo: mostrar a imagem exatamente como foi enviada — sem corte, sem zoom, sem deformação e sem fundo neutro preenchendo espaço vazio.
+## Objetivo
 
-O que vou fazer
+Reduzir a fricção de cadastro adicionando **Login com Google** (1 clique) e elevar a segurança com a checagem de senhas vazadas (HIBP). Confirmação de email continua obrigatória.
 
-1. Remover o crop forçado das imagens
-- O componente `ShimmerImage` hoje gera `srcset` usando transformação remota com `resize=cover`, o que entrega uma imagem já cortada do servidor mesmo quando o CSS pede `object-contain`. Vou ajustar para não forçar crop na otimização: a imagem servida vai manter a proporção original (equivalente a `contain`), apenas redimensionada por largura.
-- Onde uso `object-cover` no CSS, vou trocar para `object-contain` nos previews/cards de produto e set.
+## O que será feito
 
-2. Tirar a “moldura” quadrada e o fundo neutro dos cards
-- Hoje `ProductCard.tsx` força `aspect-square` + `bg-muted`, o que cria as faixas/fundo quando a foto não é quadrada. Vou remover o quadrado fixo e o fundo, deixando o container se ajustar à proporção real da foto. O card continua com largura fixa da grid, mas a altura passa a respeitar a imagem original.
-- Mesma lógica aplicada nos previews onde o usuário precisa ver a foto inteira:
-  - `src/pages/AddProduct.tsx` (preview do upload)
-  - `src/pages/ProductReview.tsx` (preview do upload)
-  - `src/pages/ProductDetail.tsx` (foto principal)
-  - `src/pages/SetDetail.tsx` (capa)
-  - `src/pages/SetForm.tsx` (capa)
-  - `src/pages/PublicSetView.tsx` (capa)
-  - `src/pages/Sets.tsx` (capa do set na listagem)
+### 1. Habilitar Google OAuth (gerenciado pela Lovable Cloud)
+- Configurar o provider Google via Cloud — sem necessidade de credenciais próprias, sem chaves para você gerenciar.
+- Será gerado o módulo `src/integrations/lovable/` que expõe `lovable.auth.signInWithOAuth("google", ...)`.
 
-3. Manter intacto só onde faz sentido
-- Avatares circulares e a stream do scanner continuam como estão, porque ali o crop é parte do design e não tem foto de produto envolvida.
-- Miniaturas muito pequenas usadas como “chips” (ex.: avatar do criador no feed) também continuam como estão, pois não são a foto principal do produto.
+### 2. Atualizar a tela de Auth (`src/pages/Auth.tsx`)
+- Adicionar botão **"Continuar com Google"** acima do formulário de email/senha, com ícone do Google e estilo luxo minimalista (botão branco/neutro, borda sutil — combina com a estética IGLU).
+- Divisor elegante "ou" entre o botão Google e o form.
+- Manter cadastro/login por email/senha como hoje.
+- Tratar erros do OAuth com toast em PT-BR.
 
-4. Considerações de layout
-- Sem `aspect-square`, a grid de produtos pode ficar com cards de alturas diferentes. Vou usar layout em colunas (estilo masonry simples com `columns-2`) na biblioteca para acomodar isso de forma natural, mantendo a estética minimalista.
-- Não vou adicionar nenhum fundo neutro novo. Onde o container atual tinha `bg-muted` só para preencher faixas, esse fundo será removido.
+### 3. Pós-login social
+- O `handle_new_user` trigger já cria o profile automaticamente — funciona igual para Google.
+- O fluxo de onboarding (5 telas) seguirá funcionando: novos usuários Google entram, perfil é criado, e como `created_at` é recente, o onboarding aparece normalmente.
 
-Resultado esperado
-- A imagem aparece exatamente como foi enviada: proporção original, sem corte, sem zoom, sem fundo extra.
-- O card se adapta à foto, em vez da foto se adaptar ao card.
+### 4. Ativar Proteção HIBP
+- Ligar `password_hibp_enabled: true` na configuração de auth.
+- Senhas que já vazaram em vazamentos públicos serão rejeitadas no cadastro/troca de senha, com mensagem clara em PT-BR.
+
+### 5. PWA / Service Worker
+- Verificar e garantir que o caminho `/~oauth` é excluído do cache do service worker (requisito para OAuth funcionar em PWA). Ajustar `vite.config.ts` (Workbox) se necessário.
+
+## O que NÃO entra nesta rodada (posso fazer depois)
+- Recuperação de senha (tela "esqueci minha senha" + `/reset-password`)
+- Tradução completa de mensagens de erro do Supabase
+- Emails de auth com a marca IGLU (templates customizados)
+
+Posso emendar qualquer um destes em seguida — é só pedir.
+
+## Resultado esperado
+Novos usuários conseguem entrar em **1 clique** com Google, e contas com senhas comprometidas são bloqueadas automaticamente. Espera-se aumento mensurável na taxa de conversão de visitante → conta criada.
