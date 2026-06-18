@@ -574,7 +574,7 @@ const UserProfile = () => {
       {/* Settings bottom sheet */}
       {showSettings && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center"
+          className="fixed inset-0 z-[60] flex items-end justify-center"
           style={{ backgroundColor: "rgba(26,23,20,0.4)" }}
           onClick={() => setShowSettings(false)}
         >
@@ -708,7 +708,7 @@ interface FollowModalProps {
 
 const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => (
   <div
-    className="fixed inset-0 z-50 flex items-end justify-center"
+    className="fixed inset-0 z-[60] flex items-end justify-center"
     style={{ backgroundColor: "rgba(26,23,20,0.4)" }}
     onClick={onClose}
   >
