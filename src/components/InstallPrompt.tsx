@@ -85,7 +85,7 @@ const InstallPrompt = () => {
 
   if (showIOSGuide) {
     return (
-      <div className="fixed bottom-20 left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300">
+      <div className="fixed left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300">
         <div
           className="rounded-2xl p-4 shadow-lg border border-border"
           style={{ backgroundColor: "hsl(var(--card))" }}
@@ -126,7 +126,7 @@ const InstallPrompt = () => {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300">
       <div
         className="rounded-2xl p-3.5 shadow-lg border border-border flex items-center gap-3"
         style={{ backgroundColor: "hsl(var(--card))" }}
