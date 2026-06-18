@@ -123,6 +123,17 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+  /* ── Safe-area utilities (iOS notch / Android gesture bar) ── */
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .min-h-dvh { min-height: 100dvh; }
+  /* Page bottom padding when fixed BottomNav (64px) is present */
+  .pb-nav { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
+
   /* Font helpers */
   .font-display {
     font-family: 'Playfair Display', Georgia, serif;
