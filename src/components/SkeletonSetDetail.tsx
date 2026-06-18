@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SkeletonSetDetail = () => (
-  <div className="min-h-screen bg-background">
-    <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+  <div className="min-h-dvh bg-background">
+    <header className="sticky top-0 z-40 bg-background border-b border-border " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
       <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
         <Skeleton className="w-8 h-8 rounded-md" />
         <div className="flex gap-1">

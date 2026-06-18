@@ -144,8 +144,8 @@ const ProductReview = () => {
   const recConfig = review ? RECOMMENDATION_CONFIG[review.recommendation] : null;
 
   return (
-    <div className="min-h-screen bg-background screen-enter">
-      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+    <div className="min-h-dvh bg-background screen-enter">
+      <header className="sticky top-0 z-40 bg-background border-b border-border " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
         <div className="flex items-center max-w-lg mx-auto px-6 h-full">
           <img
             src={igluLogo}
@@ -156,7 +156,7 @@ const ProductReview = () => {
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-6 pt-6 pb-28">
+      <div className="max-w-lg mx-auto px-6 pt-6 pb-nav">
         {/* Input Section */}
         <div className="space-y-4">
           <h1 className="font-heading text-xl font-semibold text-foreground">Consultar Produto</h1>

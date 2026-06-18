@@ -17,7 +17,7 @@ const Profile = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+    <div className="min-h-dvh flex flex-col items-center justify-center bg-background gap-4">
       <img
         src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
         alt="IGLU"

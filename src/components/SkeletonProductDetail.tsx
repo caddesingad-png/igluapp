@@ -1,9 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SkeletonProductDetail = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-dvh bg-background">
     {/* Header */}
-    <header className="sticky top-0 z-40 bg-background border-b border-border px-4 py-3">
+    <header className="sticky top-0 z-40 bg-background border-b border-border safe-top px-4 py-3">
       <div className="flex items-center justify-between max-w-lg mx-auto">
         <Skeleton className="w-8 h-8 rounded-md" />
         <div className="flex gap-1">

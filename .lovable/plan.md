@@ -1,59 +1,90 @@
-## Objetivo
+# Correção de safe-areas (iPhone notch + home indicator + Android)
 
-Fechar as 3 lacunas que faltam para deixar o login "perfeito": **Apple Sign-in**, **conformidade LGPD** (termos + privacidade + exclusão de conta) e **emails de auth com a marca IGLU**.
+## Diagnóstico do print
 
-## 1. Apple Sign-in
+No iPhone, o `viewport-fit=cover` já está ativo no `index.html`, mas o app **não consome as variáveis CSS `env(safe-area-inset-*)`** na maioria das telas. Resultado visível no seu print:
 
-- Habilitar o provider Apple via Cloud (gerenciado, sem precisar de credenciais Apple Developer próprias agora).
-- Adicionar botão **"Continuar com Apple"** na tela `src/pages/Auth.tsx`, abaixo do botão Google, com ícone oficial da Apple, mesmo estilo neutro/minimalista (botão preto com texto branco — padrão Apple HIG).
-- Mesma função `handleOAuth("apple"|"google")` (refatorar para evitar código duplicado).
-- Tratamento de erros em PT-BR (já temos o helper `translateError`).
+1. **Topo**: o header da Biblioteca (`sticky top-0`, 56px) começa colado em `top:0`, fazendo o logo IGLU sobrepor o relógio "18:59" / Dynamic Island.
+2. **Base**: a `BottomNav` (fixa, 64px) não tem `padding-bottom: env(safe-area-inset-bottom)`, então a barra de gestos do iPhone sobrepõe os labels "Biblioteca / SETs / Review…".
+3. **Conteúdo**: telas usam `pb-24` (96px) fixo — em iPhones modernos isso é insuficiente (nav 64 + ~34 da home bar = 98px), e o último item da lista pode ser tocado pela home bar.
+4. Telas full-screen (`Auth`, `Onboarding`, `ForgotPassword`, `ResetPassword`, etc.) e modais (`SetForm`, `AddProduct`) também não respeitam os insets superior/inferior.
+5. Android com gesture navigation tem o mesmo `env(safe-area-inset-bottom)` quando a PWA roda em modo standalone — a mesma correção atende ambos.
 
-> Mais tarde, quando publicar na App Store, você pode trocar para credenciais Apple Developer próprias (BYOC) — eu aviso quando for a hora.
+## Estratégia
 
-## 2. LGPD — Termos, Privacidade e Exclusão de Conta
+Tratar safe-area como **token global**, não ad-hoc em cada arquivo. Centralizar em `index.css` e aplicar via classes utilitárias do Tailwind para não espalhar `style={{}}` inline.
 
-### 2a. Páginas estáticas (rotas públicas)
-- `src/pages/Terms.tsx` em `/termos` — Termos de Uso
-- `src/pages/Privacy.tsx` em `/privacidade` — Política de Privacidade
-- Conteúdo inicial baseado em template padrão de app brasileiro de coleção pessoal (sem coleta sensível, sem revenda de dados). Você poderá editar o texto livremente.
-- Layout: tipografia luxo IGLU, header com voltar, navegação por âncoras das seções.
-- Adicionar links no rodapé do `src/pages/Auth.tsx` e no perfil.
+### 1. `tailwind.config.ts` — adicionar utilitários de safe-area
 
-### 2b. Checkbox no cadastro
-- Em `Auth.tsx` (modo cadastro), adicionar checkbox obrigatório:
-  > "Li e aceito os [Termos de Uso] e a [Política de Privacidade]"
-- Botão "Criar conta" fica desabilitado até marcar.
-- Validar também antes de Google/Apple sign-up (mostrar antes do redirect).
+Habilitar plugin/spacing extra:
+```ts
+spacing: {
+  'safe-top': 'env(safe-area-inset-top)',
+  'safe-bottom': 'env(safe-area-inset-bottom)',
+  'safe-left': 'env(safe-area-inset-left)',
+  'safe-right': 'env(safe-area-inset-right)',
+}
+```
+Habilita classes `pt-safe-top`, `pb-safe-bottom`, etc.
 
-### 2c. Exclusão de conta
-- Adicionar seção "Excluir minha conta" em `src/pages/UserProfile.tsx` (visível apenas para o próprio usuário, no fim da página).
-- Diálogo de confirmação dupla ("Digite EXCLUIR para confirmar").
-- Edge Function `delete-account` (com `verify_jwt = true`) que usa service role para:
-  - Deletar storage (avatar + product-photos do usuário)
-  - Deletar registros do usuário em todas as tabelas (`products`, `sets`, `set_layers`, etc. — cascata já existente nos foreign keys cobre a maioria)
-  - `auth.admin.deleteUser(userId)` no final
-- Após sucesso: logout + redirect para `/auth` com toast de confirmação.
+### 2. `src/index.css` — classes utilitárias semânticas
 
-## 3. Emails de auth com marca IGLU
+```css
+@layer utilities {
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-x      { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .min-h-dvh   { min-height: 100dvh; }   /* substitui min-h-screen no mobile */
+}
+```
+Definir CSS var `--nav-height: 64px;` e `--nav-total: calc(var(--nav-height) + env(safe-area-inset-bottom));` para uso global.
 
-Pré-requisito: configurar um domínio de envio. Você precisa ter um domínio próprio (ex.: `iglu.app`, `igluapp.com.br`) com acesso ao DNS. Depois:
-- Configurar o domínio de email no Cloud (adiciona um subdomínio tipo `notify.seudominio.com` para envio).
-- Gerar templates customizados para: confirmação de cadastro, recuperação de senha, magic link, convite, mudança de email.
-- Aplicar identidade IGLU: paleta neutra/bege/dourado (#C9A96E), tipografia display, copy em PT-BR amigável ("Olá! Confirme seu e-mail para começar a montar sua coleção ✨").
-- Logo IGLU no topo de cada email.
+### 3. `BottomNav.tsx`
 
-**Importante:** essa parte só funciona depois que você fornecer um domínio. Se preferir, deixo essa parte para o final — aviso pra você setar o domínio quando chegar a vez.
+- Container ganha `padding-bottom: env(safe-area-inset-bottom)` e altura total dinâmica.
+- Visualmente o "fundo claro" se estende até a borda física do device (correto pelo HIG da Apple), mas os ícones/labels ficam acima da home bar.
 
-## Ordem de implementação
+### 4. Headers `sticky top-0` (Library, Sets, History, Profile, Discover, etc.)
 
-1. Apple Sign-in (rápido)
-2. Páginas Termos + Privacidade + links + checkbox
-3. Exclusão de conta (edge function + UI)
-4. Pausa para você configurar domínio de email
-5. Templates de email branded
+Mudar de altura fixa 56px para:
+- `padding-top: env(safe-area-inset-top)`
+- conteúdo do header dentro de wrapper com altura 56px constante
+- background do header preenche a área do notch (look nativo)
 
-## O que NÃO entra
-- Captcha (você optou por não)
-- Login por SMS
-- "Sair de todos os dispositivos" (posso adicionar depois se quiser)
+Arquivos afetados: `Library.tsx`, `Sets.tsx`, `History.tsx`, `Profile.tsx`, `ProductReview.tsx`, `SetDetail.tsx`, `ProductDetail.tsx`, `AddProduct.tsx`, `SetForm.tsx`, `UserProfile.tsx`, `PublicSetView.tsx`.
+
+### 5. Padding inferior das páginas com scroll
+
+Trocar `pb-24` por `pb-[calc(6rem+env(safe-area-inset-bottom))]` (ou classe `pb-nav` definida no css). Aplicar em todas as páginas que mostram `BottomNav`.
+
+### 6. Telas full-screen sem BottomNav (Auth, Onboarding, Forgot/Reset Password, Terms, Privacy, NotFound, Index, Offline)
+
+- Trocar `min-h-screen` por `min-h-dvh` (resolve barra do Safari móvel "pulando").
+- Adicionar `safe-top safe-bottom safe-x` no container raiz para que conteúdo (botões de login, etc.) não fique sob o notch nem sob a home bar.
+
+### 7. Modais bottom-sheet (`SetForm`, `AddProduct` quando aplicável, `BarcodeScanner`, sheets do shadcn)
+
+Garantir `paddingBottom: calc(<gap> + env(safe-area-inset-bottom))` nos botões "Salvar" ancorados no rodapé. Já existe parcialmente em `SetForm.tsx` — padronizar.
+
+### 8. Toaster / Sonner
+
+Posicionamento padrão pode ficar atrás da home bar. Ajustar offset com `env(safe-area-inset-bottom)` no `<Toaster />` para que toasts mobile fiquem acima da nav.
+
+### 9. PWA standalone
+
+`index.html` já tem `viewport-fit=cover`. Adicionar `<meta name="theme-color">` (claro/escuro) e `apple-mobile-web-app-status-bar-style="default"` para que a área do notch use a cor de fundo do app (sem barra preta).
+
+## Detalhes técnicos
+
+- **Não tocar lógica de negócio** — só estilização e estrutura de containers.
+- **Sem novas dependências.**
+- **Compatibilidade**: `env(safe-area-inset-*)` retorna `0` em browsers sem notch, então desktop não muda visualmente.
+- **`100dvh` vs `100vh`**: `dvh` evita o pulo de altura no Safari iOS quando a barra de URL aparece/some — adotaremos em todos os layouts full-screen.
+- **Validação visual**: após implementar, abrir preview em viewport 390×844 (iPhone 14) e conferir Library, BottomNav, Auth e um modal (SetForm).
+
+## Escopo fechado
+
+✅ Inclui: insets globais, headers, bottom nav, paddings de scroll, telas full-screen, modais, toaster, meta tags PWA.
+❌ Não inclui: redesign visual, mudanças em ícones, ajustes de tipografia/cores.
+
+Sem mudanças em backend, Edge Functions, RLS ou tipos.

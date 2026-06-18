@@ -122,7 +122,7 @@ const Onboarding = ({ userId, onComplete, preAuth = false }: OnboardingProps) =>
   const slide = slides[current];
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden safe-top safe-bottom safe-x">
       {/* Skip / Já tenho conta */}
       <div className="absolute top-5 right-5 z-10">
         <button

@@ -143,7 +143,7 @@ const SetDetail = () => {
 
   if (!set) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center bg-background">
         <p className="font-body text-muted-foreground">Set não encontrado.</p>
       </div>
     );
@@ -152,8 +152,8 @@ const SetDetail = () => {
   const isOwner = user?.id === set.user_id;
 
   return (
-    <div className="min-h-screen pb-10 bg-background">
-      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+    <div className="min-h-dvh pb-10 bg-background">
+      <header className="sticky top-0 z-40 bg-background border-b border-border " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
           <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
             <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />

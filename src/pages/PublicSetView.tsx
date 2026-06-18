@@ -112,7 +112,7 @@ const PublicSetView = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -120,7 +120,7 @@ const PublicSetView = () => {
 
   if (notFound) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6 text-center">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-background px-6 text-center">
         <Globe className="w-12 h-12 text-muted-foreground mb-4" />
         <h1 className="text-xl font-bold text-foreground mb-2">Set not found</h1>
         <p className="text-muted-foreground text-sm">
@@ -131,7 +131,7 @@ const PublicSetView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {/* Brand header */}
       <div className="w-full flex justify-center py-3 border-b border-border bg-background">
         <img
