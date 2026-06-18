@@ -74,7 +74,7 @@ const BarcodeScanner = ({ onDetected, onClose }: BarcodeScannerProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center safe-top safe-bottom safe-x">
       {/* Close */}
       <button
         onClick={handleClose}
