@@ -126,7 +126,7 @@ const InstallPrompt = () => {
   }
 
   return (
-    <div className="fixed left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed left-4 right-4 z-[60] animate-in slide-in-from-bottom-4 duration-300" style={{ bottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
       <div
         className="rounded-2xl p-3.5 shadow-lg border border-border flex items-center gap-3"
         style={{ backgroundColor: "hsl(var(--card))" }}
