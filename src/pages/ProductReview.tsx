@@ -145,7 +145,7 @@ const ProductReview = () => {
 
   return (
     <div className="min-h-dvh bg-background screen-enter">
-      <header className="sticky top-0 z-40 bg-background border-b border-border safe-top" style={{ height: "56px" }}>
+      <header className="sticky top-0 z-40 bg-background border-b border-border " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
         <div className="flex items-center max-w-lg mx-auto px-6 h-full">
           <img
             src={igluLogo}
