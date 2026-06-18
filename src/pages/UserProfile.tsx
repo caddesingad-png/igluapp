@@ -258,7 +258,7 @@ const UserProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center bg-background">
         <div className="w-6 h-6 border-[1.5px] border-foreground border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -266,7 +266,7 @@ const UserProfile = () => {
 
   if (notFound) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6 text-center">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-background px-6 text-center">
         <Users className="w-12 h-12 text-muted-foreground/30 mb-4" strokeWidth={1.5} />
         <h1 className="font-display text-[22px] font-normal text-foreground mb-2">Perfil não encontrado</h1>
         <p className="font-body font-light text-[14px] text-muted-foreground">Este perfil não existe ou foi removido.</p>
@@ -280,7 +280,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <div className="min-h-screen pb-24 bg-background">
+      <div className="min-h-dvh pb-nav bg-background">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
             {!isOwnProfile ? (

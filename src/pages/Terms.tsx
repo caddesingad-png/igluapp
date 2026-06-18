@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import igluLogo from "@/assets/iglu-logo.svg";
 
 const LegalShell = ({ title, updatedAt, children }: { title: string; updatedAt: string; children: React.ReactNode }) => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-dvh bg-background">
     <header className="sticky top-0 z-10 bg-background/90 backdrop-blur border-b border-border">
       <div className="max-w-2xl mx-auto px-5 h-14 flex items-center gap-3">
         <Link to="/" className="p-2 -ml-2 rounded-md hover:bg-muted">

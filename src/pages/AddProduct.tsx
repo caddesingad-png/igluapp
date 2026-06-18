@@ -291,7 +291,7 @@ const AddProduct = () => {
 
   if (loadingProduct) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -303,7 +303,7 @@ const AddProduct = () => {
         <BarcodeScanner onDetected={handleBarcodeDetected} onClose={() => setShowScanner(false)} />
       )}
 
-      <div className="min-h-screen bg-background screen-enter">
+      <div className="min-h-dvh bg-background screen-enter">
         <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
           <div className="flex items-center gap-3 max-w-lg mx-auto px-4 h-full">
             <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
@@ -315,7 +315,7 @@ const AddProduct = () => {
           </div>
         </header>
 
-        <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-6 pt-6 pb-28 animate-fade-in">
+        <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-6 pt-6 pb-nav animate-fade-in">
           <div className="space-y-6">
             {/* Photo Upload */}
             <div>
