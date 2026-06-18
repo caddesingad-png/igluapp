@@ -637,7 +637,8 @@ const UserProfile = () => {
           onClick={() => !deleting && setShowDeleteConfirm(false)}
         >
           <div
-            className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-6" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}"
+            className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-6"
+            style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
