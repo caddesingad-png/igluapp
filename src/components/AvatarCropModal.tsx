@@ -77,7 +77,7 @@ const AvatarCropModal = ({ imageSrc, onConfirm, onCancel }: AvatarCropModalProps
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center safe-top safe-bottom safe-x"
       style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
     >
       {/* Header */}
