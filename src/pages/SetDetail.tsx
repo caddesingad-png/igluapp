@@ -153,7 +153,7 @@ const SetDetail = () => {
 
   return (
     <div className="min-h-dvh pb-10 bg-background">
-      <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+      <header className="sticky top-0 z-40 bg-background border-b border-border safe-top" style={{ height: "56px" }}>
         <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
           <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
             <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />

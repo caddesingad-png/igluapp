@@ -281,7 +281,7 @@ const UserProfile = () => {
   return (
     <>
       <div className="min-h-dvh pb-nav bg-background">
-        <header className="sticky top-0 z-40 bg-background border-b border-border" style={{ height: "56px" }}>
+        <header className="sticky top-0 z-40 bg-background border-b border-border safe-top" style={{ height: "56px" }}>
           <div className="flex items-center justify-between max-w-lg mx-auto px-4 h-full">
             {!isOwnProfile ? (
               <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
