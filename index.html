@@ -29,22 +29,6 @@ Organize sua coleção, acompanhe o que ama e crie looks que são completamente 
 
   <body>
     <div id="root"></div>
-    <script>
-      // DEBUG: simulate iPhone safe-area insets when URL has ?safearea=1
-      if (new URLSearchParams(location.search).has('safearea')) {
-        const s = document.createElement('style');
-        s.textContent = `
-          html { padding-top: 47px; padding-bottom: 34px; background:#000; }
-          html::before { content:'NOTCH'; position:fixed; top:0; left:0; right:0; height:47px; color:#fff; font:11px monospace; display:flex; align-items:center; justify-content:center; z-index:99999; background:rgba(0,0,0,.85); pointer-events:none; }
-          html::after { content:'HOME BAR'; position:fixed; bottom:0; left:0; right:0; height:34px; color:#fff; font:11px monospace; display:flex; align-items:center; justify-content:center; z-index:99999; background:rgba(0,0,0,.85); pointer-events:none; }
-          /* Fake env() insets via overriding our utility classes */
-          .safe-top    { padding-top: 47px !important; }
-          .safe-bottom { padding-bottom: 34px !important; }
-          .pb-nav      { padding-bottom: calc(5rem + 34px) !important; }
-        `;
-        document.head.appendChild(s);
-      }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
