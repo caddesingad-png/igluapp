@@ -579,8 +579,8 @@ const UserProfile = () => {
           onClick={() => setShowSettings(false)}
         >
           <div
-            className="w-full max-w-lg bg-card rounded-t-2xl overflow-hidden" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}"
-            style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)" }}
+            className="w-full max-w-lg bg-card rounded-t-2xl overflow-hidden"
+            style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)", paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1">
