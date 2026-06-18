@@ -31,10 +31,11 @@ const BottomNav = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border"
-      style={{ boxShadow: "0 -4px 24px rgba(26, 23, 20, 0.08)", height: "64px" }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom"
+      style={{ boxShadow: "0 -4px 24px rgba(26, 23, 20, 0.08)" }}
     >
-      <div className="flex items-center justify-around h-full max-w-lg mx-auto px-2">
+      <div className="flex items-center justify-around max-w-lg mx-auto px-2" style={{ height: "64px" }}>
+
         {tabs.map(({ path, label, icon: Icon }) => {
           const isActive = location.pathname === path;
           return (
