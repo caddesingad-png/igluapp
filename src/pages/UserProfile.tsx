@@ -579,7 +579,7 @@ const UserProfile = () => {
           onClick={() => setShowSettings(false)}
         >
           <div
-            className="w-full max-w-lg bg-card rounded-t-2xl pb-8 overflow-hidden"
+            className="w-full max-w-lg bg-card rounded-t-2xl overflow-hidden" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}"
             style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -637,7 +637,7 @@ const UserProfile = () => {
           onClick={() => !deleting && setShowDeleteConfirm(false)}
         >
           <div
-            className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-6 pb-8"
+            className="w-full max-w-md bg-card rounded-t-2xl sm:rounded-2xl p-6" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
@@ -712,7 +712,7 @@ const FollowModal = ({ title, list, onClose, onNavigate }: FollowModalProps) => 
     onClick={onClose}
   >
     <div
-      className="w-full max-w-lg bg-card rounded-t-2xl pb-8 overflow-hidden"
+      className="w-full max-w-lg bg-card rounded-t-2xl overflow-hidden" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}"
       style={{ boxShadow: "0 -4px 32px rgba(26,23,20,0.16)" }}
       onClick={(e) => e.stopPropagation()}
     >
