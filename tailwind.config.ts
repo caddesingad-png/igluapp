@@ -50,6 +50,13 @@ export default {
         "rose-glow": "hsl(var(--rose-glow))",
         nude: "hsl(var(--nude))",
         blush: "hsl(var(--blush))",
+        /* Aurora */
+        "aura-peach": "hsl(var(--aura-peach))",
+        "aura-blush": "hsl(var(--aura-blush))",
+        "aura-mist": "hsl(var(--aura-mist))",
+        "aura-cream": "hsl(var(--aura-cream))",
+        /* Gold preservado */
+        "accent-gold": "hsl(var(--accent-gold))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -60,11 +67,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        /* Status dots */
+        /* Status dots — pastel */
         "status-green": "hsl(var(--status-green))",
         "status-yellow": "hsl(var(--status-yellow))",
         "status-red": "hsl(var(--status-red))",
-        /* Dark button */
+        /* Dark button (compat) */
         "btn-dark": "hsl(var(--btn-primary-bg))",
         "btn-dark-fg": "hsl(var(--btn-primary-fg))",
         /* Tag surface */
@@ -72,18 +79,24 @@ export default {
         "tag-foreground": "hsl(var(--muted-foreground))",
       },
       borderRadius: {
-        lg: "12px",
-        md: "8px",
-        sm: "4px",
-        xl: "12px",
-        "2xl": "20px",
+        sm: "8px",
+        md: "12px",
+        lg: "20px",
+        xl: "24px",
+        "2xl": "32px",
+        "3xl": "40px",
       },
       boxShadow: {
-        card: "0 1px 3px rgba(26, 23, 20, 0.06)",
-        modal: "0 -4px 24px rgba(26, 23, 20, 0.08)",
+        card: "var(--shadow-soft-sm)",
+        modal: "var(--shadow-glass-lg)",
+        soft: "var(--shadow-soft)",
+        "soft-sm": "var(--shadow-soft-sm)",
+        "soft-inset": "var(--shadow-soft-inset)",
+        glass: "var(--shadow-glass)",
+        "glass-lg": "var(--shadow-glass-lg)",
       },
       fontFamily: {
-        display: ["'Playfair Display'", "Georgia", "serif"],
+        display: ["'Fraunces'", "'Playfair Display'", "Georgia", "serif"],
         body: ["'DM Sans'", "system-ui", "sans-serif"],
       },
       keyframes: {
@@ -103,12 +116,17 @@ export default {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
+        breathe: {
+          "0%, 100%": { transform: "scale(1)", opacity: "0.9" },
+          "50%": { transform: "scale(1.04)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
+        breathe: "breathe 2.6s ease-in-out infinite",
       },
     },
   },

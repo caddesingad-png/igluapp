@@ -9,26 +9,28 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /* Primary: dark charcoal background */
-        default:
-          "bg-btn-dark text-btn-dark-fg hover:bg-btn-dark/90 rounded-md",
+        /* Primary — pebble peach→blush gradient, pílula */
+        default: "pebble rounded-full",
+        /* Carbon button preservado para destruções/contraste */
+        carbon:
+          "bg-btn-dark text-btn-dark-fg hover:bg-btn-dark/92 rounded-full shadow-soft-sm active:shadow-soft-inset",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md",
-        /* Secondary: transparent with charcoal border */
+          "bg-destructive text-destructive-foreground hover:bg-destructive/92 rounded-full shadow-soft-sm active:shadow-soft-inset",
+        /* Ghost-glass — secundário translúcido */
         outline:
-          "border border-foreground bg-transparent text-foreground hover:bg-muted rounded-md",
+          "glass text-foreground hover:bg-card/90 rounded-full",
         secondary:
-          "bg-muted text-muted-foreground hover:bg-muted/80 rounded-md",
+          "bg-muted/80 text-foreground hover:bg-muted rounded-full shadow-soft-sm active:shadow-soft-inset",
         ghost:
-          "hover:bg-muted hover:text-foreground rounded-md",
+          "hover:bg-muted/60 hover:text-foreground rounded-full",
         link:
-          "text-muted-foreground underline-offset-4 hover:underline",
+          "text-muted-foreground underline-offset-4 hover:underline hover:text-foreground",
       },
       size: {
-        default: "h-[52px] px-5 py-2 text-[14px] tracking-[0.04em]",
-        sm: "h-9 rounded-md px-3 text-[13px]",
-        lg: "h-[52px] rounded-md px-8 text-[14px] tracking-[0.04em]",
-        icon: "h-10 w-10",
+        default: "h-[52px] px-6 py-2 text-[14px] tracking-[0.02em]",
+        sm: "h-9 px-4 text-[13px]",
+        lg: "h-[56px] px-8 text-[14px] tracking-[0.04em]",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
