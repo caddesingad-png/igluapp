@@ -191,7 +191,7 @@ const History = () => {
   return (
     <div className="min-h-dvh pb-nav bg-background screen-enter">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background border-b border-border safe-top" style={{ height: "auto" }}>
+      <header className="sticky top-0 z-40 glass-header safe-top" style={{ height: "auto" }}>
         <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
           <img
             src={igluLogo}
