@@ -71,13 +71,15 @@ const AppRoutes = () => {
 
   if (loading || (user && !onboardingChecked)) {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center bg-background gap-4">
-        <img
-          src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
-          alt="IGLU"
-          className="h-8 opacity-60 animate-pulse"
-          style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
-        />
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-4">
+        <div className="w-20 h-20 rounded-full glass-panel shadow-soft flex items-center justify-center animate-breathe">
+          <img
+            src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
+            alt="IGLU"
+            className="h-6 opacity-80"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
+        </div>
       </div>
     );
   }
