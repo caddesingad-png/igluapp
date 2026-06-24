@@ -304,7 +304,7 @@ const AddProduct = () => {
       )}
 
       <div className="min-h-dvh bg-background screen-enter">
-        <header className="sticky top-0 z-40 bg-background border-b border-border " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
+        <header className="sticky top-0 z-40 glass-header " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
           <div className="flex items-center gap-3 max-w-lg mx-auto px-4 h-full">
             <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center text-foreground">
               <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={1.5} />

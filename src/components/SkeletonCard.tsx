@@ -7,8 +7,8 @@ interface SkeletonCardProps {
 export const SkeletonCard = ({ viewMode = "grid" }: SkeletonCardProps) => {
   if (viewMode === "list") {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-        <Skeleton className="w-14 h-14 rounded-[10px] shrink-0" />
+      <div className="surface-porcelain flex items-center gap-3 p-3">
+        <Skeleton className="w-14 h-14 rounded-2xl shrink-0" />
         <div className="flex-1 min-w-0 space-y-2">
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-4 w-32" />
@@ -20,13 +20,13 @@ export const SkeletonCard = ({ viewMode = "grid" }: SkeletonCardProps) => {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <Skeleton className="aspect-square w-full" />
-      <div className="p-[10px] space-y-2">
+    <div className="surface-porcelain overflow-hidden">
+      <Skeleton className="aspect-square w-full rounded-none" />
+      <div className="p-3 space-y-2">
         <Skeleton className="h-3 w-16" />
         <Skeleton className="h-4 w-24" />
         <div className="flex items-center justify-between mt-2">
-          <Skeleton className="h-5 w-14 rounded-sm" />
+          <Skeleton className="h-5 w-14 rounded-full" />
           <Skeleton className="h-5 w-16" />
         </div>
       </div>
@@ -35,12 +35,12 @@ export const SkeletonCard = ({ viewMode = "grid" }: SkeletonCardProps) => {
 };
 
 export const SkeletonSetCard = () => (
-  <div className="rounded-xl border border-border bg-card overflow-hidden">
+  <div className="surface-porcelain overflow-hidden">
     <div className="flex gap-1 p-1.5">
-      <Skeleton className="w-[52%] aspect-square rounded-[8px]" />
+      <Skeleton className="w-[52%] aspect-square rounded-xl" />
       <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-0.5">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-square rounded-sm" />
+          <Skeleton key={i} className="aspect-square rounded-md" />
         ))}
       </div>
     </div>
@@ -52,9 +52,9 @@ export const SkeletonSetCard = () => (
 );
 
 export const SkeletonHistoryEntry = () => (
-  <div className="rounded-xl border border-border bg-card px-4 py-3">
+  <div className="surface-porcelain px-4 py-3">
     <div className="flex items-start gap-3">
-      <Skeleton className="w-8 h-8 rounded-md shrink-0" />
+      <Skeleton className="w-8 h-8 rounded-xl shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="flex justify-between">
           <div className="space-y-1.5">

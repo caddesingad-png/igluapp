@@ -1,90 +1,144 @@
-# Correção de safe-areas (iPhone notch + home indicator + Android)
+## Re-skin do IGLU — "Soft Atelier"
 
-## Diagnóstico do print
+A essência atual (luxo discreto, beige + dourado, serif editorial) fica. O que muda é a **textura da interface**: sai o flat editorial com sombras secas, entra um sistema mais arejado, com superfícies macias que parecem esculpidas em porcelana, vidro fosco com gradiente sutil e profundidade tátil de wellness app.
 
-No iPhone, o `viewport-fit=cover` já está ativo no `index.html`, mas o app **não consome as variáveis CSS `env(safe-area-inset-*)`** na maioria das telas. Resultado visível no seu print:
+A direção mistura os 4 referenciais que você pediu sem virar pastiche:
+- **Soft Minimalism** dá a base — tipografia generosa, hierarquia clara, muito ar.
+- **Neumorphism** entra só nas superfícies táteis (cards de produto, BottomNav, switches) — sombra dupla muito suave, nada de relevos pesados.
+- **Wellness App UI** define a paleta — neutros quentes com toques de aurora pêssego/rosa pó/menta gelo.
+- **Glassmorphism Soft Gradient** aparece nos headers fixos, sheets e overlays — blur + gradiente translúcido sobre um fundo com uma "aura" de cor.
 
-1. **Topo**: o header da Biblioteca (`sticky top-0`, 56px) começa colado em `top:0`, fazendo o logo IGLU sobrepor o relógio "18:59" / Dynamic Island.
-2. **Base**: a `BottomNav` (fixa, 64px) não tem `padding-bottom: env(safe-area-inset-bottom)`, então a barra de gestos do iPhone sobrepõe os labels "Biblioteca / SETs / Review…".
-3. **Conteúdo**: telas usam `pb-24` (96px) fixo — em iPhones modernos isso é insuficiente (nav 64 + ~34 da home bar = 98px), e o último item da lista pode ser tocado pela home bar.
-4. Telas full-screen (`Auth`, `Onboarding`, `ForgotPassword`, `ResetPassword`, etc.) e modais (`SetForm`, `AddProduct`) também não respeitam os insets superior/inferior.
-5. Android com gesture navigation tem o mesmo `env(safe-area-inset-bottom)` quando a PWA roda em modo standalone — a mesma correção atende ambos.
+A regra é gastar a ousadia em **um lugar**: a aura de gradiente do fundo + os cards "porcelana" são o signature. Tudo o mais fica disciplinado.
 
-## Estratégia
+---
 
-Tratar safe-area como **token global**, não ad-hoc em cada arquivo. Centralizar em `index.css` e aplicar via classes utilitárias do Tailwind para não espalhar `style={{}}` inline.
+### Thesis visual
 
-### 1. `tailwind.config.ts` — adicionar utilitários de safe-area
+**Subject**: um caderno-altar de maquiagem pessoal. Toque suave, ritual, autocuidado.
+**Risco assumido**: trocar o fundo beige chapado por uma **aura de gradiente** (peach → blush → mist) fixa no viewport com blur enorme, vista através de glass panels. O fundo respira; os cards flutuam sobre ele.
 
-Habilitar plugin/spacing extra:
-```ts
-spacing: {
-  'safe-top': 'env(safe-area-inset-top)',
-  'safe-bottom': 'env(safe-area-inset-bottom)',
-  'safe-left': 'env(safe-area-inset-left)',
-  'safe-right': 'env(safe-area-inset-right)',
-}
+### Tokens (index.css)
+
+Trocas em HSL (mantém o sistema semântico atual, sem hardcode em componentes):
+
+```text
+--background:      32 40% 96%    /* warm porcelain */
+--foreground:      25 18% 14%    /* espresso suave, não preto */
+--card:             0  0% 100%   /* porcelana pura translúcida */
+--muted:           32 25% 92%
+--muted-foreground: 25 10% 45%
+--border:          30 20% 88%
+--ring:            18 55% 72%
+
+/* Aurora accents — usados como gradiente, não como blocos */
+--aura-peach:      18 80% 82%    /* #FAC9A8 */
+--aura-blush:     340 65% 88%    /* #F4CFDB */
+--aura-mist:      170 35% 86%    /* #C9E4DD */
+--aura-cream:      42 60% 92%    /* #F7EBD5 */
+
+/* Primary vira pêssego morno em vez de dourado seco */
+--primary:         18 55% 68%    /* #E8A88A — peach */
+--primary-foreground: 25 18% 14%
+
+/* Gold antigo preservado como acento secundário (favoritos, selos) */
+--accent-gold:     38 47% 60%
+
+/* Gradientes nomeados */
+--gradient-aura:   radial-gradient(60% 50% at 20% 10%, hsl(var(--aura-peach)/0.55), transparent 60%),
+                   radial-gradient(55% 45% at 90% 30%, hsl(var(--aura-blush)/0.45), transparent 65%),
+                   radial-gradient(70% 60% at 50% 100%, hsl(var(--aura-mist)/0.40), transparent 70%);
+--gradient-glass:  linear-gradient(180deg, hsl(0 0% 100%/0.72), hsl(0 0% 100%/0.45));
+
+/* Sombras soft-neumorphic — dupla, baixa opacidade */
+--shadow-soft:     8px 8px 24px hsl(25 20% 70% / 0.18),
+                  -8px -8px 24px hsl(0 0% 100% / 0.9);
+--shadow-soft-sm:  4px 4px 12px hsl(25 20% 70% / 0.14),
+                  -4px -4px 12px hsl(0 0% 100% / 0.85);
+--shadow-soft-inset: inset 3px 3px 8px hsl(25 20% 70% / 0.18),
+                     inset -3px -3px 8px hsl(0 0% 100% / 0.9);
+--shadow-glass:    0 8px 32px hsl(25 30% 40% / 0.10);
+
+--radius: 1.25rem    /* 20px — base muito mais soft */
 ```
-Habilita classes `pt-safe-top`, `pb-safe-bottom`, etc.
 
-### 2. `src/index.css` — classes utilitárias semânticas
+Dark mode recebe versões equivalentes com porcelana → "noite morna" (#1C1916) e auras dessaturadas. Mantenho `--accent-gold` como ele é.
 
-```css
-@layer utilities {
-  .safe-top    { padding-top: env(safe-area-inset-top); }
-  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-  .safe-x      { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
-  .min-h-dvh   { min-height: 100dvh; }   /* substitui min-h-screen no mobile */
-}
-```
-Definir CSS var `--nav-height: 64px;` e `--nav-total: calc(var(--nav-height) + env(safe-area-inset-bottom));` para uso global.
+### Tipografia
 
-### 3. `BottomNav.tsx`
+Mantém a alma editorial mas suaviza:
+- **Display**: troco `Playfair Display` por **`Fraunces`** (variável, com `opsz` e `soft`=100) — mesma família serif elegante, porém com cortes mais arredondados e modernos, perfeita para wellness premium.
+- **Body**: `DM Sans` fica (já performa bem) — peso 400 padrão, 500 para ênfase.
+- **Numeric/meta**: adiciono `Fraunces` em `font-feature-settings: "tnum"` para preços, mantendo coerência sem importar uma 3ª família.
+- Escala: H1 `clamp(28px, 6vw, 40px)`, eyebrow 10px tracking 0.16em, body 14px.
 
-- Container ganha `padding-bottom: env(safe-area-inset-bottom)` e altura total dinâmica.
-- Visualmente o "fundo claro" se estende até a borda física do device (correto pelo HIG da Apple), mas os ícones/labels ficam acima da home bar.
+### Signature: a "aura"
 
-### 4. Headers `sticky top-0` (Library, Sets, History, Profile, Discover, etc.)
+Em `body::before`, fixed, full-viewport, `background: var(--gradient-aura)`, `filter: blur(80px)`, `opacity: 0.85`. Não rola junto. Todo o resto do app vive sobre ela usando glass panels.
 
-Mudar de altura fixa 56px para:
-- `padding-top: env(safe-area-inset-top)`
-- conteúdo do header dentro de wrapper com altura 56px constante
-- background do header preenche a área do notch (look nativo)
+### Componentes — o que muda
 
-Arquivos afetados: `Library.tsx`, `Sets.tsx`, `History.tsx`, `Profile.tsx`, `ProductReview.tsx`, `SetDetail.tsx`, `ProductDetail.tsx`, `AddProduct.tsx`, `SetForm.tsx`, `UserProfile.tsx`, `PublicSetView.tsx`.
+| Componente | Antes | Depois |
+|---|---|---|
+| **Body / fundo** | beige chapado | Aura gradiente fixa + porcelana |
+| **Sticky headers** (Library, Sets, History, Profile, ProductDetail) | `bg-background` opaco | `.glass-header` = `backdrop-blur-xl bg-white/55 border-b border-white/40` |
+| **BottomNav** | borda + sombra para cima | Pílula flutuante glass: `mx-4 mb-[safe] rounded-full bg-white/60 backdrop-blur-xl shadow-glass`, ícone ativo num "poço" neumórfico (`shadow-soft-inset`) com tinta peach |
+| **ProductCard** | borda 12px + shadow seca | "Porcelana": `rounded-3xl bg-white/80 backdrop-blur-sm shadow-soft`, sem borda, hover `shadow-soft-sm + translate-y-[-2px]`, press `shadow-soft-inset` |
+| **Botões primários** | preto chapado | Variante `pebble`: pílula `rounded-full`, gradiente peach→blush sutil, `shadow-soft`, press afunda (`shadow-soft-inset`) |
+| **Botões secundários** | borda fina | Ghost-glass: `bg-white/40 backdrop-blur border border-white/60` |
+| **Inputs / Textarea** | borda + bg branco | Neumórfico inset: `bg-background shadow-soft-inset border-0 rounded-2xl` |
+| **Switch / Checkbox / Radio** | shadcn default | Track com `shadow-soft-inset`, thumb com `shadow-soft-sm` |
+| **Tabs / Chips de categoria** | retângulo `bg-muted` | Pílulas com `shadow-soft-sm`; ativo afunda (`shadow-soft-inset` + foreground) |
+| **Sheets / Drawer / Dialog** | card opaco | `bg-white/70 backdrop-blur-2xl rounded-t-[32px] shadow-glass` |
+| **Toast / Sonner** | card sólido | Glass pill com leve gradiente |
+| **Skeletons / ShimmerImage** | shimmer cinza | Shimmer perolado (branco→aura-cream→branco) |
+| **Loader global (Splash)** | logo pulsando | Logo dentro de "moeda" porcelana com `shadow-soft` respirando |
+| **Empty states** | ícone Lucide cinza | Mesmo ícone num círculo porcelana neumórfico, fundo com aura visível |
+| **Status dots** | verde/amarelo/vermelho saturados | Versões "pastel": menta, peach, blush-clay |
+| **Tags PAO / categoria** | `bg-muted` retangular | Pílula `bg-white/60 backdrop-blur shadow-soft-sm` |
 
-### 5. Padding inferior das páginas com scroll
+### Microinterações
 
-Trocar `pb-24` por `pb-[calc(6rem+env(safe-area-inset-bottom))]` (ou classe `pb-nav` definida no css). Aplicar em todas as páginas que mostram `BottomNav`.
+- Press universal: `transition-shadow 180ms ease`, troca `shadow-soft` por `shadow-soft-inset` no `:active` em vez do `scale-98` atual — sensação tátil real, não cartoonesca.
+- Hover em cards: `translateY(-2px)` + reforço do shadow.
+- Page transitions: o `screen-fade` atual ganha `translateY(6px)` e duração 240ms.
+- BottomNav: ao trocar de tab, o "poço" do ativo desliza horizontalmente com `transition-all 280ms cubic-bezier(0.22, 1, 0.36, 1)`.
+- Respeitar `prefers-reduced-motion`: sem aura blur animada, sem translate.
 
-### 6. Telas full-screen sem BottomNav (Auth, Onboarding, Forgot/Reset Password, Terms, Privacy, NotFound, Index, Offline)
+### Arquivos a editar
 
-- Trocar `min-h-screen` por `min-h-dvh` (resolve barra do Safari móvel "pulando").
-- Adicionar `safe-top safe-bottom safe-x` no container raiz para que conteúdo (botões de login, etc.) não fique sob o notch nem sob a home bar.
+1. `src/index.css` — substituir tokens, adicionar utilities `.glass`, `.glass-header`, `.aura-bg`, `.shadow-soft*`, `.pebble` e o `body::before` da aura.
+2. `tailwind.config.ts` — novos `borderRadius` (base 1.25rem, full), novos `boxShadow` (soft, soft-sm, soft-inset, glass), nova family `fraunces`, cores `aura-*` e `accent-gold`.
+3. `index.html` — trocar import de Fonts (remover Playfair, adicionar Fraunces variável) e ajustar `theme-color` para o novo porcelain.
+4. `src/components/BottomNav.tsx` — pílula glass flutuante com indicador neumórfico.
+5. `src/components/ProductCard.tsx` — superfície porcelana + chips pílula.
+6. `src/components/ui/button.tsx` — adicionar variantes `pebble` (primary) e `ghost-glass`; manter as existentes para não quebrar chamadas atuais.
+7. `src/components/ui/input.tsx`, `textarea.tsx`, `select.tsx`, `switch.tsx`, `checkbox.tsx`, `radio-group.tsx`, `tabs.tsx`, `badge.tsx` — encostar nos tokens novos (sem mudar API).
+8. `src/components/ui/sheet.tsx`, `drawer.tsx`, `dialog.tsx`, `toast.tsx`, `sonner.tsx` — superfícies glass + radius 32px no topo.
+9. `src/components/ShimmerImage.tsx` + `src/components/SkeletonCard.tsx` / `SkeletonProductDetail.tsx` / `SkeletonSetDetail.tsx` — shimmer perolado.
+10. `src/components/Onboarding.tsx` — aura visível, botão pebble, dots ativos com shadow-inset.
+11. `src/pages/*` (Library, Sets, History, Profile, UserProfile, ProductDetail, SetDetail, AddProduct, SetForm, ProductReview, Auth, Onboarding, Terms, Privacy, NotFound) — aplicar `glass-header` nos headers fixos, remover `bg-background` redundante onde a aura precisa aparecer, padding rítmico, FAB "Adicionar" como pebble flutuante na Library.
+12. `src/App.tsx` — splash com logo em moeda porcelana.
 
-### 7. Modais bottom-sheet (`SetForm`, `AddProduct` quando aplicável, `BarcodeScanner`, sheets do shadcn)
+### O que NÃO muda (preservar a essência)
 
-Garantir `paddingBottom: calc(<gap> + env(safe-area-inset-bottom))` nos botões "Salvar" ancorados no rodapé. Já existe parcialmente em `SetForm.tsx` — padronizar.
+- Estrutura de navegação (BottomNav com as 5 abas atuais).
+- Português + BRL.
+- Acento `--accent-gold` mantido para favoritos (coração), selos de "atual" em cores e ícones premium — vira o detalhe quente em meio à paleta fria-quente.
+- Hierarquia editorial dos títulos (display serif grande, eyebrow uppercase).
+- Todos os comportamentos, rotas, dados, edge functions, RLS, safe-areas e PWA continuam exatamente como estão.
 
-### 8. Toaster / Sonner
+### Quality bar antes de finalizar
 
-Posicionamento padrão pode ficar atrás da home bar. Ajustar offset com `env(safe-area-inset-bottom)` no `<Toaster />` para que toasts mobile fiquem acima da nav.
+- Contraste AA em todos os tokens (texto sobre porcelana e sobre glass-header sobre aura).
+- Dark mode equivalente: aura escurece para "noite morna", glass vira `bg-black/40`.
+- `prefers-reduced-motion`: desliga translate/blur animations.
+- Sem cor hardcoded em nenhum componente — tudo via tokens.
+- Build typecheck limpo; sem regressão de safe-area.
 
-### 9. PWA standalone
+### Fora de escopo
 
-`index.html` já tem `viewport-fit=cover`. Adicionar `<meta name="theme-color">` (claro/escuro) e `apple-mobile-web-app-status-bar-style="default"` para que a área do notch use a cor de fundo do app (sem barra preta).
+- Reescrita de lógica/edge functions/queries.
+- Novos recursos.
+- Mudança de fluxo, copy ou idioma.
 
-## Detalhes técnicos
-
-- **Não tocar lógica de negócio** — só estilização e estrutura de containers.
-- **Sem novas dependências.**
-- **Compatibilidade**: `env(safe-area-inset-*)` retorna `0` em browsers sem notch, então desktop não muda visualmente.
-- **`100dvh` vs `100vh`**: `dvh` evita o pulo de altura no Safari iOS quando a barra de URL aparece/some — adotaremos em todos os layouts full-screen.
-- **Validação visual**: após implementar, abrir preview em viewport 390×844 (iPhone 14) e conferir Library, BottomNav, Auth e um modal (SetForm).
-
-## Escopo fechado
-
-✅ Inclui: insets globais, headers, bottom nav, paddings de scroll, telas full-screen, modais, toaster, meta tags PWA.
-❌ Não inclui: redesign visual, mudanças em ícones, ajustes de tipografia/cores.
-
-Sem mudanças em backend, Edge Functions, RLS ou tipos.
+Se aprovar, eu já implemento direto — começando por `index.css` + `tailwind.config.ts` + `index.html` (a base do sistema), depois `BottomNav` + `ProductCard` + variantes de Button (os componentes mais visíveis), e por fim varro os pages e os primitives shadcn restantes.

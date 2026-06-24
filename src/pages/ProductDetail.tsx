@@ -321,7 +321,7 @@ const ProductDetail = () => {
   return (
     <div className="min-h-dvh bg-background screen-enter" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom, 20px) + 60px)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 glass border-b border-border px-4 py-3 safe-top">
+      <header className="sticky top-0 z-40 glass-header px-4 py-3 safe-top">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Button variant="ghost" size="icon" onClick={() => navigate("/library")}>
             <ArrowLeft className="w-5 h-5" />
