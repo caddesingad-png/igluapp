@@ -413,8 +413,8 @@ const Library = () => {
 
       {/* Products */}
       {!loading && filtered.length > 0 && (
-        <div className="max-w-lg mx-auto px-6 pt-4 animate-fade-in">
-          <p className="font-body text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-3">
+        <div className="max-w-lg mx-auto px-5 pt-6 pb-2 animate-fade-in">
+          <p className="font-body text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-5">
             {filtered.length} produto{filtered.length !== 1 ? "s" : ""}
             {selectedCategory !== "Todas" && ` · ${selectedCategory}`}
           </p>
@@ -426,8 +426,7 @@ const Library = () => {
                 strategy={viewMode === "grid" ? rectSortingStrategy : verticalListSortingStrategy}
               >
                 {viewMode === "grid" ? (
-                  <div className="grid grid-cols-2 gap-3 auto-rows-fr items-stretch">
-
+                  <div className="grid grid-cols-2 gap-5 auto-rows-fr items-stretch">
                     {filtered.map((product) => (
                       <SortableGridItem
                         key={product.id}
@@ -437,7 +436,7 @@ const Library = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {filtered.map((product) => (
                       <SortableListItem
                         key={product.id}
@@ -451,13 +450,13 @@ const Library = () => {
             </DndContext>
           ) : (
             viewMode === "grid" ? (
-              <div className="grid grid-cols-2 gap-3 auto-rows-fr items-stretch">
+              <div className="grid grid-cols-2 gap-5 auto-rows-fr items-stretch">
                 {filtered.map((product) => (
                   <ProductCard key={product.id} product={product} viewMode="grid" onClick={() => navigate(`/product/${product.id}`)} />
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {filtered.map((product) => (
                   <ProductCard key={product.id} product={product} viewMode="list" onClick={() => navigate(`/product/${product.id}`)} />
                 ))}
