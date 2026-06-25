@@ -261,27 +261,35 @@ const Library = () => {
   return (
     <div className="min-h-dvh pb-nav bg-background screen-enter">
       {/* Header */}
-      <header className="sticky top-0 z-40 glass-header " style={{ height: "calc(56px + env(safe-area-inset-top))", paddingTop: "env(safe-area-inset-top)" }}>
-        <div className="max-w-lg mx-auto px-6 h-full flex items-center justify-between">
-          <img
-            src={igluLogo}
-            alt="IGLU"
-            className="h-[22px]"
-            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
-          />
-          <div className="flex items-center gap-2">
-            <button
+      <header
+        className="sticky top-0 z-40 glass-header"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="max-w-lg mx-auto px-3 h-14 flex items-center justify-between">
+          <div className="pl-3">
+            <img
+              src={igluLogo}
+              alt="IGLU"
+              className="h-[22px]"
+              style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <IconButton
               onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-              className="w-8 h-8 flex items-center justify-center text-foreground"
+              aria-label={viewMode === "grid" ? "Mudar para lista" : "Mudar para grade"}
             >
-              {viewMode === "grid" ? <List className="w-[18px] h-[18px]" strokeWidth={1.5} /> : <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.5} />}
-            </button>
-            <button
+              {viewMode === "grid"
+                ? <List className="w-[18px] h-[18px]" strokeWidth={1.7} />
+                : <LayoutGrid className="w-[18px] h-[18px]" strokeWidth={1.7} />}
+            </IconButton>
+            <IconButton
               onClick={() => navigate("/add-product")}
-              className="w-8 h-8 flex items-center justify-center text-foreground"
+              aria-label="Adicionar produto"
+              variant="neu"
             >
-              <Plus className="w-[20px] h-[20px]" strokeWidth={1.5} />
-            </button>
+              <Plus className="w-5 h-5" strokeWidth={2} />
+            </IconButton>
           </div>
         </div>
       </header>
