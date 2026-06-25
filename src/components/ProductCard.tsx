@@ -90,8 +90,14 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
   return (
     <div onClick={onClick} className="surface-porcelain card-press overflow-hidden cursor-pointer">
       {product.photo_url ? (
-        <div className="relative" style={{ borderRadius: "20px 20px 0 0", overflow: "hidden" }}>
-          <ShimmerImage src={product.photo_url} alt={product.name} className="w-full h-auto block" responsive sizes="(max-width: 640px) 50vw, 200px" />
+        <div className="relative aspect-square overflow-hidden" style={{ borderRadius: "20px 20px 0 0", background: "hsl(28 24% 90% / 0.6)" }}>
+          <ShimmerImage
+            src={product.photo_url}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            responsive
+            sizes="(max-width: 640px) 50vw, 200px"
+          />
           {/* warm overlay gradient at bottom of image */}
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
