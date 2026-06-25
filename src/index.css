@@ -81,6 +81,14 @@
     --shadow-glass:    0 8px 32px hsl(9 35% 45% / 0.12);
     --shadow-glass-lg: 0 12px 40px hsl(9 35% 45% / 0.16);
     --shadow-rose-glow: 0 4px 15px hsl(9 38% 67% / 0.4);
+
+    /* ── Touch system (iOS HIG 44pt / Android Material 48dp) ── */
+    --touch-min:  44px;   /* iOS minimum */
+    --touch-comf: 48px;   /* Android comfortable */
+    --touch-gap:  8px;    /* minimum gap between adjacent targets */
+
+    /* Bottom nav: 72px content + safe-area */
+    --nav-height: 72px;
   }
 
   .dark {
@@ -178,6 +186,17 @@
     font-weight: 700;
     color: hsl(var(--foreground));
   }
+
+  /* ── Disable text-selection on tap (mobile feel) but keep inputs selectable ── */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
 
 @layer utilities {
@@ -271,7 +290,71 @@
     padding-right: env(safe-area-inset-right);
   }
   .min-h-dvh { min-height: 100dvh; }
-  .pb-nav { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+
+  /* Reserve space for the fixed BottomNav (72px + safe-area-inset-bottom). */
+  .pb-nav { padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 8px); }
+
+  /* ── Touch target utilities ── */
+  /* Forces a ≥44px hit area without changing visible size of the child. */
+  .tap-44 { position: relative; }
+  .tap-44::after {
+    content: "";
+    position: absolute;
+    inset: 50% 50%;
+    width: var(--touch-min);
+    height: var(--touch-min);
+    transform: translate(-50%, -50%);
+  }
+  .tap-48::after { width: var(--touch-comf); height: var(--touch-comf); }
+
+  /* Visible icon-button base — use when you want the chip itself to BE 44px. */
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: var(--touch-min); min-width: var(--touch-min);
+    border-radius: 9999px;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 150ms ease, transform 150ms ease;
+  }
+  .icon-btn:active { transform: scale(0.94); }
+
+  /* Pill segmented control row — 44px tall, ≥8px gap between segments */
+  .segmented {
+    display: inline-flex; align-items: center;
+    height: var(--touch-min);
+    background: hsl(var(--muted) / 0.6);
+    padding: 4px;
+    border-radius: 9999px;
+    box-shadow: var(--shadow-soft-inset);
+    gap: 4px;
+  }
+  .segmented > button {
+    height: calc(var(--touch-min) - 8px);
+    padding: 0 16px;
+    border-radius: 9999px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+  }
+  .segmented > button[aria-selected="true"],
+  .segmented > button[data-active="true"] {
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: var(--shadow-soft-sm);
+  }
+
+  /* ── Platform-conditional system fonts (opt-in) ── */
+  html[data-platform="ios"] .font-system {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+  }
+  html[data-platform="android"] .font-system {
+    font-family: Roboto, 'Roboto Flex', system-ui, sans-serif;
+  }
+  html[data-platform="web"] .font-system {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
 
   /* Font helpers — single family, hierarchy by weight */
   .font-display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.02em; }
