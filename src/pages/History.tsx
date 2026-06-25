@@ -191,39 +191,44 @@ const History = () => {
   return (
     <div className="min-h-dvh pb-nav bg-background screen-enter">
       {/* Header */}
-      <header className="sticky top-0 z-40 glass-header safe-top" style={{ height: "auto" }}>
-        <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
-          <img
-            src={igluLogo}
-            alt="IGLU"
-            className="h-[22px]"
-            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
-          />
+      <header
+        className="sticky top-0 z-40 glass-header"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="max-w-lg mx-auto px-3 h-14 flex items-center justify-between">
+          <div className="pl-3">
+            <img
+              src={igluLogo}
+              alt="IGLU"
+              className="h-[22px]"
+              style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+            />
+          </div>
           {tab === "historico" && purchases.length > 0 && (
-            <p className="font-body text-[11px] text-muted-foreground">
+            <p className="font-body text-[11px] text-muted-foreground pr-3">
               {fmt(purchases.reduce((s, p) => s + p.price, 0))} total
             </p>
           )}
         </div>
 
-        {/* Sub-tabs */}
-        <div className="max-w-lg mx-auto px-6 pb-3 flex gap-1 bg-muted/40 rounded-md p-1" style={{ margin: "0 24px 12px" }}>
-          <button
-            onClick={() => setTab("historico")}
-            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
-              tab === "historico" ? "bg-card text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Histórico
-          </button>
-          <button
-            onClick={() => setTab("financas")}
-            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
-              tab === "financas" ? "bg-card text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Finanças
-          </button>
+        {/* Sub-tabs — segmented 44px */}
+        <div className="max-w-lg mx-auto px-4 pb-3">
+          <div className="segmented w-full flex">
+            <button
+              onClick={() => setTab("historico")}
+              data-active={tab === "historico"}
+              className="flex-1"
+            >
+              Histórico
+            </button>
+            <button
+              onClick={() => setTab("financas")}
+              data-active={tab === "financas"}
+              className="flex-1"
+            >
+              Finanças
+            </button>
+          </div>
         </div>
       </header>
 
