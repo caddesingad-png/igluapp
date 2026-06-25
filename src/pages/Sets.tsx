@@ -214,18 +214,29 @@ const Sets = () => {
                 </p>
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-end px-1 pb-1" onClick={(e) => e.stopPropagation()}>
-                <button className="h-7 w-7 flex items-center justify-center text-muted-foreground" onClick={() => handleShare(set)}>
-                  <Share2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+              {/* Actions — 44px tap targets, ≥8px gap between adjacent buttons */}
+              <div className="flex items-center justify-end gap-1 px-1 pb-1" onClick={(e) => e.stopPropagation()}>
+                <button
+                  aria-label="Compartilhar set"
+                  className="h-11 w-11 flex items-center justify-center text-muted-foreground rounded-full active:bg-muted/60 active:scale-95 transition"
+                  onClick={() => handleShare(set)}
+                >
+                  <Share2 className="w-4 h-4" strokeWidth={1.6} />
                 </button>
-                <button className="h-7 w-7 flex items-center justify-center text-muted-foreground" onClick={() => navigate(`/sets/${set.id}/edit`)}>
-                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <button
+                  aria-label="Editar set"
+                  className="h-11 w-11 flex items-center justify-center text-muted-foreground rounded-full active:bg-muted/60 active:scale-95 transition"
+                  onClick={() => navigate(`/sets/${set.id}/edit`)}
+                >
+                  <Pencil className="w-4 h-4" strokeWidth={1.6} />
                 </button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <button className="h-7 w-7 flex items-center justify-center">
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" strokeWidth={1.5} />
+                    <button
+                      aria-label="Deletar set"
+                      className="h-11 w-11 flex items-center justify-center rounded-full active:bg-destructive/10 active:scale-95 transition"
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" strokeWidth={1.6} />
                     </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="rounded-[20px]">
