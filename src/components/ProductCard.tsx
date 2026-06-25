@@ -161,4 +161,19 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard, (prev, next) => {
+  // Re-render only when visible fields change. Equal-by-value comparison.
+  const a = prev.product, b = next.product;
+  return (
+    a.id === b.id &&
+    a.name === b.name &&
+    a.brand === b.brand &&
+    a.category === b.category &&
+    a.purchase_price === b.purchase_price &&
+    a.photo_url === b.photo_url &&
+    a.is_favorite === b.is_favorite &&
+    a.current_color === b.current_color &&
+    prev.viewMode === next.viewMode &&
+    prev.onClick === next.onClick
+  );
+});
