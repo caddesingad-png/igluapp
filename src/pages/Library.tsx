@@ -128,14 +128,15 @@ const SortableListItem = ({
         gap: "8px",
       }}
     >
-      <div
+      <button
         {...attributes}
         {...listeners}
-        className="shrink-0 w-7 h-7 flex items-center justify-center text-muted-foreground touch-none cursor-grab active:cursor-grabbing"
+        aria-label="Arrastar para reordenar"
+        className="shrink-0 h-11 w-11 flex items-center justify-center text-muted-foreground touch-none cursor-grab active:cursor-grabbing"
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical className="w-4 h-4" strokeWidth={1.5} />
-      </div>
+      </button>
       <div className="flex-1 min-w-0">
         <ProductCard product={product} viewMode="list" onClick={onClick} />
       </div>
