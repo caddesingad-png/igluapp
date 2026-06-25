@@ -88,17 +88,19 @@ const SortableGridItem = ({
         position: "relative",
       }}
     >
-      {/* Drag handle overlay (top-left) — aria-hidden so no text leaks */}
-      <div
+      {/* Drag handle — 44px hit area, visible chip 28px */}
+      <button
         {...attributes}
         {...listeners}
-        aria-hidden="true"
-        className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center rounded bg-background/60 touch-none cursor-grab active:cursor-grabbing"
+        aria-label="Arrastar para reordenar"
+        className="absolute top-1 left-1 z-10 h-11 w-11 flex items-center justify-center touch-none cursor-grab active:cursor-grabbing"
         onClick={(e) => e.stopPropagation()}
         style={{ WebkitUserSelect: "none", userSelect: "none" }}
       >
-        <GripVertical className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
-      </div>
+        <span className="h-7 w-7 rounded-full glass flex items-center justify-center">
+          <GripVertical className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+        </span>
+      </button>
       <ProductCard product={product} viewMode="grid" onClick={onClick} />
     </div>
   );
