@@ -295,29 +295,35 @@ const Library = () => {
       </header>
 
       {/* Search + filters */}
-      <div className="max-w-lg mx-auto px-6 pt-4 pb-2 space-y-3">
+      <div className="max-w-lg mx-auto px-4 pt-3 pb-2 space-y-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" strokeWidth={1.5} />
           <input
             placeholder="Buscar por nome ou marca…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-[44px] pl-9 pr-9 rounded-md border border-border bg-card text-[14px] font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors"
+            enterKeyHint="search"
+            className="w-full h-[44px] pl-9 pr-12 rounded-md border border-border bg-card text-[14px] font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <X className="w-3.5 h-3.5" />
+            <button
+              onClick={() => setSearch("")}
+              aria-label="Limpar busca"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+            >
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 pb-0.5">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 py-1 -my-1">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`shrink-0 h-8 px-3.5 rounded-sm font-body text-[12px] uppercase tracking-[0.08em] transition-colors ${
+                aria-pressed={selectedCategory === cat}
+                className={`shrink-0 h-9 px-4 rounded-full font-body text-[12px] uppercase tracking-[0.08em] transition-colors active:scale-95 ${
                   selectedCategory === cat
                     ? "bg-foreground text-btn-dark-fg"
                     : "bg-muted text-muted-foreground"
@@ -331,17 +337,18 @@ const Library = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`shrink-0 h-8 w-8 flex items-center justify-center rounded-sm transition-colors ${
+                aria-label="Ordenar produtos"
+                className={`shrink-0 h-11 w-11 flex items-center justify-center rounded-full transition-colors active:scale-95 ${
                   sortBy !== "custom" ? "bg-foreground text-btn-dark-fg" : "bg-muted text-muted-foreground"
                 }`}
               >
-                <SlidersHorizontal className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <SlidersHorizontal className="w-4 h-4" strokeWidth={1.7} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
                 {SORT_OPTIONS.map((opt) => (
-                  <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-sm font-body">
+                  <DropdownMenuRadioItem key={opt.value} value={opt.value} className="text-sm font-body py-2.5">
                     {opt.label}
                     {opt.value === "custom" && (
                       <span className="ml-1.5 text-[10px] text-muted-foreground">arraste ✦</span>
