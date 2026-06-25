@@ -186,6 +186,17 @@
     font-weight: 700;
     color: hsl(var(--foreground));
   }
+
+  /* ── Disable text-selection on tap (mobile feel) but keep inputs selectable ── */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
 
 @layer utilities {
