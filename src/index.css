@@ -2,160 +2,158 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400,500,600;9..144,400..600,100&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* ── Soft Atelier — Wellness porcelain ── */
-    --background: 32 40% 96%;          /* warm porcelain #F7F1EA */
-    --foreground: 25 18% 14%;          /* espresso suave */
+    /* ── Iglu Atelier — Warm porcelain + Rose Antique ── */
+    --background: 28 27% 95%;          /* #F7F3EF warm porcelain */
+    --foreground: 22 17% 15%;          /* #2C2420 deep espresso */
 
-    --card: 0 0% 100%;                 /* porcelana pura */
-    --card-foreground: 25 18% 14%;
+    --card: 22 56% 98%;                /* #FFFAF6 */
+    --card-foreground: 22 17% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 18% 14%;
+    --popover: 22 56% 98%;
+    --popover-foreground: 22 17% 15%;
 
-    /* Primary peach — substitui o gold seco */
-    --primary: 18 55% 68%;             /* #E8A88A */
-    --primary-foreground: 25 22% 16%;
+    /* Primary — Rose Antique */
+    --primary: 9 38% 67%;              /* #C9928A */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 32 35% 94%;
-    --secondary-foreground: 25 18% 14%;
+    --secondary: 30 30% 92%;
+    --secondary-foreground: 22 17% 15%;
 
-    --muted: 32 25% 92%;               /* #ECE5DC */
-    --muted-foreground: 25 10% 45%;    /* #7B736C */
+    --muted: 28 24% 90%;               /* #EDE5DE neumorphic surface */
+    --muted-foreground: 18 11% 57%;    /* #9E8E87 warm taupe */
 
-    --accent: 340 50% 92%;             /* blush soft */
-    --accent-foreground: 25 18% 14%;
+    --accent: 33 41% 71%;              /* #D4B896 champagne gold */
+    --accent-foreground: 22 17% 15%;
 
     --destructive: 6 60% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 20% 88%;              /* hairline porcelana */
-    --input: 30 25% 92%;
-    --ring: 18 55% 72%;
+    --border: 28 20% 86%;
+    --input: 28 20% 88%;
+    --ring: 9 38% 67%;
 
-    --radius: 1.25rem;                 /* 20px — soft */
+    --radius: 1.25rem;
 
-    /* Sidebar (mantido para shadcn) */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 25 18% 14%;
-    --sidebar-primary: 18 55% 68%;
-    --sidebar-primary-foreground: 25 18% 14%;
-    --sidebar-accent: 32 25% 92%;
-    --sidebar-accent-foreground: 25 18% 14%;
-    --sidebar-border: 30 20% 88%;
-    --sidebar-ring: 18 55% 72%;
+    --sidebar-background: 22 56% 98%;
+    --sidebar-foreground: 22 17% 15%;
+    --sidebar-primary: 9 38% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 28 24% 90%;
+    --sidebar-accent-foreground: 22 17% 15%;
+    --sidebar-border: 28 20% 86%;
+    --sidebar-ring: 9 38% 67%;
 
-    /* ── Aurora accents ── */
-    --aura-peach:  18 80% 82%;         /* #FAC9A8 */
-    --aura-blush: 340 65% 88%;         /* #F4CFDB */
-    --aura-mist:  170 35% 86%;         /* #C9E4DD */
-    --aura-cream:  42 60% 92%;         /* #F7EBD5 */
+    /* Aurora soft accents (kept for ambient background) */
+    --aura-peach:  14 60% 86%;
+    --aura-blush:   9 50% 88%;
+    --aura-mist:   33 45% 88%;
+    --aura-cream:  28 50% 92%;
 
-    /* Gold preservado como acento secundário (favoritos, selos) */
-    --accent-gold: 38 47% 60%;         /* #C9A96E */
+    /* Champagne gold (premium accents) */
+    --accent-gold: 33 41% 65%;
+    --rose-antique: 9 38% 67%;
+    --text-tertiary: 22 18% 71%;       /* #BFB0AA */
 
-    /* Compat tokens existentes */
-    --rose-glow: 18 55% 68%;
-    --nude: 32 40% 96%;
-    --blush: 340 50% 92%;
-    --btn-primary-bg: 25 18% 14%;
-    --btn-primary-fg: 32 40% 96%;
+    --rose-glow: 9 38% 67%;
+    --nude: 28 27% 95%;
+    --blush: 9 50% 88%;
+    --btn-primary-bg: 22 17% 15%;
+    --btn-primary-fg: 28 27% 95%;
 
-    /* Status — versão pastel */
     --status-green:  155 30% 60%;
     --status-yellow:  38 60% 70%;
     --status-red:    6 60% 68%;
 
-    /* ── Soft shadows (neumorphic dupla) ── */
+    /* Soft neumorphic shadows (light shadow + light highlight) */
     --shadow-soft:
-      8px 8px 24px hsl(25 25% 65% / 0.16),
-      -8px -8px 24px hsl(0 0% 100% / 0.92);
+      4px 4px 10px hsl(22 14% 75% / 0.55),
+      -4px -4px 10px hsl(0 0% 100% / 0.95);
     --shadow-soft-sm:
-      4px 4px 12px hsl(25 25% 65% / 0.12),
-      -4px -4px 12px hsl(0 0% 100% / 0.85);
+      2px 2px 6px hsl(22 14% 75% / 0.45),
+      -2px -2px 6px hsl(0 0% 100% / 0.9);
     --shadow-soft-inset:
-      inset 3px 3px 8px hsl(25 25% 65% / 0.18),
-      inset -3px -3px 8px hsl(0 0% 100% / 0.9);
-    --shadow-glass: 0 8px 32px hsl(25 30% 35% / 0.10);
-    --shadow-glass-lg: 0 16px 48px hsl(25 30% 35% / 0.14);
+      inset 3px 3px 6px hsl(22 14% 75% / 0.5),
+      inset -3px -3px 6px hsl(0 0% 100% / 0.95);
+    --shadow-glass:    0 8px 32px hsl(9 35% 45% / 0.12);
+    --shadow-glass-lg: 0 12px 40px hsl(9 35% 45% / 0.16);
+    --shadow-rose-glow: 0 4px 15px hsl(9 38% 67% / 0.4);
   }
 
   .dark {
-    --background: 25 18% 9%;           /* noite morna */
-    --foreground: 32 25% 92%;
-    --card: 25 15% 13%;
-    --card-foreground: 32 25% 92%;
-    --popover: 25 15% 13%;
-    --popover-foreground: 32 25% 92%;
-    --primary: 18 55% 65%;
-    --primary-foreground: 25 18% 9%;
-    --secondary: 25 12% 18%;
-    --secondary-foreground: 32 25% 92%;
-    --muted: 25 10% 18%;
-    --muted-foreground: 32 8% 60%;
-    --accent: 340 30% 22%;
-    --accent-foreground: 32 25% 92%;
+    --background: 22 17% 9%;
+    --foreground: 28 27% 92%;
+    --card: 22 14% 13%;
+    --card-foreground: 28 27% 92%;
+    --popover: 22 14% 13%;
+    --popover-foreground: 28 27% 92%;
+    --primary: 9 38% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 22 12% 18%;
+    --secondary-foreground: 28 27% 92%;
+    --muted: 22 10% 18%;
+    --muted-foreground: 18 10% 60%;
+    --accent: 33 30% 30%;
+    --accent-foreground: 28 27% 92%;
     --destructive: 6 60% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 25 10% 22%;
-    --input: 25 10% 22%;
-    --ring: 18 55% 65%;
-    --sidebar-background: 25 18% 9%;
-    --sidebar-foreground: 32 25% 92%;
-    --sidebar-primary: 18 55% 65%;
-    --sidebar-primary-foreground: 25 18% 9%;
-    --sidebar-accent: 25 12% 18%;
-    --sidebar-accent-foreground: 32 25% 92%;
-    --sidebar-border: 25 10% 22%;
-    --sidebar-ring: 18 55% 65%;
+    --border: 22 10% 22%;
+    --input: 22 10% 22%;
+    --ring: 9 38% 67%;
+    --sidebar-background: 22 17% 9%;
+    --sidebar-foreground: 28 27% 92%;
+    --sidebar-primary: 9 38% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 22 12% 18%;
+    --sidebar-accent-foreground: 28 27% 92%;
+    --sidebar-border: 22 10% 22%;
+    --sidebar-ring: 9 38% 67%;
 
-    --aura-peach:  18 50% 35%;
-    --aura-blush: 340 35% 30%;
-    --aura-mist:  170 25% 28%;
-    --aura-cream:  42 30% 32%;
-    --accent-gold: 38 47% 60%;
+    --aura-peach: 14 40% 32%;
+    --aura-blush:  9 35% 30%;
+    --aura-mist:  33 25% 28%;
+    --aura-cream: 28 30% 30%;
+    --accent-gold: 33 41% 60%;
+    --text-tertiary: 22 12% 50%;
 
-    --rose-glow: 18 55% 65%;
-    --nude: 25 12% 18%;
-    --blush: 340 30% 22%;
-    --btn-primary-bg: 32 25% 92%;
-    --btn-primary-fg: 25 18% 9%;
+    --rose-glow: 9 38% 67%;
+    --nude: 22 12% 18%;
+    --blush: 9 35% 30%;
+    --btn-primary-bg: 28 27% 92%;
+    --btn-primary-fg: 22 17% 9%;
 
     --shadow-soft:
-      8px 8px 24px hsl(0 0% 0% / 0.45),
-      -8px -8px 24px hsl(32 15% 18% / 0.4);
+      4px 4px 10px hsl(0 0% 0% / 0.45),
+      -4px -4px 10px hsl(28 15% 18% / 0.4);
     --shadow-soft-sm:
-      4px 4px 12px hsl(0 0% 0% / 0.4),
-      -4px -4px 12px hsl(32 15% 18% / 0.35);
+      2px 2px 6px hsl(0 0% 0% / 0.4),
+      -2px -2px 6px hsl(28 15% 18% / 0.35);
     --shadow-soft-inset:
-      inset 3px 3px 8px hsl(0 0% 0% / 0.4),
-      inset -3px -3px 8px hsl(32 15% 18% / 0.35);
+      inset 3px 3px 6px hsl(0 0% 0% / 0.4),
+      inset -3px -3px 6px hsl(28 15% 18% / 0.35);
     --shadow-glass: 0 8px 32px hsl(0 0% 0% / 0.45);
-    --shadow-glass-lg: 0 16px 48px hsl(0 0% 0% / 0.55);
+    --shadow-glass-lg: 0 12px 40px hsl(0 0% 0% / 0.55);
+    --shadow-rose-glow: 0 4px 15px hsl(9 38% 50% / 0.5);
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
-  html, body {
-    background: hsl(var(--background));
-  }
+  html, body { background: hsl(var(--background)); }
 
   body {
     @apply text-foreground antialiased;
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-weight: 400;
     position: relative;
     min-height: 100dvh;
   }
 
-  /* ── A AURA ── gradiente radial fixo, blur enorme, vive atrás de tudo */
+  /* Soft aurora — quieter, warmer */
   body::before {
     content: "";
     position: fixed;
@@ -163,100 +161,109 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(38vmax 32vmax at 12% 8%,  hsl(var(--aura-peach) / 0.65), transparent 65%),
-      radial-gradient(34vmax 30vmax at 92% 22%, hsl(var(--aura-blush) / 0.55), transparent 68%),
-      radial-gradient(40vmax 36vmax at 78% 96%, hsl(var(--aura-mist)  / 0.50), transparent 70%),
-      radial-gradient(30vmax 28vmax at 18% 88%, hsl(var(--aura-cream) / 0.55), transparent 70%);
-    filter: blur(60px) saturate(110%);
-    opacity: 0.9;
+      radial-gradient(40vmax 32vmax at 10% 6%,  hsl(var(--aura-peach) / 0.55), transparent 65%),
+      radial-gradient(36vmax 30vmax at 94% 18%, hsl(var(--aura-blush) / 0.45), transparent 68%),
+      radial-gradient(42vmax 36vmax at 82% 96%, hsl(var(--aura-mist)  / 0.40), transparent 72%),
+      radial-gradient(32vmax 28vmax at 14% 88%, hsl(var(--aura-cream) / 0.50), transparent 72%);
+    filter: blur(70px) saturate(108%);
+    opacity: 0.85;
   }
 
-  .dark body::before {
-    opacity: 0.55;
-    filter: blur(70px) saturate(120%);
-  }
+  .dark body::before { opacity: 0.5; filter: blur(80px) saturate(115%); }
 
+  /* Titles use the same Plus Jakarta Sans — hierarchy via weight only */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
-    font-variation-settings: "opsz" 96, "SOFT" 100;
-    letter-spacing: -0.01em;
-    font-weight: 500;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    color: hsl(var(--foreground));
   }
 }
 
 @layer utilities {
   /* ── Glass surfaces ── */
   .glass {
-    background: hsl(0 0% 100% / 0.65);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid hsl(0 0% 100% / 0.6);
+    background: hsl(22 56% 98% / 0.75);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid hsl(0 0% 100% / 0.5);
   }
   .dark .glass {
-    background: hsl(25 15% 13% / 0.55);
-    border-color: hsl(32 15% 30% / 0.3);
+    background: hsl(22 14% 13% / 0.6);
+    border-color: hsl(28 15% 30% / 0.3);
   }
 
   .glass-header {
-    background: linear-gradient(180deg, hsl(var(--background) / 0.72), hsl(var(--background) / 0.45));
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%);
-    border-bottom: 1px solid hsl(0 0% 100% / 0.5);
+    background: hsl(var(--background) / 0.85);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid hsl(9 38% 67% / 0.12);
   }
-  .dark .glass-header {
-    border-bottom-color: hsl(32 15% 30% / 0.3);
-  }
+  .dark .glass-header { border-bottom-color: hsl(28 15% 30% / 0.3); }
 
   .glass-panel {
-    background: hsl(0 0% 100% / 0.7);
+    background: hsl(22 56% 98% / 0.7);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
     backdrop-filter: blur(16px) saturate(150%);
     border: 1px solid hsl(0 0% 100% / 0.55);
   }
   .dark .glass-panel {
-    background: hsl(25 15% 13% / 0.6);
-    border-color: hsl(32 15% 30% / 0.25);
+    background: hsl(22 14% 13% / 0.6);
+    border-color: hsl(28 15% 30% / 0.25);
   }
 
-  /* ── Soft / neumorphic shadows ── */
   .shadow-soft       { box-shadow: var(--shadow-soft); }
   .shadow-soft-sm    { box-shadow: var(--shadow-soft-sm); }
   .shadow-soft-inset { box-shadow: var(--shadow-soft-inset); }
   .shadow-glass      { box-shadow: var(--shadow-glass); }
   .shadow-glass-lg   { box-shadow: var(--shadow-glass-lg); }
+  .shadow-rose-glow  { box-shadow: var(--shadow-rose-glow); }
 
-  /* Porcelana — superfície tátil padrão de cards */
+  /* Porcelain card — frosted glass */
   .surface-porcelain {
-    background: hsl(0 0% 100% / 0.82);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    box-shadow: var(--shadow-soft-sm);
-    border-radius: 1.25rem;
-    transition: box-shadow 200ms ease, transform 200ms ease;
+    background: hsl(22 56% 98% / 0.75);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid hsl(0 0% 100% / 0.5);
+    box-shadow: 0 8px 32px hsl(9 35% 45% / 0.12);
+    border-radius: 20px;
+    transition: box-shadow 200ms ease, transform 150ms ease;
   }
   .surface-porcelain:active {
     box-shadow: var(--shadow-soft-inset);
-    transform: scale(0.995);
+    transform: scale(0.985);
   }
   .dark .surface-porcelain {
-    background: hsl(25 15% 14% / 0.72);
+    background: hsl(22 14% 14% / 0.72);
+    border-color: hsl(28 15% 30% / 0.3);
   }
 
-  /* Pebble — botão primary pílula gradiente peach→blush */
-  .pebble {
-    background: linear-gradient(135deg, hsl(var(--aura-peach)), hsl(var(--aura-blush)));
-    color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-soft-sm);
+  /* Neumorphic surface — for pills, icon buttons */
+  .surface-neu {
+    background: hsl(var(--muted));
+    box-shadow: var(--shadow-soft);
     border-radius: 9999px;
-    transition: box-shadow 180ms ease, transform 180ms ease;
+    transition: box-shadow 180ms ease, transform 150ms ease;
   }
-  .pebble:hover { box-shadow: var(--shadow-soft); }
-  .pebble:active { box-shadow: var(--shadow-soft-inset); transform: scale(0.98); }
+  .surface-neu:active {
+    box-shadow: var(--shadow-soft-inset);
+    transform: scale(0.97);
+  }
+
+  /* Rose pebble — primary CTA gradient */
+  .pebble {
+    background: linear-gradient(135deg, hsl(9 38% 67%), hsl(12 42% 72%));
+    color: #FFFFFF;
+    box-shadow: var(--shadow-rose-glow);
+    border-radius: 16px;
+    transition: box-shadow 180ms ease, transform 150ms ease, filter 180ms ease;
+  }
+  .pebble:hover  { filter: brightness(1.03); box-shadow: 0 6px 20px hsl(9 38% 67% / 0.5); }
+  .pebble:active { transform: scale(0.97); box-shadow: var(--shadow-soft-inset); }
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* ── Safe-area utilities ── */
   .safe-top    { padding-top: env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .safe-x {
@@ -264,38 +271,53 @@
     padding-right: env(safe-area-inset-right);
   }
   .min-h-dvh { min-height: 100dvh; }
-  /* Pílula BottomNav flutuante: ~72px + offset */
   .pb-nav { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
 
-  /* Font helpers */
-  .font-display {
-    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
-    font-variation-settings: "opsz" 96, "SOFT" 100;
-    letter-spacing: -0.01em;
-  }
-  .font-body { font-family: 'DM Sans', system-ui, sans-serif; }
+  /* Font helpers — single family, hierarchy by weight */
+  .font-display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.02em; }
+  .font-body    { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
   .font-tabular { font-feature-settings: "tnum" 1, "lnum" 1; }
-  .label-overline {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: hsl(var(--muted-foreground));
-  }
 
-  /* Press/transitions */
-  .card-press { transition: transform 180ms ease, box-shadow 180ms ease; }
+  /* Typographic roles */
+  .t-screen-title   { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; color: hsl(var(--foreground)); }
+  .t-section-header { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  .t-card-title     { font-size: 16px; font-weight: 600; letter-spacing: -0.1px; color: hsl(var(--foreground)); }
+  .t-brand          { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  .t-body           { font-size: 14px; font-weight: 400; line-height: 1.5; color: hsl(var(--muted-foreground)); }
+  .t-price          { font-size: 15px; font-weight: 700; letter-spacing: 0.01em; color: hsl(var(--rose-antique)); }
+  .t-stat-num       { font-size: 22px; font-weight: 700; color: hsl(var(--foreground)); }
+  .t-stat-label     { font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: hsl(var(--muted-foreground)); }
+  .t-meta           { font-size: 12px; font-weight: 400; color: hsl(var(--text-tertiary)); }
+  .t-cta            { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+  .label-overline   { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+
+  .card-press { transition: transform 150ms ease, box-shadow 180ms ease; }
   .card-press:active { transform: scale(0.985); }
 
-  .screen-enter { animation: screen-fade 240ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .screen-enter { animation: screen-fade 200ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-  .btn-press { transition: opacity 120ms ease, box-shadow 180ms ease, transform 180ms ease; }
-  .btn-press:active { opacity: 0.92; transform: scale(0.985); }
+  .btn-press { transition: opacity 120ms ease, box-shadow 180ms ease, transform 150ms ease; }
+  .btn-press:active { opacity: 0.94; transform: scale(0.97); }
+
+  /* Staggered card entrance */
+  .stagger-in > * { animation: card-rise 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .stagger-in > *:nth-child(1)  { animation-delay:  20ms; }
+  .stagger-in > *:nth-child(2)  { animation-delay:  80ms; }
+  .stagger-in > *:nth-child(3)  { animation-delay: 140ms; }
+  .stagger-in > *:nth-child(4)  { animation-delay: 200ms; }
+  .stagger-in > *:nth-child(5)  { animation-delay: 260ms; }
+  .stagger-in > *:nth-child(6)  { animation-delay: 320ms; }
+  .stagger-in > *:nth-child(7)  { animation-delay: 380ms; }
+  .stagger-in > *:nth-child(8)  { animation-delay: 440ms; }
 }
 
 @keyframes screen-fade {
   from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -317,7 +339,6 @@
   animation: shimmer-glow 1.8s ease-in-out infinite;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   body::before { filter: blur(40px); opacity: 0.6; }
   *, *::before, *::after {
