@@ -9,7 +9,6 @@ const tabs = [
   { path: "/profile", label: "Perfil", icon: User },
 ];
 
-// Prefetch route modules on hover/focus
 const prefetchedRoutes = new Set<string>();
 const routeModules: Record<string, () => Promise<unknown>> = {
   "/library": () => import("@/pages/Library"),
@@ -29,62 +28,69 @@ const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const activeIndex = Math.max(0, tabs.findIndex((t) => t.path === location.pathname));
-
   return (
     <nav
-      className="fixed left-0 right-0 z-50 safe-x flex justify-center pointer-events-none"
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
+      className="fixed left-0 right-0 bottom-0 z-50 safe-x"
+      style={{
+        background: "hsl(28 27% 95% / 0.85)",
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        borderTop: "1px solid hsl(9 38% 67% / 0.15)",
+      }}
     >
       <div
-        className="glass shadow-glass-lg rounded-full pointer-events-auto relative px-2"
-        style={{ height: "64px", width: "min(92vw, 28rem)" }}
+        className="flex items-center justify-around px-2"
+        style={{
+          height: "72px",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
       >
-        {/* Indicador "poço" neumórfico que desliza */}
-        <div
-          className="absolute top-1.5 bottom-1.5 rounded-full transition-all duration-300 ease-out"
-          style={{
-            width: `calc(${100 / tabs.length}% - 8px)`,
-            left: `calc(${(activeIndex * 100) / tabs.length}% + 4px)`,
-            background: "linear-gradient(135deg, hsl(var(--aura-peach) / 0.55), hsl(var(--aura-blush) / 0.45))",
-            boxShadow: "var(--shadow-soft-inset)",
-          }}
-          aria-hidden
-        />
-
-        <div className="relative flex items-center justify-around h-full">
-          {tabs.map(({ path, label, icon: Icon }) => {
-            const isActive = location.pathname === path;
-            return (
-              <button
-                key={path}
-                onClick={() => navigate(path)}
-                onPointerEnter={() => prefetchRoute(path)}
-                onFocus={() => prefetchRoute(path)}
-                className="flex flex-col items-center justify-center flex-1 h-full gap-0.5 z-10 focus-visible:outline-none"
-                aria-label={label}
-                aria-current={isActive ? "page" : undefined}
+        {tabs.map(({ path, label, icon: Icon }) => {
+          const isActive = location.pathname === path;
+          return (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              onPointerEnter={() => prefetchRoute(path)}
+              onFocus={() => prefetchRoute(path)}
+              className="flex flex-col items-center justify-center flex-1 gap-1 btn-press focus-visible:outline-none"
+              aria-label={label}
+              aria-current={isActive ? "page" : undefined}
+            >
+              <div
+                className="flex items-center justify-center transition-all duration-200"
+                style={{
+                  height: "36px",
+                  padding: isActive ? "0 14px" : "0 10px",
+                  borderRadius: "9999px",
+                  background: isActive
+                    ? "linear-gradient(135deg, hsl(9 38% 67%), hsl(12 42% 72%))"
+                    : "transparent",
+                  boxShadow: isActive ? "0 4px 15px hsl(9 38% 67% / 0.35)" : "none",
+                }}
               >
                 <Icon
-                  className="w-[18px] h-[18px] transition-colors"
+                  className="w-[18px] h-[18px]"
                   style={{
-                    color: isActive ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground) / 0.7)",
-                    strokeWidth: isActive ? 2 : 1.6,
+                    color: isActive ? "#FFFFFF" : "hsl(18 11% 57%)",
+                    strokeWidth: isActive ? 2.2 : 1.8,
                   }}
                 />
-                <span
-                  className="font-body text-[9px] tracking-[0.06em] transition-colors"
-                  style={{
-                    color: isActive ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground) / 0.7)",
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  {label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+              </div>
+              <span
+                className="font-body transition-colors"
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  color: isActive ? "hsl(9 38% 55%)" : "hsl(18 11% 57%)",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );

@@ -96,8 +96,9 @@ export default {
         "glass-lg": "var(--shadow-glass-lg)",
       },
       fontFamily: {
-        display: ["'Fraunces'", "'Playfair Display'", "Georgia", "serif"],
-        body: ["'DM Sans'", "system-ui", "sans-serif"],
+        display: ["'Plus Jakarta Sans'", "system-ui", "sans-serif"],
+        body: ["'Plus Jakarta Sans'", "system-ui", "sans-serif"],
+        sans: ["'Plus Jakarta Sans'", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
