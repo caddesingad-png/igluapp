@@ -107,42 +107,48 @@ const Sets = () => {
   return (
     <div className="min-h-dvh pb-nav bg-background screen-enter">
       {/* Header */}
-      <header className="sticky top-0 z-40 glass-header safe-top" style={{ height: "auto" }}>
-        <div className="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
-          <img
-            src={igluLogo}
-            alt="IGLU"
-            className="h-[22px]"
-            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
-          />
+      <header
+        className="sticky top-0 z-40 glass-header"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="max-w-lg mx-auto px-3 h-14 flex items-center justify-between">
+          <div className="pl-3">
+            <img
+              src={igluLogo}
+              alt="IGLU"
+              className="h-[22px]"
+              style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+            />
+          </div>
           {tab === "my" && (
             <button
               onClick={() => navigate("/sets/new")}
-              className="w-8 h-8 flex items-center justify-center text-foreground"
+              aria-label="Criar set"
+              className="h-11 w-11 flex items-center justify-center rounded-full text-foreground active:bg-muted/60 active:scale-95 transition"
             >
-              <Plus className="w-[20px] h-[20px]" strokeWidth={1.5} />
+              <Plus className="w-5 h-5" strokeWidth={2} />
             </button>
           )}
         </div>
 
-        {/* Sub-tabs */}
-        <div className="max-w-lg mx-auto px-6 pb-3 flex gap-1 bg-muted/40 mx-6 rounded-md p-1" style={{ margin: "0 24px 12px" }}>
-          <button
-            onClick={() => setTab("my")}
-            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
-              tab === "my" ? "bg-card text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Meus SETs
-          </button>
-          <button
-            onClick={() => setTab("discover")}
-            className={`flex-1 py-2 rounded-sm font-body text-[12px] font-medium transition-colors ${
-              tab === "discover" ? "bg-card text-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Descobrir
-          </button>
+        {/* Sub-tabs — segmented control with 44px height */}
+        <div className="max-w-lg mx-auto px-4 pb-3">
+          <div className="segmented w-full flex">
+            <button
+              onClick={() => setTab("my")}
+              data-active={tab === "my"}
+              className="flex-1"
+            >
+              Meus SETs
+            </button>
+            <button
+              onClick={() => setTab("discover")}
+              data-active={tab === "discover"}
+              className="flex-1"
+            >
+              Descobrir
+            </button>
+          </div>
         </div>
       </header>
 
