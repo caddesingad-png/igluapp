@@ -81,6 +81,7 @@ const SortableGridItem = ({
   return (
     <div
       ref={setNodeRef}
+      className="h-full"
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
