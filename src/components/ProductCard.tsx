@@ -88,7 +88,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
   }
 
   return (
-    <div onClick={onClick} className="surface-porcelain card-press overflow-hidden cursor-pointer">
+    <div onClick={onClick} className="surface-porcelain card-press overflow-hidden cursor-pointer h-full flex flex-col">
       {product.photo_url ? (
         <div className="relative aspect-square overflow-hidden" style={{ borderRadius: "20px 20px 0 0", background: "hsl(28 24% 90% / 0.6)" }}>
           <ShimmerImage
