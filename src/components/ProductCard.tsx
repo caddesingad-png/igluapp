@@ -44,7 +44,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
 
   if (viewMode === "list") {
     return (
-      <div onClick={onClick} className="surface-porcelain card-press flex items-center gap-3 p-3 cursor-pointer">
+      <div onClick={onClick} className="surface-porcelain card-press flex items-center gap-4 p-4 cursor-pointer">
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 relative"
           style={{ background: "hsl(28 24% 90%)", boxShadow: "var(--shadow-soft-inset)" }}
@@ -137,7 +137,7 @@ const ProductCard = ({ product, viewMode = "grid", onClick }: ProductCardProps) 
         </div>
       )}
 
-      <div className="p-3.5 flex-1 flex flex-col">
+      <div className="p-4 flex-1 flex flex-col">
         <p className="t-brand truncate">{product.brand}</p>
         <p className="t-card-title truncate mt-1 leading-tight">{product.name}</p>
         <div className="flex items-center justify-between mt-2.5 gap-2">
