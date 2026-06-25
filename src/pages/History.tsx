@@ -339,8 +339,12 @@ const History = () => {
           <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px rgba(26,23,20,0.06)" }}>
             <div className="flex items-center justify-between mb-4">
               <p className="font-display text-[16px] font-normal text-foreground">Orçamento mensal</p>
-              <button className="text-muted-foreground" onClick={() => { setEditingBudget((v) => !v); setBudgetInput(String(monthlyBudget ?? "")); }}>
-                <Pencil className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <button
+                aria-label={editingBudget ? "Fechar edição" : "Editar orçamento"}
+                className="h-11 w-11 -mr-2 flex items-center justify-center rounded-full text-muted-foreground active:bg-muted/60 active:scale-95 transition"
+                onClick={() => { setEditingBudget((v) => !v); setBudgetInput(String(monthlyBudget ?? "")); }}
+              >
+                <Pencil className="w-4 h-4" strokeWidth={1.6} />
               </button>
             </div>
             {editingBudget ? (
