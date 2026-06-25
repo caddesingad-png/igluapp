@@ -425,7 +425,8 @@ const Library = () => {
                 strategy={viewMode === "grid" ? rectSortingStrategy : verticalListSortingStrategy}
               >
                 {viewMode === "grid" ? (
-                  <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
+                  <div className="grid grid-cols-2 gap-3 auto-rows-fr items-stretch">
+
                     {filtered.map((product) => (
                       <SortableGridItem
                         key={product.id}
