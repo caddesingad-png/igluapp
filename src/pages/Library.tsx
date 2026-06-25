@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Plus, LayoutGrid, List, Search, SlidersHorizontal, X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import IconButton from "@/components/IconButton";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
