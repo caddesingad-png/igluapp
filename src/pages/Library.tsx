@@ -81,6 +81,7 @@ const SortableGridItem = ({
   return (
     <div
       ref={setNodeRef}
+      className="h-full"
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -425,7 +426,8 @@ const Library = () => {
                 strategy={viewMode === "grid" ? rectSortingStrategy : verticalListSortingStrategy}
               >
                 {viewMode === "grid" ? (
-                  <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
+                  <div className="grid grid-cols-2 gap-3 auto-rows-fr items-stretch">
+
                     {filtered.map((product) => (
                       <SortableGridItem
                         key={product.id}
@@ -449,7 +451,7 @@ const Library = () => {
             </DndContext>
           ) : (
             viewMode === "grid" ? (
-              <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
+              <div className="grid grid-cols-2 gap-3 auto-rows-fr items-stretch">
                 {filtered.map((product) => (
                   <ProductCard key={product.id} product={product} viewMode="grid" onClick={() => navigate(`/product/${product.id}`)} />
                 ))}
