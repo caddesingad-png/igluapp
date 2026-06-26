@@ -204,6 +204,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          deletion_scheduled_at: string | null
           display_name: string | null
           id: string
           monthly_budget: number | null
@@ -215,6 +216,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          deletion_scheduled_at?: string | null
           display_name?: string | null
           id?: string
           monthly_budget?: number | null
@@ -226,6 +228,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          deletion_scheduled_at?: string | null
           display_name?: string | null
           id?: string
           monthly_budget?: number | null
@@ -514,6 +517,12 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      purge_scheduled_accounts: {
+        Args: never
+        Returns: {
+          purged_user_id: string
+        }[]
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
