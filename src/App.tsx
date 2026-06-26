@@ -85,15 +85,15 @@ const AppRoutes = () => {
     );
   }
 
-  // Rotas públicas de fluxo de senha — funcionam independentemente do estado de auth
-  // (reset-password é acessado via link de e-mail e cria sessão temporária)
+  // Rotas públicas de fluxo de senha / callback de auth
   const path = window.location.pathname;
   const isPasswordFlow = path === "/forgot-password" || path === "/reset-password";
+  const isAuthCallback = path === "/auth/callback";
   const isLegalPage = path === "/termos" || path === "/privacidade";
 
   // Não logada: mostrar onboarding primeiro, depois auth
   if (!user) {
-    if (!preAuthOnboardingDone && !isPasswordFlow && !isLegalPage) {
+    if (!preAuthOnboardingDone && !isPasswordFlow && !isLegalPage && !isAuthCallback) {
       return (
         <Onboarding
           preAuth
@@ -107,6 +107,7 @@ const AppRoutes = () => {
         <Route path="/privacidade" element={<Privacy />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/sets/:id/public" element={<PublicSetView />} />
         <Route path="*" element={<Auth />} />
       </Routes>
@@ -114,11 +115,21 @@ const AppRoutes = () => {
   }
 
   // Logada via link de recovery — vai direto para definir nova senha
-  if (isPasswordFlow) {
+  if (isRecoveryFlow || isPasswordFlow) {
     return (
       <Routes>
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="*" element={<ResetPassword />} />
+      </Routes>
+    );
+  }
+
+  // Auth callback enquanto logada — deixa a página finalizar redirect
+  if (isAuthCallback) {
+    return (
+      <Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     );
   }
