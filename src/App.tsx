@@ -26,6 +26,7 @@ import UserProfile from "./pages/UserProfile";
 import ProductReview from "./pages/ProductReview";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AuthCallback from "./pages/AuthCallback";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 
