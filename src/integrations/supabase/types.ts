@@ -518,6 +518,12 @@ export type Database = {
         }
         Returns: number
       }
+      purge_scheduled_accounts: {
+        Args: never
+        Returns: {
+          purged_user_id: string
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
