@@ -31,6 +31,15 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<Provider | null>(null);
 
+  // Sempre redireciona para o domínio público do app, nunca para a URL do preview/editor.
+  const getAppOrigin = () => {
+    const origin = window.location.origin;
+    if (origin.includes("id-preview--") || origin.includes("lovableproject.com")) {
+      return "https://igluapp.lovable.app";
+    }
+    return origin;
+  };
+
   const handleOAuth = async (provider: Provider) => {
     // Para cadastro, exigir aceite de termos
     if (!isLogin && !acceptedTerms) {
@@ -40,7 +49,7 @@ const Auth = () => {
     setOauthLoading(provider);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: getAppOrigin(),
       });
       if (result.error) {
         toast.error(translateError(result.error.message || `Falha ao entrar com ${provider}.`));
@@ -72,7 +81,7 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: getAppOrigin() },
         });
         if (error) throw error;
         toast.success("Confira seu e-mail para confirmar a conta ✨");
