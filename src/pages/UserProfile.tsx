@@ -187,7 +187,7 @@ const UserProfile = () => {
     try {
       const { error } = await supabase.functions.invoke("delete-account", { body: {} });
       if (error) throw error;
-      toast.success("Conta excluída. Sentiremos sua falta. 💌");
+      toast.success("Conta agendada para exclusão em 90 dias. Você será deslogada agora. 💌");
       await supabase.auth.signOut();
       navigate("/auth", { replace: true });
     } catch (err: any) {
