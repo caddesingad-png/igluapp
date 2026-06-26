@@ -1,72 +1,70 @@
-## Diagnóstico (do que encontrei agora)
+## Estado atual da segurança
 
-**🔴 Crítico**
-1. **Tabela `profiles` exposta publicamente** — política `USING (true)` expõe `monthly_budget` (dado financeiro), `bio`, `display_name`, `avatar_url`, `onboarding_completed` para qualquer pessoa não autenticada. Vazamento de dados real.
-2. **Bucket `product-photos` público com listing aberto** — qualquer um consegue listar todos os arquivos de todos os usuários (não só ler por URL conhecida).
-3. **Edge functions `identify-product` e `review-product` com `verify_jwt = false`** — chamáveis sem login, podem ser abusadas para drenar créditos da Lovable AI por terceiros.
+Boa notícia: o trabalho da última rodada deixou o app em ótimo estado. Validei agora:
 
-**🟡 Médio**
-4. Funções `SECURITY DEFINER` com `EXECUTE` aberto a `anon`/`authenticated` (lint Supabase 0028/0029).
-5. **HIBP (senhas vazadas)** — não está confirmado como ativo nas configurações do Auth.
-6. Edge function `delete-account` valida JWT manualmente — ok, mas pode ser endurecida com rate-limit.
-7. Sem **CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy** no `index.html` (ajuda contra XSS, clickjacking e melhora reputação do domínio).
+- **Linter do banco**: 0 problemas.
+- **Dependências npm**: 0 vulnerabilidades high/critical.
+- **Scan fresco anterior**: só 3 warns informativos (avatares públicos por design, contagem de likes em sets públicos).
 
-**🟢 Reputação de e-mail (Google "perigoso/suspeito")**
-8. E-mails de confirmação saem do domínio padrão do Supabase (`*.supabase.co`) sem SPF/DKIM/DMARC do seu domínio → Gmail marca como suspeito ou joga no spam.
-9. Sem template de e-mail com marca IGLU + link de domínio próprio confiável.
-10. Sem páginas públicas de `/termos` e `/privacidade` indexáveis (Google Safe Browsing valoriza isso).
+Mas o painel ainda mostra findings antigos porque ninguém os marcou como resolvidos. E descobri **1 bug real** que escapou.
 
----
+## O que vou fazer
 
-## Plano de correção (em fases, sem quebrar nada)
+### 1. Corrigir bug real — política de upload de avatar (warn, mas explorável)
 
-### Fase 1 — Vazamento de dados (URGENTE)
-- **Migration**: substituir a policy `Public profiles are viewable by anyone` por:
-  - Manter `profiles_public` view (já existe) como única superfície pública, com `SELECT` só de `display_name`, `avatar_url`, `bio`.
-  - Na tabela `profiles`: SELECT apenas `auth.uid() = user_id`. Remover policy `true`.
-- Auditar componentes que leem `profiles` direto (Discover, UserProfile) e migrar para `profiles_public`.
+Hoje a política do bucket faz:
+```
+auth.uid()::text = replace(storage.filename(name), '.jpg', '')
+```
+Isso só remove `.jpg`. Se o usuário A subir `avatars/<uid-do-B>.png` (ou `.webp`), o `replace` não tira nada, e como `<uid-do-B>.png ≠ <uid-do-A>`, a checagem falha — **bom no INSERT**, mas o problema é o inverso: A pode subir `avatars/<uid-do-A>.png` e depois um arquivo chamado literalmente `<uid-do-A>` (sem extensão) para qualquer caminho que comece com `avatars/`, e variações com outras extensões aceitam só se o nome bater. O risco real é overwrite por colisão de nomes em extensões não previstas + inconsistência com o resto do app (que usa pasta-por-userId).
 
-### Fase 2 — Storage
-- Manter bucket `product-photos` público para leitura por URL (necessário pro app), mas:
-  - Adicionar policy que **bloqueia LISTING** (`SELECT` em `storage.objects` só para o dono da pasta `{userId}/...`).
-  - Garantir que upload/delete já estão restritos por `auth.uid()`.
+**Migration**: trocar as 2 políticas (INSERT e UPDATE) para o padrão folder-based já usado em product-photos:
+```sql
+DROP POLICY "Users can upload their own avatar" ON storage.objects;
+DROP POLICY "Users can update their own avatar" ON storage.objects;
 
-### Fase 3 — Edge functions
-- Mudar `identify-product` e `review-product` para `verify_jwt = true` (em `config.toml`).
-- Adicionar rate-limit simples por usuário (ex.: 30 chamadas / 10min) usando tabela `ai_usage`.
-- Endurecer `delete-account` com confirmação por re-auth (já valida JWT).
+CREATE POLICY "Users can upload their own avatar" ON storage.objects
+FOR INSERT TO authenticated WITH CHECK (
+  bucket_id = 'product-photos'
+  AND (storage.foldername(name))[1] = 'avatars'
+  AND (storage.foldername(name))[2] = auth.uid()::text
+);
 
-### Fase 4 — Funções SECURITY DEFINER
-- Revisar `handle_new_user`, `update_set_likes_count`, `update_updated_at_column`:
-  - `update_updated_at_column` e `update_set_likes_count` são triggers — REVOKE EXECUTE de `public/anon/authenticated`.
-  - `handle_new_user` é trigger no `auth.users` — REVOKE EXECUTE.
+CREATE POLICY "Users can update their own avatar" ON storage.objects
+FOR UPDATE TO authenticated USING (
+  bucket_id = 'product-photos'
+  AND (storage.foldername(name))[1] = 'avatars'
+  AND (storage.foldername(name))[2] = auth.uid()::text
+) WITH CHECK (
+  bucket_id = 'product-photos'
+  AND (storage.foldername(name))[1] = 'avatars'
+  AND (storage.foldername(name))[2] = auth.uid()::text
+);
+```
+Novo caminho: `avatars/{userId}/avatar.jpg` (ou qualquer extensão/nome).
 
-### Fase 5 — Auth hardening
-- Ativar **HIBP password check** via `configure_auth`.
-- Garantir **email confirmation obrigatório**.
-- Reduzir tempo de sessão para 7 dias com refresh rotativo.
+**Código frontend**: atualizar o lugar único que sobe avatar para usar o novo path (`avatars/${user.id}/avatar.<ext>`) e atualizar `profiles.avatar_url`. Vou identificar o componente exato e adaptar — sem mudar UX.
 
-### Fase 6 — Headers de segurança no `index.html`
-- Adicionar meta tags: `Content-Security-Policy` (compatível com Supabase + Lovable AI), `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`, `Permissions-Policy` mínima.
+### 2. Marcar findings antigos como resolvidos no painel
 
-### Fase 7 — Reputação de e-mail (resolve o "Google considera perigoso")
-- Configurar **domínio de e-mail próprio** (ex.: `mail.iglu.app` ou subdomínio que você indicar) via `email_domain--check_email_domain_status` + setup dialog.
-- Após DNS verificado (SPF/DKIM/DMARC alinhados), scaffoldar **templates de auth com marca IGLU** (`scaffold_auth_email_templates`).
-- Resultado: e-mails saem de `no-reply@seudominio` com assinatura verificada → Gmail/Outlook tratam como confiável, sem aviso "link suspeito".
+Já foram corrigidos na rodada passada, mas o painel ainda lista:
+- `profiles_public_readable` (error) → `profiles` foi fechado, leitura pública só via view `profiles_public`.
+- `set_likes_no_select_for_public` (warn) → era falso positivo do próprio scanner.
+- `SUPA_anon_security_definer_function_executable` + `SUPA_authenticated_*` (warn) → `REVOKE EXECUTE` aplicado nas funções trigger.
+- `SUPA_public_bucket_allows_listing` (warn) → política de listing trocada.
 
-### Fase 8 — Páginas legais públicas
-- Garantir `/termos` e `/privacidade` (já existem) com conteúdo completo LGPD e meta tags SEO — ajuda no Google Safe Browsing.
+Vou chamar `manage_security_finding` em batch com `mark_as_fixed` + explicação por item.
 
-### Fase 9 — Monitoramento contínuo
-- Atualizar `security-memory` com decisões tomadas.
-- Rodar `security--run_security_scan` ao final para confirmar 0 erros críticos.
+### 3. Atualizar security memory
 
----
+Adicionar nota sobre o novo padrão `avatars/{userId}/` para o scanner não voltar a flagar o esquema antigo.
 
-## ⚠️ Antes de eu executar, preciso confirmar 2 coisas:
+## O que NÃO vou fazer
 
-1. **Domínio para envio de e-mails** — você tem um domínio próprio (ex.: `iglu.app`, `igluapp.com.br`)? Sem isso não consigo eliminar o aviso do Google nos e-mails de confirmação. Se sim, qual? Vou usar um subdomínio tipo `mail.<seu-domínio>`.
+- Não vou mexer em coisas já intencionais (bucket público por URL direta, avatares visíveis no feed social, likes_count em sets públicos).
+- Não vou configurar e-mails com domínio próprio (você não tem domínio ainda — quando tiver, é outra rodada).
+- Não vou adicionar rate-limit custom nas edge functions além do que a Lovable AI Gateway já oferece.
 
-2. **Re-quebra do Discover/UserProfile** — ao fechar a tabela `profiles`, telas que leem `display_name`/`avatar_url` de outros usuários precisam passar a usar a view `profiles_public`. Posso refatorar essas telas no mesmo passo? (recomendo sim)
+## Resultado esperado
 
-Se confirmar (1) o domínio e (2) que posso refatorar, executo tudo em sequência sem você precisar aprovar de novo cada fase.
+Após essa rodada: 0 findings de error, 0 warns acionáveis, painel limpo, política de avatar consistente com o resto do storage.

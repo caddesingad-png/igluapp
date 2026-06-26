@@ -212,7 +212,7 @@ const UserProfile = () => {
     try {
       // Converte Blob → File com metadados corretos para o storage
       const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
-      const path = `avatars/${userId}.jpg`;
+      const path = `avatars/${userId}/avatar.jpg`;
       const { error: uploadError } = await supabase.storage
         .from("product-photos")
         .upload(path, file, { upsert: true, contentType: "image/jpeg" });
