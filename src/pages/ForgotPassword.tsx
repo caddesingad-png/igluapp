@@ -24,7 +24,7 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${(window.location.origin.includes("id-preview--") || window.location.origin.includes("lovableproject.com")) ? "https://igluapp.lovable.app" : window.location.origin}/reset-password`,
       });
       if (error) throw error;
       setSent(true);
