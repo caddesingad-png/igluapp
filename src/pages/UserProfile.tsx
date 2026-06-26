@@ -644,10 +644,12 @@ const UserProfile = () => {
             <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
               <AlertTriangle className="w-5 h-5 text-destructive" />
             </div>
-            <h3 className="font-display text-[20px] text-foreground mb-2">Excluir conta permanentemente</h3>
+            <h3 className="font-display text-[20px] text-foreground mb-2">Excluir conta</h3>
             <p className="font-body text-[13px] text-muted-foreground leading-relaxed mb-4">
-              Esta ação <strong className="text-foreground">não pode ser desfeita</strong>. Sua coleção,
-              SETs, histórico de compras, fotos e todos os dados serão apagados imediatamente.
+              Sua conta será <strong className="text-foreground">desativada imediatamente</strong> e
+              todos os seus dados (coleção, SETs, fotos, histórico) serão apagados em definitivo
+              após <strong className="text-foreground">90 dias</strong>. Nesse período, o acesso
+              fica bloqueado — não é possível entrar novamente.
             </p>
             <p className="font-body text-[13px] text-muted-foreground mb-2">
               Para confirmar, digite <strong className="text-foreground">EXCLUIR</strong> abaixo:
