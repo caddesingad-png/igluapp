@@ -33,7 +33,7 @@ import Privacy from "./pages/Privacy";
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isRecoveryFlow } = useAuth();
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   // Para não-logadas: mostrar onboarding até que decidam criar conta/entrar
