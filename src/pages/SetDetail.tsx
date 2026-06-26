@@ -70,8 +70,8 @@ const SetDetail = () => {
         setSet(setRes.data);
         setLikesCount(setRes.data.likes_count ?? 0);
 
-        const { data: profileData } = await supabase
-          .from("profiles")
+        const { data: profileData } = await (supabase
+          .from("profiles_public" as any) as any)
           .select("display_name, avatar_url")
           .eq("user_id", setRes.data.user_id)
           .single();
