@@ -678,7 +678,7 @@ const UserProfile = () => {
                 disabled={deleting || deleteText !== "EXCLUIR"}
                 className="flex-1 h-11 rounded-xl bg-destructive text-destructive-foreground font-body text-[14px] hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {deleting ? "Excluindo..." : "Excluir tudo"}
+                {deleting ? "Agendando..." : "Excluir e sair"}
               </button>
             </div>
           </div>
