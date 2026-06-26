@@ -1,70 +1,41 @@
-## Estado atual da segurança
+## Diagnóstico
 
-Boa notícia: o trabalho da última rodada deixou o app em ótimo estado. Validei agora:
+- DNS de `notify.weareiglu.com`: **verificado** ✅
+- Setup de envio do projeto: **"Setting up — Confirming email delivery is ready"** ⏳
+- Enquanto esse passo final não termina, **o Lovable continua enviando os e-mails de auth pelo remetente padrão `@auth.lovable.app`** — é por isso que o Gmail mostra "suspeito". Nenhum template novo é usado ainda; nada quebrado no código.
 
-- **Linter do banco**: 0 problemas.
-- **Dependências npm**: 0 vulnerabilidades high/critical.
-- **Scan fresco anterior**: só 3 warns informativos (avatares públicos por design, contagem de likes em sets públicos).
+Os templates branded de IGLU já estão deployados e vão entrar em uso automaticamente assim que o setup virar **Active**.
 
-Mas o painel ainda mostra findings antigos porque ninguém os marcou como resolvidos. E descobri **1 bug real** que escapou.
+## O que fazer
 
-## O que vou fazer
+### 1. Aguardar o setup terminar (sem mexer em nada)
+A confirmação final de envio costuma levar de minutos até algumas horas após o DNS verificar. Você acompanha em **Cloud → Emails**. Quando o status virar **Active**:
+- O remetente passa a ser `IGLU <no-reply@notify.weareiglu.com>` (ou similar)
+- SPF, DKIM e DMARC do subdomínio já estão configurados pelo Lovable via NS delegation
+- O alerta "suspeito" do Gmail desaparece em novos envios
 
-### 1. Corrigir bug real — política de upload de avatar (warn, mas explorável)
+### 2. Testar deliverability quando ficar Active
+- Criar conta de teste com Gmail, Outlook e iCloud
+- Conferir cabeçalho do e-mail: `SPF=pass`, `DKIM=pass`, `DMARC=pass`
+- Rodar um teste em https://www.mail-tester.com/ (cola o endereço, cria conta, vê a nota — alvo 9/10+)
 
-Hoje a política do bucket faz:
-```
-auth.uid()::text = replace(storage.filename(name), '.jpg', '')
-```
-Isso só remove `.jpg`. Se o usuário A subir `avatars/<uid-do-B>.png` (ou `.webp`), o `replace` não tira nada, e como `<uid-do-B>.png ≠ <uid-do-A>`, a checagem falha — **bom no INSERT**, mas o problema é o inverso: A pode subir `avatars/<uid-do-A>.png` e depois um arquivo chamado literalmente `<uid-do-A>` (sem extensão) para qualquer caminho que comece com `avatars/`, e variações com outras extensões aceitam só se o nome bater. O risco real é overwrite por colisão de nomes em extensões não previstas + inconsistência com o resto do app (que usa pasta-por-userId).
+### 3. Boas práticas adicionais para reputação
+- **Não alterar** os templates removendo o footer de unsubscribe (o Lovable injeta automaticamente — necessário para Gmail/Yahoo bulk sender rules)
+- **Não habilitar** Resend/SendGrid no mesmo subdomínio — quebraria a delegação NS
+- **Manter HIBP + confirmação obrigatória** (já está ligado) — reduz contas falsas que geram bounce
+- Pedir aos primeiros usuários para marcar como "Não é spam" / mover para caixa de entrada na primeira vez — isso treina o filtro do Gmail rapidamente para o domínio novo
 
-**Migration**: trocar as 2 políticas (INSERT e UPDATE) para o padrão folder-based já usado em product-photos:
-```sql
-DROP POLICY "Users can upload their own avatar" ON storage.objects;
-DROP POLICY "Users can update their own avatar" ON storage.objects;
+### 4. Se após 24h o status ainda estiver "Setting up"
+Me avise — aí faço re-trigger do setup via deploy do `auth-email-hook` (force reconcile) ou abro um diagnóstico mais profundo.
 
-CREATE POLICY "Users can upload their own avatar" ON storage.objects
-FOR INSERT TO authenticated WITH CHECK (
-  bucket_id = 'product-photos'
-  AND (storage.foldername(name))[1] = 'avatars'
-  AND (storage.foldername(name))[2] = auth.uid()::text
-);
+## Resumo técnico
 
-CREATE POLICY "Users can update their own avatar" ON storage.objects
-FOR UPDATE TO authenticated USING (
-  bucket_id = 'product-photos'
-  AND (storage.foldername(name))[1] = 'avatars'
-  AND (storage.foldername(name))[2] = auth.uid()::text
-) WITH CHECK (
-  bucket_id = 'product-photos'
-  AND (storage.foldername(name))[1] = 'avatars'
-  AND (storage.foldername(name))[2] = auth.uid()::text
-);
-```
-Novo caminho: `avatars/{userId}/avatar.jpg` (ou qualquer extensão/nome).
+| Item | Estado |
+|---|---|
+| DNS NS + SPF/DKIM/DMARC de `notify.weareiglu.com` | Verificado |
+| Templates branded IGLU (6 arquivos) | Deployados |
+| `auth-email-hook` edge function | Deployado |
+| Project email setup (último passo) | Em andamento |
+| Remetente atual dos e-mails | Ainda `@auth.lovable.app` até virar Active |
 
-**Código frontend**: atualizar o lugar único que sobe avatar para usar o novo path (`avatars/${user.id}/avatar.<ext>`) e atualizar `profiles.avatar_url`. Vou identificar o componente exato e adaptar — sem mudar UX.
-
-### 2. Marcar findings antigos como resolvidos no painel
-
-Já foram corrigidos na rodada passada, mas o painel ainda lista:
-- `profiles_public_readable` (error) → `profiles` foi fechado, leitura pública só via view `profiles_public`.
-- `set_likes_no_select_for_public` (warn) → era falso positivo do próprio scanner.
-- `SUPA_anon_security_definer_function_executable` + `SUPA_authenticated_*` (warn) → `REVOKE EXECUTE` aplicado nas funções trigger.
-- `SUPA_public_bucket_allows_listing` (warn) → política de listing trocada.
-
-Vou chamar `manage_security_finding` em batch com `mark_as_fixed` + explicação por item.
-
-### 3. Atualizar security memory
-
-Adicionar nota sobre o novo padrão `avatars/{userId}/` para o scanner não voltar a flagar o esquema antigo.
-
-## O que NÃO vou fazer
-
-- Não vou mexer em coisas já intencionais (bucket público por URL direta, avatares visíveis no feed social, likes_count em sets públicos).
-- Não vou configurar e-mails com domínio próprio (você não tem domínio ainda — quando tiver, é outra rodada).
-- Não vou adicionar rate-limit custom nas edge functions além do que a Lovable AI Gateway já oferece.
-
-## Resultado esperado
-
-Após essa rodada: 0 findings de error, 0 warns acionáveis, painel limpo, política de avatar consistente com o resto do storage.
+**Não há mudança de código pendente.** A próxima ação é esperar o setup virar Active e validar com um teste real.
