@@ -6,10 +6,14 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRecoveryFlow, setIsRecoveryFlow] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsRecoveryFlow(true);
+        }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -25,5 +29,5 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { user, session, loading };
+  return { user, session, loading, isRecoveryFlow };
 };
