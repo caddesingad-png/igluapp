@@ -67,7 +67,9 @@ const AppRoutes = () => {
           }
         }
         setOnboardingChecked(true);
-      });
+      })
+      .catch(() => setOnboardingChecked(true));
+
   }, [user]);
 
   if (connectionError && !user) {
