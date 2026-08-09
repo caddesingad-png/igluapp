@@ -8,8 +8,10 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRecoveryFlow, setIsRecoveryFlow] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
 
   useEffect(() => {
+
     // Verifica se a conta está agendada para exclusão. Se sim, desloga.
     const checkScheduledDeletion = async (uid: string) => {
       const { data } = await supabase
