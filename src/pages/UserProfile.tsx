@@ -178,9 +178,22 @@ const UserProfile = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Falha de rede: limpa a sessão local para não prender a usuária logada
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
+          .forEach((k) => localStorage.removeItem(k));
+      }
+    }
     toast.success("Sessão encerrada");
+    navigate("/auth", { replace: true });
   };
+
 
   const handleDeleteAccount = async () => {
     setDeleting(true);

@@ -33,7 +33,7 @@ import Privacy from "./pages/Privacy";
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
-  const { user, loading, isRecoveryFlow } = useAuth();
+  const { user, loading, isRecoveryFlow, connectionError } = useAuth();
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   // Para não-logadas: mostrar onboarding até que decidam criar conta/entrar
@@ -67,8 +67,37 @@ const AppRoutes = () => {
           }
         }
         setOnboardingChecked(true);
-      });
+      }, () => setOnboardingChecked(true));
+
+
   }, [user]);
+
+  if (connectionError && !user) {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-5 px-8 text-center">
+        <div className="w-16 h-16 rounded-full glass-panel shadow-soft flex items-center justify-center">
+          <img
+            src={new URL("@/assets/iglu-logo.svg", import.meta.url).href}
+            alt="IGLU"
+            className="h-5 opacity-70"
+            style={{ filter: "brightness(0) saturate(100%) invert(10%) sepia(8%) saturate(800%) hue-rotate(340deg) brightness(90%) contrast(90%)" }}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <h1 className="font-display text-[20px] text-foreground">Não foi possível conectar</h1>
+          <p className="font-body font-light text-[14px] text-muted-foreground max-w-xs">
+            O serviço está temporariamente indisponível. Verifique sua conexão e tente novamente.
+          </p>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="min-h-[44px] px-6 rounded-full bg-primary text-primary-foreground font-body text-[14px] active:scale-[0.98] transition-transform"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   if (loading || (user && !onboardingChecked)) {
     return (
@@ -84,6 +113,7 @@ const AppRoutes = () => {
       </div>
     );
   }
+
 
   // Rotas públicas de fluxo de senha / callback de auth
   const path = window.location.pathname;

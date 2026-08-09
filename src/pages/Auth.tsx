@@ -12,7 +12,15 @@ import igluLogo from "@/assets/iglu-logo.svg";
 
 const translateError = (msg: string): string => {
   const m = (msg || "").toLowerCase();
+  if (
+    m.includes("load failed") ||
+    m.includes("failed to fetch") ||
+    m.includes("networkerror") ||
+    m.includes("network request failed")
+  )
+    return "Serviço temporariamente indisponível. Verifique sua conexão e tente novamente em instantes.";
   if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+
   if (m.includes("user already registered")) return "Esta conta já existe. Faça login.";
   if (m.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
   if (m.includes("password should be at least")) return "A senha deve ter pelo menos 6 caracteres.";
