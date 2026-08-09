@@ -50,17 +50,39 @@ export const useAuth = () => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        setTimeout(() => { checkScheduledDeletion(session.user.id); }, 0);
+    let settled = false;
+    const timeoutId = setTimeout(() => {
+      if (!settled) {
+        setConnectionError(true);
+        setLoading(false);
       }
-    });
+    }, 8000);
 
-    return () => subscription.unsubscribe();
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        settled = true;
+        clearTimeout(timeoutId);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+        if (session?.user) {
+          setTimeout(() => { checkScheduledDeletion(session.user.id); }, 0);
+        }
+      })
+      .catch(() => {
+        settled = true;
+        clearTimeout(timeoutId);
+        setConnectionError(true);
+        setLoading(false);
+      });
+
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
-  return { user, session, loading, isRecoveryFlow };
+  return { user, session, loading, isRecoveryFlow, connectionError };
+
 };
